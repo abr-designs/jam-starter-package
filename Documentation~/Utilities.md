@@ -1,7 +1,8 @@
 ﻿# Utilities
 
-- ### [Animators](utilities-animators.md)
-- ### [Draw.cs](utilities-draw.md)
+- ### [Animators](Utilities/utilities-animators.md)
+- ### [Draw.cs](Utilities/utilities-draw.md)
+- ### [Extensions](Utilities/utilities-extensions.md)
 
 ### `[ReadOnly]` Attribute
 You can add this attribute to any serialized field _(For non-custom structs)_ and it will prevent the value from being edited

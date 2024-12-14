@@ -22,7 +22,9 @@ projects & Game jams.
 - ### [Music Manager](Documentation~/music-manager.md)
 - ### [VFX Manager](Documentation~/vfx-manager.md)
 - ### [Utilities](Documentation~/Utilities.md)
-  - #### [Animators](Documentation~/utilities-animators.md)
+  - #### [Animators](Documentation~/Utilities/utilities-animators.md)
+  - #### [Draw.cs](Documentation~/Utilities/utilities-draw.md)
+  - #### [Extensions](Documentation~/Utilities/utilities-extensions.md)
      
 
 
