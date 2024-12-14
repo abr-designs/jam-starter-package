@@ -11,10 +11,10 @@ namespace Utilities.Debugging
         [Conditional("UNITY_EDITOR")]
         public static void Label(Vector3 position, string label)
         {
-            Label(position, label, Color.white, GIZMOS_RADIUS * 2f);
+            Label(position, label, /*Color.white, */GIZMOS_RADIUS * 2f);
         }
         [Conditional("UNITY_EDITOR")]
-        public static void Label(Vector3 position, string label, Color color, float offset)
+        public static void Label(Vector3 position, string label, /*Color color, */float offset)
         {
             if(Camera.current != null && _currentCamera != Camera.current)
                 _currentCamera = Camera.current;
@@ -24,12 +24,12 @@ namespace Utilities.Debugging
             
             var camPositionOffset = camRight * offset;
             
-            UnityEditor.Handles.color = color;
+            //UnityEditor.Handles.color = color;
             UnityEditor.Handles.Label(position + camPositionOffset, label );
         }
         
         [Conditional("UNITY_EDITOR")]
-        public static void Circle(Vector3 position, float radius, int segments, Color color)
+        public static void Circle(Vector3 position,Color color, float radius = 1f, int segments = 12)
         {
             // If either radius or number of segments are less or equal to 0, skip drawing
             if (radius <= 0.0f || segments <= 0)
