@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Utilities
 {
-    public class ScreenFader : MonoBehaviour
+    public class ScreenFader : HiddenSingleton<ScreenFader>
     {
         private static readonly Color32 Black = new Color32(0, 0, 0, 255);
         private static readonly Color32 Clear = new Color32(0, 0, 0, 0);
@@ -13,39 +13,29 @@ namespace Utilities
         [SerializeField]
         private Image blackImage;
 
-        //
-        //============================================================================================================//
-
-        private static ScreenFader _instance;
-        
-        private void Awake()
-        {
-            _instance = this;
-        }
-
         //============================================================================================================//
         public static void ForceSetColorBlack()
         {
-            _instance.blackImage.color = Black;
+            Instance.blackImage.color = Black;
         }
         public static void ForceSetColorClear()
         {
-            _instance.blackImage.color = Clear;
+            Instance.blackImage.color = Clear;
         }
 
         public static Coroutine FadeInOut(float time, Action onFaded, Action onComplete)
         {
-            return _instance.StartCoroutine(_instance.FadeInOutCoroutine(time, onFaded, onComplete));
+            return Instance.StartCoroutine(Instance.FadeInOutCoroutine(time, onFaded, onComplete));
         }
         
         public static Coroutine FadeOut(float time, Action onComplete)
         {
-            return _instance.StartCoroutine(_instance.FadeCoroutine(Clear, Black, time, onComplete));
+            return Instance.StartCoroutine(Instance.FadeCoroutine(Clear, Black, time, onComplete));
         }
         
         public static Coroutine FadeIn(float time, Action onComplete)
         {
-            return _instance.StartCoroutine(_instance.FadeCoroutine(Black, Clear, time, onComplete));
+            return Instance.StartCoroutine(Instance.FadeCoroutine(Black, Clear, time, onComplete));
         }
         
         //Instance Coroutines
