@@ -1,6 +1,7 @@
 ﻿# Utilities
 
 - ### [Animators](Utilities/utilities-animators.md)
+- ### [Wait-For Animations](Utilities/utilities-wait-animation.md)
 - ### [Draw.cs](Utilities/utilities-draw.md)
 - ### [Extensions](Utilities/utilities-extensions.md)
 - ### [Physics](Utilities/utilities-physics.md)

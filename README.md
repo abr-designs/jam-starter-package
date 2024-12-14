@@ -23,6 +23,7 @@ projects & Game jams.
 - ### [VFX Manager](Documentation~/vfx-manager.md)
 - ### [Utilities](Documentation~/Utilities.md)
   - #### [Animators](Documentation~/Utilities/utilities-animators.md)
+  - #### [Wait-For Animations](Documentation~/Utilities/utilities-wait-animation.md)
   - #### [Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Extensions](Documentation~/Utilities/utilities-extensions.md)
   - #### [Physics](Documentation~/Utilities/utilities-physics.md)
