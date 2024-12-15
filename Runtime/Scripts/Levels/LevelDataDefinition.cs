@@ -2,7 +2,7 @@
 
 namespace Levels
 {
-    public class LevelController : MonoBehaviour
+    public class LevelDataDefinition : MonoBehaviour
     {
         public string levelName;
         [TextArea]

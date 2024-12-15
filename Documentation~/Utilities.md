@@ -2,9 +2,9 @@
 
 - ### [Animators](Utilities/utilities-animators.md)
 - ### [Wait-For Animations](Utilities/utilities-wait-animation.md)
-- ### [Draw.cs](Utilities/utilities-draw.md)
-- ### [Extensions](Utilities/utilities-extensions.md)
 - ### [Physics](Utilities/utilities-physics.md)
+- ### [Extensions](Utilities/utilities-extensions.md)
+- ### [Debugging - Draw.cs](Utilities/utilities-draw.md)
 
 ### `HiddenSingleton`
 This class is used for any object that should act as a singleton but you may want to limit access to. For example, the
@@ -17,7 +17,6 @@ public class LevelLoader : HiddenSingleton<LevelLoader>
     public static bool LoadNextLevel() => Instance.TryLoadNextLevel();
     public static void Restart() => Instance.RestartLevel();
     public static void LoadFirstLevel() => Instance.LoadLevel(0);
-    
 }
 ```
 
