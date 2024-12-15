@@ -53,6 +53,17 @@
       "displayName": "Sprite Color Change Example",
       "description": "Material & example of Sprite Color Changer, which allows direct setting of sprite color, bypassing the default Additive color setting",
       "path": "Samples~/SpriteColorChange"
+    },
+    {
+      "displayName": "SFX & Music Controllers",
+      "description": "",
+      "path": "Samples~/Sounds"
+    }
+  ,
+    {
+      "displayName": "VFX Controller",
+      "description": "",
+      "path": "Samples~/VisualFX"
     }
   ]
 }
