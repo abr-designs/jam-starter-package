@@ -17,5 +17,42 @@
     "com.unity.textmeshpro": "3.0.9",
     "com.unity.inputsystem": "1.7.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Main Menu UI",
+      "description": "Example Main Menu, with scene",
+      "path": "Samples~/MainMenu"
+    },
+    {
+      "displayName": "Game Input",
+      "description": "Pre-made Game Input Actions, with a delegator",
+      "path": "Samples~/GameInput"
+    },
+    {
+      "displayName": "Dialog System",
+      "description": "Example of how to use IDisplayDialog",
+      "path": "Samples~/DialogSystem"
+    },
+    {
+      "displayName": "Cinematics",
+      "description": "Cinematics camera controller example, with prefab",
+      "path": "Samples~/Cinematics"
+    },
+    {
+      "displayName": "Textures & Stencils",
+      "description": "Various Images, sprites & Stencils that can be used for particle systems, shadows & beyond",
+      "path": "Samples~/Textures"
+    },
+    {
+      "displayName": "Materials",
+      "description": "AdditiveSprite & Imphenzia Material",
+      "path": "Samples~/Materials"
+    },
+    {
+      "displayName": "Sprite Color Change Example",
+      "description": "Material & example of Sprite Color Changer, which allows direct setting of sprite color, bypassing the default Additive color setting",
+      "path": "Samples~/SpriteColorChange"
+    }
+  ]
 }
