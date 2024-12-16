@@ -1,8 +1,8 @@
 {
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
-  "version": "0.0.1",
-  "unity": "2021.3",
+  "version": "0.0.1-6000",
+  "unity": "6000.0",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
     "jam"
@@ -13,10 +13,9 @@
   },
   "dependencies": {
     "com.unity.feature.2d": "2.0.1",
-    "com.unity.cinemachine": "2.10.1",
-    "com.unity.textmeshpro": "3.0.9",
-    "com.unity.inputsystem": "1.7.0",
-    "com.unity.nuget.newtonsoft-json": "3.2.1"
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.cinemachine": "3.1.2",
+    "com.unity.inputsystem": "1.11.2"
   },
   "samples": [
     {
