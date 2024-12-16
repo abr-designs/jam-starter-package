@@ -2,8 +2,8 @@
 This package is meant to include an ever-growing library of scripts, tools, systems & basic textures that help to kick off
 projects & Game jams.
 
-### `v0.0.1` - Dec 15, 2024
-### Supports Unity 2022
+### `v0.0.1-6000` - Dec 16, 2024
+### Supports Unity 6000.0
 
 ## To Do
 - [ ] Add Cinematics Documentation
