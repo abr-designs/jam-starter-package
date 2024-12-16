@@ -32,7 +32,7 @@ jobs:
       # Step 4: Install dependencies and build the docs
       - name: Install dependencies and build
         run: |
-          cd vitepress-site
+          cd WebsiteDocs~
           npm install
           npm run build
 
