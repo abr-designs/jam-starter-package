@@ -1,0 +1,45 @@
+name: Deploy VitePress Docs
+
+on:
+  push:
+    branches:
+      - main  # Trigger when pushing to the main branch
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the main branch
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      # Step 2: Set up Node.js environment for VitePress
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Step 3: Set base URL for VitePress build using environment variable
+      - name: Set base URL for VitePress build
+        run: |
+          REPO_NAME=$(basename $(git rev-parse --show-toplevel))
+          echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
+
+      # Step 4: Install dependencies and build the docs
+      - name: Install dependencies and build
+        run: |
+          cd vitepress-site
+          npm install
+          npm run build
+
+      # Step 5: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: vitepress-site/.vitepress/dist
+          publish_branch: gh-pages
