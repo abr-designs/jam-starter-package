@@ -6,12 +6,12 @@ export default defineConfig({
   title: "Jam Starter Package",
   description: "Documentation",
   srcDir: './site', // Specify the location of Markdown files
-  base: '/', // needs to be changed for building on github
+  base: process.env.VITE_BASE_URL || '/', // needs to be changed for building on github,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Home', link: '/home' }
+      //{ text: 'Examples', link: '/markdown-examples' }
     ],
 
     sidebar: generateSidebar('site'), // Automatically generates sidebar from 'docs'

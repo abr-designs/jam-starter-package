@@ -1,6 +1,7 @@
 // Update any links etc from docs -- change .cs links to open github
 const fs = require("node:fs/promises")
 const path = require("node:path")
+const { glob } = require('glob');
 
 const repoUrl = 'https://github.com/abr-designs/jam-starter-package/blob/main/';
 const docsDir = path.join(__dirname, "../site");
@@ -45,6 +46,27 @@ const processMarkdownFiles = async () => {
     }
 };
 
+
+// Ensure all images are lowercase
+const processImages = async () => {
+    const imageFiles = await glob(`${docsDir}/**/*.{png,jpg,gif}`);
+    imageFiles.forEach(async file => {
+        const ext = path.extname(file);
+        if(ext === ext.toUpperCase())
+        {  
+            const oldPath = file;
+            const newPath = file.replace(ext, ext.toLocaleLowerCase());
+            await fs.rename(oldPath, newPath, err => {
+                if(err) console.error('Could not rename image file', file)
+            });
+        }
+    })
+}
+
 processMarkdownFiles()
-    .then(() => console.log('Prebuild step completed!'))
+    .then(() => console.log('Markdown file links - Prebuild step completed!'))
+    .catch((err) => console.error('Error during prebuild:', err));
+
+processImages()
+    .then(() => console.log('Image rename - Prebuild step completed!'))
     .catch((err) => console.error('Error during prebuild:', err));
