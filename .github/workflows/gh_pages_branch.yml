@@ -13,14 +13,14 @@ jobs:
     steps:
       # Step 1: Checkout the main branch
       - name: Checkout main branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
-          lfs: true # Ensure LFS files are checked out
+          # lfs: true # Ensure LFS files are checked out
 
-      - name: Pull LFS files manually
-        run: |
-          git lfs pull  # Explicitly pull LFS files after checkout
+      # - name: Pull LFS files manually
+      #   run: |
+      #     git lfs pull  # Explicitly pull LFS files after checkout
 
       # Step 2: Set up Node.js environment for VitePress
       - name: Setup Node.js
@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           cd WebsiteDocs~
-          npm install
+          npm ci
           npm run docs:build
 
       # Step 5: Deploy to GitHub Pages
