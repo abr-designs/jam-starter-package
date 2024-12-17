@@ -34,6 +34,13 @@ jobs:
             lfs: true
       - name: LFS Pull
         run: git lfs pull 
+
+      - name: List Files and Sizes - Image Debug
+        run: |
+          cd Documentation~/Images
+          echo "Listing all files and their sizes:"
+          find . -type f -exec du -h {} + | sort -rh
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
