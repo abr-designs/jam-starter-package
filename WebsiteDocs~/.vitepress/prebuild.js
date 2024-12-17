@@ -7,7 +7,8 @@ const repoUrl = 'https://github.com/abr-designs/jam-starter-package/blob/main/';
 const docsDir = path.join(__dirname, "../site");
 
 function collapseSlashes(url) {
-    return url.replace(/\/{2,}/g,'/');
+    
+    return url.replace(/(?<!https:\/)\/{2,}/g, '/');
 }
 
 // Function to replace .cs file links with GitHub URLs
