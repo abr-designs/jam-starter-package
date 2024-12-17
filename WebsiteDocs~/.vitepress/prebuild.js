@@ -22,6 +22,15 @@ const fixDocLinks = (content) => {
     });
   };
 
+// Function to replace containing capital extensions (ex .PNG)
+const fixCapitalLinks = (content) => {
+    // Replace all links with capital extensions to lowercase extensions
+    return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
+        const newUrl = `${url}${ext.toLowerCase()}`;
+        return `(${newUrl})`;
+      });
+  };
+
 // Function to process markdown files
 const processMarkdownFiles = async () => {
     const files = await fs.readdir(docsDir);
@@ -38,6 +47,7 @@ const processMarkdownFiles = async () => {
 
         let updatedContent = fixCsLinks(content);
         updatedContent = fixDocLinks(updatedContent);
+        updatedContent = fixCapitalLinks(updatedContent);
 
         if (updatedContent !== content) {
             console.log(`Updated links in ${file}`);
@@ -47,21 +57,18 @@ const processMarkdownFiles = async () => {
 };
 
 
-// Ensure all images are lowercase
-const processImages = async () => {
-    const imageFiles = await glob(`${docsDir}/**/*.{PNG,JPG,GIF}`);
-    imageFiles.forEach(async file => {
+// Ensure all extensions are lowercase
+const processExtensions = async () => {
+    const files = await glob(`${docsDir}/**/*.*`, {nodir: true});
+
+    files.forEach(async file => {
         const ext = path.extname(file);
         if(ext === ext.toUpperCase())
         {  
             const oldPath = file;
             const newPath = file.replace(ext, ext.toLocaleLowerCase());
-            await fs.rename(oldPath, newPath, err => {
-                if(err) console.error('Could not rename image file', file)
-                else {
-                    console.log(`Renamed ${oldPath} to ${newPath}`)
-                }
-            });
+            await fs.rename(oldPath, newPath);
+            console.log(`Renamed ${oldPath} to ${newPath}`);
         }
     })
 }
@@ -70,6 +77,6 @@ processMarkdownFiles()
     .then(() => console.log('Markdown file links - Prebuild step completed!'))
     .catch((err) => console.error('Error during prebuild:', err));
 
-processImages()
+processExtensions()
     .then(() => console.log('Image rename - Prebuild step completed!'))
     .catch((err) => console.error('Error during prebuild:', err));
