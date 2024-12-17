@@ -6,6 +6,10 @@ const { glob } = require('glob');
 const repoUrl = 'https://github.com/abr-designs/jam-starter-package/blob/main/';
 const docsDir = path.join(__dirname, "../site");
 
+function collapseSlashes(url) {
+    return url.replace(/\/{2,}/g,'/');
+}
+
 // Function to replace .cs file links with GitHub URLs
 const fixCsLinks = (content) => {
     return content.replace(/\[([^\]]+)\]\(([^)]+\.cs)\)/g, (match, text, filePath) => {
@@ -26,10 +30,20 @@ const fixDocLinks = (content) => {
 const fixCapitalLinks = (content) => {
     // Replace all links with capital extensions to lowercase extensions
     return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
-        const newUrl = `${url}${ext.toLowerCase()}`;
+        const newUrl = `/${url}${ext.toLowerCase()}`;
         return `(${newUrl})`;
       });
   };
+
+// Ensure image links are absolute to asset path
+const fixImageAssets = (content) => {
+ // Replace all instances of ../Images with /Images
+ return content.replace(/\(([^)]+?)(\.[a-zA-Z]+)\)/g, (match, url, ext) => {
+    
+    const newUrl = `${collapseSlashes(url.replace("../Images","/Images"))}${ext.toLowerCase()}`;
+    return `(${newUrl})`;
+  });
+}
 
 // Function to process markdown files
 const processMarkdownFiles = async () => {
@@ -43,6 +57,7 @@ const processMarkdownFiles = async () => {
         let updatedContent = fixCsLinks(content);
         updatedContent = fixDocLinks(updatedContent);
         updatedContent = fixCapitalLinks(updatedContent);
+        updatedContent = fixImageAssets(updatedContent);
 
         if (updatedContent !== content) {
             console.log(`Updated links in ${file}`);
