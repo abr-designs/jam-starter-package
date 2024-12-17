@@ -49,7 +49,7 @@ const processMarkdownFiles = async () => {
 
 // Ensure all images are lowercase
 const processImages = async () => {
-    const imageFiles = await glob(`${docsDir}/**/*.{png,jpg,gif}`);
+    const imageFiles = await glob(`${docsDir}/**/*.{PNG,JPG,GIF}`);
     imageFiles.forEach(async file => {
         const ext = path.extname(file);
         if(ext === ext.toUpperCase())
