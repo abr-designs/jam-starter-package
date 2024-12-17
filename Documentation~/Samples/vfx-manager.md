@@ -5,7 +5,7 @@ The intention of the VFX Manager is to allow you to easily create library of eff
 anywhere within your code, without needing to worry about managing the lifespan of that newly created GameObject. This
 also avoids needing to find `VFXManager.cs` within the scene, so long as the prefab exists within the scene.
 
-![VFX Manager](../Images/vfx_manager.PNG)
+![VFX Manager](../Images/vfx_manager.png)
 
 You can add new enum values into `VFX.cs`, as this will operate in two locations:
 

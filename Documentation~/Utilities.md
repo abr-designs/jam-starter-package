@@ -37,7 +37,7 @@ This operates with Coroutines, and can be awaited. If not called from a Coroutin
 You can add this attribute to any serialized field _(For non-custom structs)_ and it will prevent the value from being edited
 while keeping it visible, useful for debugger, or allowing designers to see what is happening.
 
-![readonly attribute](Images/readonly.PNG)
+![readonly attribute](Images/readonly.png)
 ```csharp
 [SerializeField, ReadOnly, Min(0)]
 private float speed;
