@@ -18,6 +18,10 @@ jobs:
           ref: main
           lfs: true # Ensure LFS files are checked out
 
+      - name: Pull LFS files manually
+        run: |
+          git lfs pull  # Explicitly pull LFS files after checkout
+
       # Step 2: Set up Node.js environment for VitePress
       - name: Setup Node.js
         uses: actions/setup-node@v3
