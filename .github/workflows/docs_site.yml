@@ -34,7 +34,7 @@ jobs:
         run: |
           cd WebsiteDocs~
           npm install
-          npm run build
+          npm run docs:build
 
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
