@@ -58,6 +58,9 @@ const processImages = async () => {
             const newPath = file.replace(ext, ext.toLocaleLowerCase());
             await fs.rename(oldPath, newPath, err => {
                 if(err) console.error('Could not rename image file', file)
+                else {
+                    console.log(`Renamed ${oldPath} to ${newPath}`)
+                }
             });
         }
     })
