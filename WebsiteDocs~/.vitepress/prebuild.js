@@ -33,17 +33,12 @@ const fixCapitalLinks = (content) => {
 
 // Function to process markdown files
 const processMarkdownFiles = async () => {
-    const files = await fs.readdir(docsDir);
+    const mdFiles = await glob(`${docsDir}/**/*.md`, {nodir: true});
 
-    for (const file of files) {
-        const filePath = path.join(docsDir, file);
-
-        if ((await fs.stat(filePath)).isDirectory()) {
-            continue;
-        }
-
+    for (const file of mdFiles) {
+        
         // Read the file, process the content, and write it back
-        let content = await fs.readFile(filePath, 'utf-8');
+        let content = await fs.readFile(file, 'utf-8');
 
         let updatedContent = fixCsLinks(content);
         updatedContent = fixDocLinks(updatedContent);
@@ -51,7 +46,7 @@ const processMarkdownFiles = async () => {
 
         if (updatedContent !== content) {
             console.log(`Updated links in ${file}`);
-            await fs.writeFile(filePath, updatedContent, 'utf-8');
+            await fs.writeFile(file, updatedContent, 'utf-8');
         }
     }
 };
