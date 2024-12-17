@@ -33,7 +33,7 @@ jobs:
         with:
             lfs: true
       - name: Get LFS objects
-        run: git lfs checkout
+        run: git lfs pull
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
