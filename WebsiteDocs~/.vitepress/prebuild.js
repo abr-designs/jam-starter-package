@@ -46,6 +46,16 @@ const fixImageAssets = (content) => {
   });
 }
 
+// Replace checkbox with emoji (- [])
+const replaceCheckboxes = (content) => {
+ let newContent = content.replace(/- \[ \]/g, (match) => {
+    return '- :white_large_square:';
+  });
+  return newContent.replace(/- \[[x,X]\]/g, (match) => {
+   return '- :white_check_mark:'; 
+  });
+}
+
 // Function to process markdown files
 const processMarkdownFiles = async () => {
     const mdFiles = await glob(`${docsDir}/**/*.md`, {nodir: true});
@@ -59,6 +69,7 @@ const processMarkdownFiles = async () => {
         updatedContent = fixDocLinks(updatedContent);
         updatedContent = fixCapitalLinks(updatedContent);
         updatedContent = fixImageAssets(updatedContent);
+        updatedContent = replaceCheckboxes(updatedContent);
 
         if (updatedContent !== content) {
             console.log(`Updated links in ${file}`);

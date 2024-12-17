@@ -6,6 +6,7 @@ projects & Game jams.
 ### Supports Unity 2022
 
 ## To Do
+- [x] Online document generation
 - [ ] Add Cinematics Documentation
 - [ ] Expand [TransformAnimator.cs](Runtime/Scripts/Utilities/Animations/TransformAnimator.cs) to function in 3D
 - [ ] Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D
@@ -14,6 +15,7 @@ projects & Game jams.
 - [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
 - [ ] Remove call requirement for [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs)
 - [ ] Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
+
 
 ## Samples
 - ### [VFX Manager](Documentation~/Samples/vfx-manager.md)
