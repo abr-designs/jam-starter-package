@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "process-docs": "shx rm -rf ./site && shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../readme.md ./site/home.md && node .vitepress/prebuild.js",
+    "process-docs": "shx rm -rf ./site && shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md && node .vitepress/prebuild.js",
     "predocs:dev": "npm run process-docs",
     "docs:dev": "vitepress dev",
     "predocs:build": "npm run process-docs",
