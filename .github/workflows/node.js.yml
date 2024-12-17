@@ -30,16 +30,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4 
-        with:
-            lfs: true
-      - name: LFS Pull
-        run: git lfs pull --verbose
+      #   with:
+      #       lfs: true
+      # - name: LFS Pull
+      #   run: git lfs pull --verbose
 
-      - name: List Files and Sizes - Image Debug
-        run: |
-          cd Documentation~/Images
-          echo "Listing all files and their sizes:"
-          find . -type f -exec du -h {} + | sort -rh
+      # - name: List Files and Sizes - Image Debug
+      #   run: |
+      #     cd Documentation~/Images
+      #     echo "Listing all files and their sizes:"
+      #     find . -type f -exec du -h {} + | sort -rh
 
       - name: Set up Node
         uses: actions/setup-node@v4
