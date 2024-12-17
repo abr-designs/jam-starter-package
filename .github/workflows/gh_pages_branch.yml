@@ -41,6 +41,11 @@ jobs:
           npm ci
           npm run docs:build
 
+      # Copy images to build for testing
+      - name: Copy Images
+        run: |
+          cp -r Documentation~/Images WebsiteDocs~/.vitepress/dist
+
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
