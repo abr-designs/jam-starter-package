@@ -3,9 +3,9 @@
 layout: home
 
 hero:
-  name: "Jam Starter Docs"
-  text: "Documentation for Jam Starter Package"
-  tagline: For Unity 2022+
+  name: "Jam Starter"
+  text: "Documentation"
+  tagline: Unity 2022+ / Unity 6
   actions:
     - theme: brand
       text: Get Started
