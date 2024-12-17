@@ -35,17 +35,14 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
       - name: Set base URL for VitePress build
         run: |
           REPO_NAME=$(basename $(git rev-parse --show-toplevel))
           echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
-        
-      - name: Build
-        run: |
+      - name: Install dependencies & build
+        run: | 
           cd WebsiteDocs~
+          npm ci
           npm run docs:build
       - name: Setup Pages
         uses: actions/configure-pages@v4
