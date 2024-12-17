@@ -29,12 +29,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Go to docs
-        run: cd WebsiteDocs~
+        uses: actions/checkout@v4  
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
+          cache-dependency-path: WebsiteDocs~/package-lock.json
           node-version: 20
           cache: 'npm'
       - name: Set base URL for VitePress build
@@ -43,6 +42,7 @@ jobs:
           echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
       - name: Install dependencies & build
         run: | 
+          cd WebsiteDocs~
           npm ci
           npm run docs:build
       - name: Setup Pages
