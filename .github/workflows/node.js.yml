@@ -33,7 +33,7 @@ jobs:
         with:
             lfs: true
       - name: LFS Pull
-        run: git lfs pull 
+        run: git lfs pull --verbose
 
       - name: List Files and Sizes - Image Debug
         run: |
