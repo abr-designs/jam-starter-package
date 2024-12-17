@@ -30,13 +30,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4 
-      #   with:
-      #       lfs: true
-      # - name: LFS Pull
-      #   run: git lfs pull
+        with:
+            lfs: true
+      - name: LFS Pull
+        run: git lfs pull
 
-      # - name: LFS Debug
-      #   run: git lfs ls-files
+      - name: LFS Debug
+        run: git lfs ls-files
 
       # - name: List Files and Sizes - Image Debug
       #   run: |
