@@ -1,6 +1,10 @@
 import { resolve } from 'node:path';
 import { readdirSync, statSync } from 'node:fs';
 
+// Custom ignore filter list
+// TODO -- move this into a parameter passed into function
+const excludeList = ["home.md"];
+
 /**
  * Generates a sidebar configuration for VitePress.
  * @param {string} dirPath - The base directory containing the docs.
@@ -12,7 +16,7 @@ export function generateSidebar(dirPath) {
   function scanDir(path, base = '') {
 
     let entries = readdirSync(path)
-      .filter(file => !file.startsWith('.') && !file.startsWith('index')) // Ignore hidden files and `index.md`
+      .filter(file => !file.startsWith('.') && !file.startsWith('index') && !excludeList.includes(file)) // Ignore hidden files and `index.md`
       .map(file => ({
         name: file,
         path: resolve(path, file),

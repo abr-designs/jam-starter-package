@@ -137,3 +137,11 @@
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+
+/** CUSTOM SECTION -- Brennan 
+* Put any custom CSS theme below here
+*/
+
+ul.docs-checklist li {
+  list-style: none;
+}
