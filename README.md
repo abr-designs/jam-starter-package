@@ -5,7 +5,7 @@ projects & Game jams.
 > ## Installation Instructions
 > To install the Starter kit:
 > 
-> ![giturl_installation.PNG](Documentation%7E/Images/giturl_installation.PNG)
+> ![giturl_installation.PNG](Documentation~/Images/giturl_installation.PNG)
 > 1. Open the Package Window
 > 2. Select the **+** button
 > 3. Click Add from GitURL
