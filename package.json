@@ -63,6 +63,11 @@
       "displayName": "Sprite Color Change Example",
       "description": "Material & example of Sprite Color Changer, which allows direct setting of sprite color, bypassing the default Additive color setting",
       "path": "Samples~/SpriteColorChange"
-    }    
+    },
+    {
+      "displayName": "Recycling Example",
+      "description": "Example of how to utilize the Recycling Utility provided.",
+      "path": "Samples~/Recycling"
+    }
   ]
 }

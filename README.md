@@ -2,7 +2,7 @@
 This package is meant to include an ever-growing library of scripts, tools, systems & basic textures that help to kick off
 projects & Game jams.
 
-### `v0.0.1` - Dec 15, 2024
+### `v0.0.2` - Dec 29, 2024
 ### Supports Unity 2022
 
 ## To Do
@@ -14,6 +14,9 @@ projects & Game jams.
 - [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
 - [ ] Remove call requirement for [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs)
 - [ ] Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
+- [ ] Add Character Controller Example
+- [x] ~~Add Recycling Utility~~ as of `v0.0.2`
+
 
 ## Samples
 - ### [VFX Manager](Documentation~/Samples/vfx-manager.md)
@@ -33,6 +36,7 @@ projects & Game jams.
   - #### [Physics](Documentation~/Utilities/utilities-physics.md)
   - #### [Extensions](Documentation~/Utilities/utilities-extensions.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
+  - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
 
 ---
 
