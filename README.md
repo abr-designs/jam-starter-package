@@ -12,8 +12,7 @@ projects & Game jams.
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
 
-
-### `v0.0.2` - Dec 29, 2024
+### `v0.0.3` - Dec 29, 2024
 ### Supports Unity 2022
 
 ## To Do

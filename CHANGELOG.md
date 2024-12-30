@@ -8,7 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] - yyyy-mm-dd
 
 ### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+-
+
+## [0.0.3] - yyyy-mm-dd
+
+### Added
 - Added random enum selection through `Utilities.EnumExtensions.GetRandomEnum()`
+- Added `JMath.cs` to provide various math & number functions
+  - Includes option to convert `int` into a roman numeral
+- Added `LerpFunctions.cs` as utility for custom lerp behaviours
 
 ### Changed
 - Updated README to include Samples tutorial
