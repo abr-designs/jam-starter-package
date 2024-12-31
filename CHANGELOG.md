@@ -23,10 +23,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `JMath.cs` to provide various math & number functions
   - Includes option to convert `int` into a roman numeral
 - Added `LerpFunctions.cs` as utility for custom lerp behaviours
+- Added `PhysicsLauncher3D.cs` as a 3D option for launch objects
+  - Includes appropriate Gizmos as well
 
 ### Changed
 - Updated README to include Samples tutorial
 - Updated `package.json` to show author information
+- Added `Draw.Circle()` with overload that includes the circles normal
 
 ### Fixed
 -

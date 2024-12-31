@@ -18,7 +18,7 @@ projects & Game jams.
 ## To Do
 - [ ] Add Cinematics Documentation
 - [ ] Expand [TransformAnimator.cs](Runtime/Scripts/Utilities/Animations/TransformAnimator.cs) to function in 3D
-- [ ] Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D
+- [x] ~~Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D~~ - As of `v0.0.3`
 - [ ] Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library
 - [ ] Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)
 - [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
