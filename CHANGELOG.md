@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated README to include Samples tutorial
 - Updated `package.json` to show author information
 - Added `Draw.Circle()` with overload that includes the circles normal
+- Added `Shuffle()` extension method for Lists & Arrays in `CollectionExtensions.cs`
+- Set `CollectionExtensions.cs` to use `System.Random` instead of `UnityEngine.Random`
 
 ### Fixed
 -
