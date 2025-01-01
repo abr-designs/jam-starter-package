@@ -16,11 +16,14 @@ namespace Utilities.Physics
 
         public Vector3 GetLaunchVelocity()
         {
-            throw new NotImplementedException();
-            /*var dir = Quaternion.Euler(0f, 0f, Random.Range(-spawnAngle, spawnAngle)) * spawnDirection.normalized;
+            var dir = Quaternion.Euler(
+                Random.Range(-spawnAngle, spawnAngle), 
+                Random.Range(-spawnAngle, spawnAngle), 
+                Random.Range(-spawnAngle, spawnAngle)) * spawnDirection.normalized;
+            
             var force = Random.Range(spawnForceRange.x, spawnForceRange.y);
 
-            return dir * force;*/
+            return dir * force;
         }
 
 #if UNITY_EDITOR
