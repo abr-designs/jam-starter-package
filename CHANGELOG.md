@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `LerpFunctions.cs` as utility for custom lerp behaviours
 - Added `PhysicsLauncher3D.cs` as a 3D option for launch objects
   - Includes appropriate Gizmos as well
+- Added `MouseCaster.cs` into Utilities
 
 ### Changed
 - Updated README to include Samples tutorial
