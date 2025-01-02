@@ -32,7 +32,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `Draw.Circle()` with overload that includes the circles normal
 - Added `Shuffle()` extension method for Lists & Arrays in `CollectionExtensions.cs`
 - Set `CollectionExtensions.cs` to use `System.Random` instead of `UnityEngine.Random`
-
+- Added additional functions to `CollisionChecks.cs`
+  - `Line2Rect()` - Checks if a line is interacting a rectangle
+  - `Poly2Point()` - Checks if a point is interacting with a polygon 
+  - `Poly2Rect()` - Checks if a rectangle is interacting with a polygon
 ### Fixed
 -
 
