@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 -
 
-## [0.0.3] - yyyy-mm-dd
+## [0.0.3] - 2025-01-09
 
 ### Added
 - Added random enum selection through `Utilities.EnumExtensions.GetRandomEnum()`
