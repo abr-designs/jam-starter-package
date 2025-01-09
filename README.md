@@ -12,26 +12,32 @@ projects & Game jams.
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
 
-
-### `v0.0.2` - Dec 29, 2024
+### `v0.0.3` - Jan 09, 2025
 ### Supports Unity 2022
 
 ## To Do
 - [x] Online document generation
 - [ ] Add Cinematics Documentation
 - [ ] Expand [TransformAnimator.cs](Runtime/Scripts/Utilities/Animations/TransformAnimator.cs) to function in 3D
-- [ ] Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D
-- [ ] Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library
-- [ ] Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)
 - [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
 - [ ] Remove call requirement for [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs)
 - [ ] Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - [ ] Add Character Controller Example
+- [ ] Add Text Animators
+- [ ] Add Trajectory Line Renderer
+- [ ] Add procedural shapes using shaders
+- [x] ~~Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library~~ - As of `v0.0.3`
+- [x] ~~Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D~~ - As of `v0.0.3`
+- [x] ~~Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)~~ - As of `v0.0.3`
 - [x] ~~Add Recycling Utility~~ as of `v0.0.2`
 
 
 
 ## Samples
+> To add samples, navigate to the **_Package Manager window → Jam Starter Kit → Samples_**
+> 
+> ![samples](Documentation%7E/Images/samples_tutorial.PNG)
+
 - ### [VFX Manager](Documentation~/Samples/vfx-manager.md)
 - ### [SFX Manager](Documentation~/Samples/sfx-manager.md)
 - ### [Music Manager](Documentation~/Samples/music-manager.md)

@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Utilities.Debugging
 {
@@ -70,6 +72,56 @@ namespace Utilities.Debugging
                 // Points are connected using DrawLine method and using the passed color
                 UnityEngine.Debug.DrawLine(lineStart, lineEnd, color);
             }
+        }
+        
+        [Conditional("UNITY_EDITOR")]
+        public static void Circle(Vector3 position, Vector3 normal, Color color, float radius = 1f, int segments = 12)
+        {
+            // If either radius or number of segments are less or equal to 0, skip drawing
+            if (radius <= 0.0f || segments <= 0)
+            {
+                return;
+            }
+ 
+            // Single segment of the circle covers (360 / number of segments) degrees
+            float angleStep = (360.0f / segments);
+ 
+            // Result is multiplied by Mathf.Deg2Rad constant which transforms degrees to radians
+            // which are required by Unity's Mathf class trigonometry methods
+ 
+            angleStep *= Mathf.Deg2Rad;
+ 
+            // lineStart and lineEnd variables are declared outside of the following for loop
+            Vector3 lineStart = Vector3.zero;
+            Vector3 lineEnd = Vector3.zero;
+            
+            var rot = Quaternion.LookRotation(normal);
+            
+            for (int i = 0; i < segments; i++)
+            {
+                // Line start is defined as starting angle of the current segment (i)
+                lineStart.x = Mathf.Cos(angleStep * i) ;
+                lineStart.y = Mathf.Sin(angleStep * i);
+ 
+                // Line end is defined by the angle of the next segment (i+1)
+                lineEnd.x = Mathf.Cos(angleStep * (i + 1));
+                lineEnd.y = Mathf.Sin(angleStep * (i + 1));
+
+                var newStart = rot * lineStart;
+                var newEnd = rot * lineEnd;
+ 
+                // Results are multiplied so they match the desired radius
+                newStart *= radius;
+                newEnd *= radius;
+
+                // Results are offset by the desired position/origin 
+                newStart += position;
+                newEnd += position;
+
+                // Points are connected using DrawLine method and using the passed color
+                UnityEngine.Debug.DrawLine(newStart, newEnd, color);
+            }
+            
         }
         
         [Conditional("UNITY_EDITOR")]

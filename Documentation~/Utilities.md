@@ -47,3 +47,13 @@ private float _current;
 public int test;
 ```
 
+### `MouseCaster`
+> _**NOTE** This is for 3D space only currently._
+
+The `MouseCaster` provides a simple utility to cast a ray from the camera position out, based on a distance & layermask 
+provided.
+![mouse-caster_example.gif](Images/mouse-caster_example.gif)
+
+You are able to access `MouseCaster.HitObject` to read what the mouse is currently hovering
+
+![mouse-caster.PNG](Images/mouse-caster.PNG)
