@@ -142,6 +142,112 @@ namespace Utilities.Physics
             var distY = y1 - y2;
             return (float)Math.Sqrt((distX * distX) + (distY * distY));
         }
+        
+        
+        // LINE/RECTANGLE
+        public static bool Line2Rect(float x1, float y1, float x2, float y2, float rx, float ry, float rw, float rh) {
+
+            // check if the line has hit any of the rectangle's sides
+            // uses the Line/Line function below
+            bool left =   Line2Line(x1,y1,x2,y2, rx,ry,rx, ry+rh);
+            bool right =  Line2Line(x1,y1,x2,y2, rx+rw,ry, rx+rw,ry+rh);
+            bool top =    Line2Line(x1,y1,x2,y2, rx,ry, rx+rw,ry);
+            bool bottom = Line2Line(x1,y1,x2,y2, rx,ry+rh, rx+rw,ry+rh);
+
+            // if ANY of the above are true, the line
+            // has hit the rectangle
+            if (left || right || top || bottom) {
+                return true;
+            }
+            return false;
+        }
+        public static bool Circle2Rect(float cx, float cy, float radius, float rx, float ry, float rw, float rh) {
+
+            // temporary variables to set edges for testing
+            float testX = cx;
+            float testY = cy;
+
+            // which edge is closest?
+            if (cx < rx)         testX = rx;      // test left edge
+            else if (cx > rx+rw) testX = rx+rw;   // right edge
+            if (cy < ry)         testY = ry;      // top edge
+            else if (cy > ry+rh) testY = ry+rh;   // bottom edge
+
+            // get distance from closest edges
+            float distX = cx-testX;
+            float distY = cy-testY;
+            float distance = (float)Math.Sqrt( (distX*distX) + (distY*distY) );
+
+            // if the distance is less than the radius, collision!
+            if (distance <= radius) {
+                return true;
+            }
+            return false;
+        }
+        
+        // POLYGON/POINT
+        public static bool Poly2Point(Vector3[] vertices, float px, float py)
+        {
+            bool collision = false;
+
+            // go through each of the vertices, plus
+            // the next vertex in the list
+            int next = 0;
+            for (int current = 0; current < vertices.Length; current++)
+            {
+
+                // get next vertex in list
+                // if we've hit the end, wrap around to 0
+                next = current + 1;
+                if (next == vertices.Length) next = 0;
+
+                // get the PVectors at our current position
+                // this makes our if statement a little cleaner
+                Vector3 vc = vertices[current]; // c for "current"
+                Vector3 vn = vertices[next]; // n for "next"
+
+                // compare position, flip 'collision' variable
+                // back and forth
+                if (((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) &&
+                    (px < (vn.x - vc.x) * (py - vc.y) / (vn.y - vc.y) + vc.x))
+                {
+                    collision = !collision;
+                }
+            }
+
+            return collision;
+        }
+
+        // POLYGON/RECTANGLE
+        public static bool Poly2Rect(Vector3[] vertices, float rx, float ry, float rw, float rh)
+        {
+            // go through each of the vertices, plus the next
+            // vertex in the list
+            for (int current = 0; current < vertices.Length; current++)
+            {
+                // get next vertex in list
+                // if we've hit the end, wrap around to 0
+                var next = current + 1;
+                if (next == vertices.Length) next = 0;
+
+                // get the PVectors at our current position
+                // this makes our if statement a little cleaner
+                Vector3 vc = vertices[current]; // c for "current"
+                Vector3 vn = vertices[next]; // n for "next"
+
+                // check against all four sides of the rectangle
+                bool collision = Line2Rect(vc.x, vc.y, vn.x, vn.y, rx, ry, rw, rh);
+                if (collision) return true;
+
+                // optional: test if the rectangle is INSIDE the polygon
+                // note that this iterates all sides of the polygon
+                // again, so only use this if you need to
+                bool inside = Poly2Point(vertices, rx, ry);
+                if (inside) return true;
+            }
+
+            return false;
+        }
 
         //============================================================================================================//
 
