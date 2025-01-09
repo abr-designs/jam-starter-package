@@ -28,13 +28,13 @@ const fixDocLinks = (content) => {
   };
 
 // Function to replace containing capital extensions (ex .PNG)
-const fixCapitalLinks = (content) => {
-    // Replace all links with capital extensions to lowercase extensions
-    return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
-        const newUrl = `/${url}${ext.toLowerCase()}`;
-        return `(${newUrl})`;
-      });
-  };
+// const fixCapitalLinks = (content) => {
+//     // Replace all links with capital extensions to lowercase extensions
+//     return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
+//         const newUrl = `/${url}${ext.toLowerCase()}`;
+//         return `(${newUrl})`;
+//       });
+//   };
 
 // Ensure image links are absolute to asset path
 const fixImageAssets = (content) => {
