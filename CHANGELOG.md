@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `PhysicsLauncher3D.cs` as a 3D option for launch objects
   - Includes appropriate Gizmos as well
 - Added `MouseCaster.cs` into Utilities
+- Added WebsiteDocs~ directory to generate website documentation from Documentation~ folder
 
 ### Changed
 - Updated README to include Samples tutorial
