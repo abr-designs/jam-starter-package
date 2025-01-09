@@ -1,4 +1,4 @@
-# Jam Starter Kit
+# [Jam Starter Kit] (https://abr-designs.github.io/jam-starter-package/)
 This package is meant to include an ever-growing library of scripts, tools, systems & basic textures that help to kick off
 projects & Game jams.
 
