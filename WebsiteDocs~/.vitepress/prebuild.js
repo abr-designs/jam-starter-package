@@ -20,21 +20,21 @@ const fixCsLinks = (content) => {
 };
 // Function to replace links starting with 'Documentation~' to be relative to the root
 const fixDocLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\((Documentation~[^\)]+)\)/g, (match, text, docPath) => {
+    return content.replace(/\[([^\]]+)\]\((Documentation(?:~|%7E)[^\)]+)\)/g, (match, text, docPath) => {
       // Replace 'Documentation~' with the correct URL for documentation links
-      const relativeUrl = `${docPath.replace('Documentation~', '')}`; // Adjust URL
+      const relativeUrl = `${docPath.replace('Documentation~', '').replace('Documentation%7E', '')}`; // Adjust URL
       return `[${text}](${relativeUrl})`;
     });
   };
 
 // Function to replace containing capital extensions (ex .PNG)
-// const fixCapitalLinks = (content) => {
-//     // Replace all links with capital extensions to lowercase extensions
-//     return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
-//         const newUrl = `/${url}${ext.toLowerCase()}`;
-//         return `(${newUrl})`;
-//       });
-//   };
+const fixCapitalLinks = (content) => {
+    // Replace all links with capital extensions to lowercase extensions
+    return content.replace(/\(([^)]+?)(\.[A-Z]+)\)/g, (match, url, ext) => {
+        const newUrl = `/${url}${ext.toLowerCase()}`;
+        return `(${newUrl})`;
+      });
+  };
 
 // Ensure image links are absolute to asset path
 const fixImageAssets = (content) => {
@@ -67,7 +67,7 @@ const processMarkdownFiles = async () => {
 
         let updatedContent = fixCsLinks(content);
         updatedContent = fixDocLinks(updatedContent);
-        updatedContent = fixCapitalLinks(updatedContent);
+        // updatedContent = fixCapitalLinks(updatedContent);
         updatedContent = fixImageAssets(updatedContent);
         updatedContent = replaceCheckboxes(updatedContent);
 
