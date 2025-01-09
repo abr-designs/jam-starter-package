@@ -23,6 +23,8 @@ projects & Game jams.
 - [ ] Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - [ ] Add Character Controller Example
 - [ ] Add Text Animators
+- [ ] Add Trajectory Line Renderer
+- [ ] Add procedural shapes using shaders
 - [x] ~~Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library~~ - As of `v0.0.3`
 - [x] ~~Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D~~ - As of `v0.0.3`
 - [x] ~~Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)~~ - As of `v0.0.3`
