@@ -23,6 +23,7 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
+    name: Generate Pages with Vitepress
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -66,6 +67,6 @@ jobs:
         with:
           # Upload dist folder
           path: './WebsiteDocs~/.vitepress/dist'
-      - name: Deploy to GitHub Pages
+      - name: Deploy pages to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4
