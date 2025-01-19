@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace Utilities
 {
@@ -16,7 +18,7 @@ namespace Utilities
             var v = value * value * ((4.0f - 4.0f * value) / value);
             
             
-            return Mathf.Lerp(start, end, v * v);
+            return LERP(start, end, v * v);
         }
         
         public static Vector2 HermiteCubed(Vector2 start, Vector2 end, float value)
@@ -36,7 +38,7 @@ namespace Utilities
         //Ease in out
         public static float Hermite(float start, float end, float value)
         {
-            return Mathf.Lerp(start, end, value * value * (3.0f - 2.0f * value));
+            return start + (end - start) * (value * value * (3.0f - 2.0f * value));
         }
 
         public static Vector2 Hermite(Vector2 start, Vector2 end, float value)
@@ -53,26 +55,26 @@ namespace Utilities
         //Ease out
         public static float Sinerp(float start, float end, float value)
         {
-            return Mathf.Lerp(start, end, Mathf.Sin(value * Mathf.PI * 0.5f));
+            return LERP(start, end, Mathf.Sin(value * Mathf.PI * 0.5f));
         }
 
         public static Vector2 Sinerp(Vector2 start, Vector2 end, float value)
         {
-            return new Vector2(Mathf.Lerp(start.x, end.x, Mathf.Sin(value * Mathf.PI * 0.5f)),
-                Mathf.Lerp(start.y, end.y, Mathf.Sin(value * Mathf.PI * 0.5f)));
+            return new Vector2(LERP(start.x, end.x, Mathf.Sin(value * Mathf.PI * 0.5f)),
+                LERP(start.y, end.y, Mathf.Sin(value * Mathf.PI * 0.5f)));
         }
 
         public static Vector3 Sinerp(Vector3 start, Vector3 end, float value)
         {
-            return new Vector3(Mathf.Lerp(start.x, end.x, Mathf.Sin(value * Mathf.PI * 0.5f)),
-                Mathf.Lerp(start.y, end.y, Mathf.Sin(value * Mathf.PI * 0.5f)),
-                Mathf.Lerp(start.z, end.z, Mathf.Sin(value * Mathf.PI * 0.5f)));
+            return new Vector3(LERP(start.x, end.x, Mathf.Sin(value * Mathf.PI * 0.5f)),
+                LERP(start.y, end.y, Mathf.Sin(value * Mathf.PI * 0.5f)),
+                LERP(start.z, end.z, Mathf.Sin(value * Mathf.PI * 0.5f)));
         }
 
         //Ease in
         public static float Coserp(float start, float end, float value)
         {
-            return Mathf.Lerp(start, end, 1.0f - Mathf.Cos(value * Mathf.PI * 0.5f));
+            return LERP(start, end, 1.0f - Mathf.Cos(value * Mathf.PI * 0.5f));
         }
 
         public static Vector2 Coserp(Vector2 start, Vector2 end, float value)
@@ -89,7 +91,7 @@ namespace Utilities
         //Boing
         public static float Berp(float start, float end, float value)
         {
-            value = Mathf.Clamp01(value);
+            value = Math.Clamp(value, 0f, 1f);
             value = (Mathf.Sin(value * Mathf.PI * (0.2f + 2.5f * value * value * value)) * Mathf.Pow(1f - value, 2.2f) +
                      value) * (1f + (1.2f * (1f - value)));
             return start + (end - start) * value;
@@ -108,7 +110,7 @@ namespace Utilities
         //Like lerp with ease in ease out
         public static float SmoothStep(float x, float min, float max)
         {
-            x = Mathf.Clamp(x, min, max);
+            x = Math.Clamp(x, min, max);
             float v1 = (x - min) / (max - min);
             float v2 = (x - min) / (max - min);
             return -2 * v1 * v1 * v1 + 3 * v2 * v2;
@@ -141,13 +143,13 @@ namespace Utilities
             Vector3 fullDirection = lineEnd - lineStart;
             Vector3 lineDirection = Vector3.Normalize(fullDirection);
             float closestPoint = Vector3.Dot((point - lineStart), lineDirection);
-            return lineStart + (Mathf.Clamp(closestPoint, 0.0f, Vector3.Magnitude(fullDirection)) * lineDirection);
+            return lineStart + (Math.Clamp(closestPoint, 0.0f, Vector3.Magnitude(fullDirection)) * lineDirection);
         }
 
         //Bounce
         public static float Bounce(float x)
         {
-            return Mathf.Abs(Mathf.Sin(6.28f * (x + 1f) * (x + 1f)) * (1f - x));
+            return (float)Math.Abs(Math.Sin(6.28f * (x + 1f) * (x + 1f)) * (1f - x));
         }
 
         public static Vector2 Bounce(Vector2 vec)
@@ -164,7 +166,7 @@ namespace Utilities
         // all thanks to Opless for this!
         public static bool Approx(float val, float about, float range)
         {
-            return ((Mathf.Abs(val - about) < range));
+            return ((Math.Abs(val - about) < range));
         }
 
         // test if a Vector3 is close to another Vector3 (due to floating point inprecision)
@@ -185,7 +187,7 @@ namespace Utilities
         {
             float min = 0.0f;
             float max = 360.0f;
-            float half = Mathf.Abs((max - min) / 2.0f); //half the distance between min and max
+            float half = Math.Abs((max - min) / 2.0f); //half the distance between min and max
             float retval = 0.0f;
             float diff = 0.0f;
 
@@ -203,6 +205,12 @@ namespace Utilities
 
             // Debug.Log("Start: "  + start + "   End: " + end + "  Value: " + value + "  Half: " + half + "  Diff: " + diff + "  Retval: " + retval);
             return retval;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float LERP(float a, float b, float t)
+        {
+            return a + (b - a) * t;
         }
     }
 }

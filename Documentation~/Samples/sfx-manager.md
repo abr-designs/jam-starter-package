@@ -8,7 +8,7 @@ The intention of the SFX Manager is to allow you to easily play SFX, that can th
 anywhere within your code, without needing to worry about managing the lifespan SFX, automatically setting sound varieties,
 channel limits, as well as volume limits
 
-![SFX Manager](../Images/sfx_manager.PNG)
+![SFX Manager](../Images/sfx_manager.png)
 - You can use `Max Playing` to help prevent spam. When the value is `0` it will play unlimited.
 - `AudioClips` list will choose a random sound from the list when called, you can use just a single sound if you like.
 

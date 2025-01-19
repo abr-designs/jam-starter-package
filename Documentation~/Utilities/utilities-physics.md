@@ -20,7 +20,7 @@ This static class provides simple math solutions for determining overlap of spec
 This **struct** is a helper that provides a random velocity based on the parameters set by you. The intention is that this is
 called elsewhere to get the information
 
-![example](../Images/physics-launcher.PNG)
+![example](../Images/physics-launcher.png)
 ![physics3d_example.gif](../Images/physics3d_example.gif)
 
 - `SpawnLocation`: This can be retrieved to use as the spawn location, but is also used to display the gizmos

@@ -1,0 +1,25 @@
+{
+  "scripts": {
+    "process-docs": "shx rm -rf ./site && shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md && node .vitepress/prebuild.js",
+    "copy-assets": "shx mkdir -p ./site/public && shx cp -r ./site/Images ./site/public",
+    "predocs:dev": "npm run process-docs",
+    "docs:dev": "vitepress dev",
+    "predocs:build": "npm run process-docs",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "name": "websitedocs~",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "shx": "^0.3.4",
+    "vitepress": "^1.5.0"
+  },
+  "dependencies": {
+    "glob": "^11.0.0"
+  }
+}
