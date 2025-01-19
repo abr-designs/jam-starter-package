@@ -25,12 +25,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Includes `CURVE.cs` which allows us to change how a tween moves from 0 -> 1
   - Added `TweenController.cs` as location where Tweens will be updated
 - Added docs for the [Materials Sample](Documentation~/Samples/samples-materials.md)
+- Added Settings menu to the Main Menu Sample
+  - This includes [`SettingsUI.cs`](Samples%7E/MainMenu/SettingsUI.cs) & [`BaseUIWindow.cs](Samples%7E/MainMenu/BaseUIWindow.cs) to help organize functionality
 
 ### Changed
 - Replaced calls in `LerpFunctions.cs` to `Mathf.Lerp()` with local `LERP()` to be more performant
 - Replaced calls in `LerpFunctions.cs` to `Mathf.Clamp()` or `Mathf.Clamp01()` with more performant calls to `Math.Clamp()`
 - Moved `Sprite Color Change Example` sample into the `Materials` sample
-- 
+- Removed the need for the Audio Controller sample from the Main Menu sample, requiring users to add it
 
 ### Fixed
 -
