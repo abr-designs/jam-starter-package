@@ -1,40 +1,42 @@
-# Jam Starter Kit
+# [Jam Starter Kit](https://abr-designs.github.io/jam-starter-package/)
 This package is meant to include an ever-growing library of scripts, tools, systems & basic textures that help to kick off
 projects & Game jams.
 
 > ## Installation Instructions
 > To install the Starter kit:
 > 
-> ![giturl_installation.PNG](Documentation%7E/Images/giturl_installation.PNG)
+> ![giturl_installation.png](Documentation~/Images/giturl_installation.png)
 > 1. Open the Package Window
 > 2. Select the **+** button
 > 3. Click Add from GitURL
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
 
-### `v0.0.3-6000` - Jan 09, 2025
+### `v0.0.4-6000` - Jan 19, 2025
 ### Supports Unity 6000.0
 
 ## To Do
+- [x] Online document generation
 - [ ] Add Cinematics Documentation
 - [ ] Expand [TransformAnimator.cs](Runtime/Scripts/Utilities/Animations/TransformAnimator.cs) to function in 3D
 - [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
 - [ ] Remove call requirement for [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs)
-- [ ] Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - [ ] Add Character Controller Example
 - [ ] Add Text Animators
 - [ ] Add Trajectory Line Renderer
 - [ ] Add procedural shapes using shaders
+- [x] ~~Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)~~ - As of `v0.0.4`
 - [x] ~~Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library~~ - As of `v0.0.3`
 - [x] ~~Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D~~ - As of `v0.0.3`
 - [x] ~~Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)~~ - As of `v0.0.3`
 - [x] ~~Add Recycling Utility~~ as of `v0.0.2`
 
 
+
 ## Samples
 > To add samples, navigate to the **_Package Manager window → Jam Starter Kit → Samples_**
 > 
-> ![samples](Documentation%7E/Images/samples_tutorial.PNG)
+> ![samples](Documentation~/Images/samples_tutorial.PNG)
 
 - ### [VFX Manager](Documentation~/Samples/vfx-manager.md)
 - ### [SFX Manager](Documentation~/Samples/sfx-manager.md)
@@ -43,6 +45,7 @@ projects & Game jams.
 - ### [Game Input](Documentation~/Samples/game-input.md)
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
 - ### [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
+- ### [Materials](Documentation~/Samples/samples-materials.md)
 
 ## Features
 - ### [Level Loading](Documentation~/Levels.md)
@@ -52,6 +55,7 @@ projects & Game jams.
   - #### [Wait-For Animations](Documentation~/Utilities/utilities-wait-animation.md)
   - #### [Physics](Documentation~/Utilities/utilities-physics.md)
   - #### [Extensions](Documentation~/Utilities/utilities-extensions.md)
+  - #### [Transform Tweens](Documentation~/Utilities/utilities-extensions-transform.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
 

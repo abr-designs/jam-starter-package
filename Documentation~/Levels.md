@@ -9,7 +9,7 @@ defined on the `LevelLoader`. This is great if you want to create a puzzle game,
 
 ## `LevelDataDefinition`
 
-![level-data_example.PNG](Images/level-data_example.PNG)
+![level-data_example.png](Images/level-data_example.png)
 
 The `LevelDataDefinition` is meant to be attached to a root `GameObject`, so that the `LevelLoader` can use it do determine
 basic level information.
@@ -24,7 +24,7 @@ This class can be easily extended, but by default includes the following:
 This class is meant to be a main controller for navigating between levels. It will hold a collection of `LevelDataDefinition`
 objects, intended to be prefabs.
 
-![level-loader_example.PNG](Images/level-loader_example.PNG)
+![level-loader_example.png](Images/level-loader_example.png)
 
 You have the ability to retrieve the current active level by calling `LevelLoader.CurrentLevelController`.
 
