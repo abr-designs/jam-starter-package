@@ -66,6 +66,30 @@ namespace Utilities.Physics
         {
             return Point2Circle(point.x, point.y, circlePosition.x, circlePosition.y, r);
         }
+        
+        // CIRCLE/CIRCLE
+        //based on: https://www.jeffreythompson.org/collision-detection/circle-circle.php
+        public static bool CircleToCircle(Vector2 pos1, float r1, Vector2 pos2, float r2)
+        {
+            return CircleToCircle(pos1.x, pos1.y, r1, pos2.x, pos2.y, r2);
+        }
+        public static bool CircleToCircle(float c1x, float c1y, float c1r, float c2x, float c2y, float c2r)
+        {
+            // get distance between the circle's centers
+            // use the Pythagorean Theorem to compute the distance
+            float distX = c1x - c2x;
+            float distY = c1y - c2y;
+            float distance = Mathf.Sqrt((distX * distX) + (distY * distY));
+
+            // if the distance is less than the sum of the circle's
+            // radii, the circles are touching!
+            if (distance <= c1r + c2r)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public static bool Line2Circle(Vector2 lineStart, Vector2 lineEnd, Vector2 circlePos, float r, out Vector2 closest)
         {
