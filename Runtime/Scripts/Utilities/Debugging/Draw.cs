@@ -66,11 +66,11 @@ namespace Utilities.Debugging
                 lineEnd *= radius;
  
                 // Results are offset by the desired position/origin 
-                lineStart += position;
-                lineEnd += position;
+                //lineStart += position;
+                //lineEnd += position;
  
                 // Points are connected using DrawLine method and using the passed color
-                UnityEngine.Debug.DrawLine(lineStart, lineEnd, color);
+                UnityEngine.Debug.DrawLine(lineStart + position, lineEnd + position, color);
             }
         }
         
@@ -115,11 +115,11 @@ namespace Utilities.Debugging
                 newEnd *= radius;
 
                 // Results are offset by the desired position/origin 
-                newStart += position;
-                newEnd += position;
+                //newStart += position;
+                //newEnd += position;
 
                 // Points are connected using DrawLine method and using the passed color
-                UnityEngine.Debug.DrawLine(newStart, newEnd, color);
+                UnityEngine.Debug.DrawLine(newStart + position, newEnd + position, color);
             }
             
         }
