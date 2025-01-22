@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed [`Draw.Circle()`](Runtime/Scripts/Utilities/Debugging/Draw.cs) position offset being broken
+- Fixed build compilation issue with [MouseCaster.cs](Runtime/Scripts/Utilities/MouseCaster.cs) caused by `DrawRay()` preprocessor directive
 
 ## [0.0.4] - 2025-01-19
 

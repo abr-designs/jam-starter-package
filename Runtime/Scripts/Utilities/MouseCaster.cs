@@ -63,15 +63,11 @@ namespace Utilities
         //Unity Editor Functions
         //============================================================================================================//
         
-#if UNITY_EDITOR
-
         [Conditional("UNITY_EDITOR")]
         private static void DrawRay(Ray ray, float dist, Color color)
         {
             UnityEngine.Debug.DrawRay(ray.origin, ray.direction * dist, color);
         }
-        
-#endif
         
     }
 }
