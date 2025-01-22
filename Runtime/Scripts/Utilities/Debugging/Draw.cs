@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Utilities.Debugging
 {
@@ -18,6 +16,7 @@ namespace Utilities.Debugging
         [Conditional("UNITY_EDITOR")]
         public static void Label(Vector3 position, string label, /*Color color, */float offset)
         {
+#if UNITY_EDITOR
             if(Camera.current != null && _currentCamera != Camera.current)
                 _currentCamera = Camera.current;
             
@@ -26,8 +25,8 @@ namespace Utilities.Debugging
             
             var camPositionOffset = camRight * offset;
             
-            //UnityEditor.Handles.color = color;
             UnityEditor.Handles.Label(position + camPositionOffset, label );
+#endif
         }
         
         [Conditional("UNITY_EDITOR")]
