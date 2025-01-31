@@ -172,10 +172,11 @@ namespace Utilities.Tweening
         internal bool Update(float deltaTime)
         {
             //We want to countdown the time to the target
-            _time = Math.Clamp(_time - deltaTime, 0f, 1f);
+            _time = Math.Clamp(_time - deltaTime, 0f, _totalTime);
 
             //Because we're counting down, we'll need to invert then normalize the value to get the curve.T
-            var dt = GetCurveT(_curve, 1f - (_time / _totalTime));
+            var normalizedTime = (_time / _totalTime);
+            var dt = GetCurveT(_curve, 1f - normalizedTime);
 
             switch (Transformation)
             {

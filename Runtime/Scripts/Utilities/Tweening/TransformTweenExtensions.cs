@@ -74,6 +74,9 @@ namespace Utilities.Tweening
         
         private static void SetupTweenController()
         {
+            if (!Application.isPlaying)
+                return;
+            
             if (_isSetup)
                 throw new Exception();
             

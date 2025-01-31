@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed [`Draw.Circle()`](Runtime/Scripts/Utilities/Debugging/Draw.cs) position offset being broken
 - Fixed build compilation issue with [MouseCaster.cs](Runtime/Scripts/Utilities/MouseCaster.cs) caused by `DrawRay()` preprocessor directive
 - Fixed build Compilation issue with [Draw.cs](Runtime/Scripts/Utilities/Debugging/Draw.cs) caused by `Label()` contents not having preprocessor directive
+- Fixed [`TweenTo()` Bug](https://github.com/abr-designs/jam-starter-package/issues/8) caused by clamping the time value from `0 - 1`
+- Fixed `TransformTweenExtensions.SetupTweenController()` being able to trigger in Editor causing an error
 
 ## [0.0.4] - 2025-01-19
 
