@@ -12,8 +12,9 @@ projects & Game jams.
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
 
-### `v0.0.5` - Feb 24, 2025
-### Supports Unity 2022
+### `v0.0.5-6000` - Feb 24, 2025
+### Supports Unity 6000.0
+
 
 ## To Do
 - [x] Online document generation
@@ -58,6 +59,7 @@ projects & Game jams.
   - #### [Transform Tweens](Documentation~/Utilities/utilities-extensions-transform.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
+- ### [WebGL Templates](WebGLTemplates~/README.md)
 
 ---
 

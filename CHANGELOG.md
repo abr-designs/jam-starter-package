@@ -5,22 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - yyyy-mm-dd
-
-### Added
-- 
-
-### Changed
-- 
-
-### Fixed
--
 
 ## [0.0.5] - 2025-02-24
 
 ### Added
 - Added missing `Circle2Circle()` function in [`CollisionChecks.cs`](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs)
   - Includes overload for `Vector2` parameters
+- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds _**(Unity 6 Only!)**_
+- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates _**(Unity 6 Only!)**_
+  - There's a Menu Item at `WebGL/Create Template` that will copy the package directory into the Local Assets directory
 
 ### Changed
 - 
@@ -90,6 +83,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - 
 
 ### Fixed
+-
+
+## [0.0.1-6000] - 2024-12-16
+
+Updates to main branch to function on **Unity 6**
+
+### Changed
+- Updated target Unity version to `6000.0`
+- Removed packages that are no longer use with **Unity 6**
+  - TextmeshPro
+- Updated Cinemachine to `3.1.2`
+- Updated InputSystem to `1.11.2`
+- 
+
+### Fixed
+- Fixed namespace upgrade requirement for Cinemachine: `Cinemachine` -> `Unity.Cinemachine`
+- Fixed `CinemachineVirtualCamera` -> `CinemachineCamera`
+- Fixed `CinemachineSmoothPath` -> `SplineContainer`
 -
 
 ## [0.0.1] - 2024-12-15

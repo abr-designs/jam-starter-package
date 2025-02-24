@@ -1,6 +1,6 @@
 using System.Collections;
 using Cameras;
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Cinematics
@@ -13,7 +13,7 @@ namespace Cinematics
 
         protected virtual bool KeepCamera { get; } = false;
 
-        [SerializeField] protected CinemachineVirtualCamera targetCamera;
+        [SerializeField] protected CinemachineCamera targetCamera;
 
         protected static Transform playerTransform;
 
@@ -45,12 +45,12 @@ namespace Cinematics
 
         protected abstract IEnumerator PlayCinematicCoroutine();
 
-        protected void ForceSetCameraPosition(CinemachineVirtualCamera targetCamera)
+        protected void ForceSetCameraPosition(CinemachineCamera camera)
         {
             var brain = Camera.main.GetComponent<CinemachineBrain>();
             brain.enabled = false;
 
-            var newCameraTransform = targetCamera.transform;
+            var newCameraTransform = camera.transform;
 
             Camera.main.transform.position = newCameraTransform.position;
             Camera.main.transform.rotation = newCameraTransform.rotation;
