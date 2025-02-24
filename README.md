@@ -11,10 +11,12 @@ projects & Game jams.
 > 3. Click Add from GitURL
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
+> ### Installing for older versions
+> For versions **previous to Unity 6**, use the following git url instead
+> - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.5-6000` - Feb 24, 2025
+### `v0.0.5` - Feb 24, 2025
 ### Supports Unity 6000.0
-
 
 ## To Do
 - [x] Online document generation
