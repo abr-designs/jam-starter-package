@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added missing `Circle2Circle()` function in [`CollisionChecks.cs`](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs)
   - Includes overload for `Vector2` parameters
+- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds _**(Unity 6 Only!)**_
+- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates _**(Unity 6 Only!)**_
+  - There's a Menu Item at `WebGL/Create Template` that will copy the package directory into the Local Assets directory
 
 ### Changed
 - 
