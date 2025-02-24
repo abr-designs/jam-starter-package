@@ -58,6 +58,7 @@ projects & Game jams.
   - #### [Transform Tweens](Documentation~/Utilities/utilities-extensions-transform.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
+- ### [WebGL Templates](WebGLTemplates~/README.md)
 
 ---
 

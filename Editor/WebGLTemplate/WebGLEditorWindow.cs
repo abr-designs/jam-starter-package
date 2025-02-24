@@ -51,6 +51,16 @@ namespace JamStarter.Editor.WebGLTemplate
             AssetDatabase.Refresh();
         }
         
+        [MenuItem("WebGL/Create Template", true)]
+        private static bool ValidateCreateTemplate()
+        {
+#if UNITY_6000_0_OR_NEWER
+            return true;
+#else
+            return false;
+#endif
+        }
+        
         private static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
         {
             // Get information about the source directory
