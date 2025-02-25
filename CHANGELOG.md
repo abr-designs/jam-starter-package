@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Includes overload for `Vector2` parameters
 - Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds
 - Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates
-  - There's a Menu Item at `WebGL/Create Template` that will copy the package directory into the Local Assets directory
+  - There's a Menu Item at `WebGL/Template Wizard` that will open the WebGL template customizer.
+  - The Create Template button will copy the template from the package directory into the Local Assets directory and setup all the appropriate build time variables for customization
 
 ### Changed
 - 
