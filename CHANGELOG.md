@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.6-preview] - yyyy-mm-dd
 
 ### Added
-- 
+- New PR Template into the `/.github/` directory
 
 ### Changed
 - 
