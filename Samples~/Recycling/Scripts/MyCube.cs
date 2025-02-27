@@ -12,7 +12,7 @@ public class MyCube : MonoBehaviour, IRecyclable
     public bool IsRecycled { get; set; }
     public void OnRecycled()
     {
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
     }
 
     private void Update()

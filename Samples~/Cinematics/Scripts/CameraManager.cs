@@ -1,6 +1,7 @@
 using System;
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Splines;
 using Utilities;
 
 namespace Cameras
@@ -21,10 +22,10 @@ namespace Cameras
         [SerializeField]
         private CinemachineBrain brain;
         [SerializeField]
-        private CinemachineSmoothPath dollyTrack;
+        private SplineContainer dollyTrack;
 
         [SerializeField]
-        private CinemachineVirtualCamera[] virtualCameras;
+        private CinemachineCamera[] virtualCameras;
 
         //============================================================================================================//
 

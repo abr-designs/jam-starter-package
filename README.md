@@ -11,27 +11,12 @@ projects & Game jams.
 > 3. Click Add from GitURL
 > 4. Paste `https://github.com/abr-designs/jam-starter-package.git` into the text box
 
+> ### Installing for older versions
+> For versions **previous to Unity 6**, use the following git url instead
+> - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.4` - Jan 19, 2025
-### Supports Unity 2022
-
-## To Do
-- [x] Online document generation
-- [ ] Add Cinematics Documentation
-- [ ] Expand [TransformAnimator.cs](Runtime/Scripts/Utilities/Animations/TransformAnimator.cs) to function in 3D
-- [ ] Add missing Gizmos into [WaitForUIMoveAnimations.cs](Runtime/Scripts/Utilities/WaitForAnimations/WaitForUIMoveAnimations.cs)
-- [ ] Remove call requirement for [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs)
-- [ ] Add Character Controller Example
-- [ ] Add Text Animators
-- [ ] Add Trajectory Line Renderer
-- [ ] Add procedural shapes using shaders
-- [x] ~~Add Settings menu sample into [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)~~ - As of `v0.0.4`
-- [x] ~~Expand [CollisionChecks.cs](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs) library~~ - As of `v0.0.3`
-- [x] ~~Expand [PhysicsLauncher.cs](Runtime/Scripts/Utilities/Physics/PhysicsLauncher.cs) to function in 3D~~ - As of `v0.0.3`
-- [x] ~~Implement Reorder List extension into [CollectionExtensions.cs](Runtime/Scripts/Utilities/extensions/CollectionExtensions.cs)~~ - As of `v0.0.3`
-- [x] ~~Add Recycling Utility~~ as of `v0.0.2`
-
-
+### `v0.0.5` - Feb 24, 2025
+### Supports Unity 6000.0
 
 ## Samples
 > To add samples, navigate to the **_Package Manager window → Jam Starter Kit → Samples_**
@@ -58,6 +43,7 @@ projects & Game jams.
   - #### [Transform Tweens](Documentation~/Utilities/utilities-extensions-transform.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
+- ### [WebGL Templates](WebGLTemplates~/README.md)
 
 ---
 
