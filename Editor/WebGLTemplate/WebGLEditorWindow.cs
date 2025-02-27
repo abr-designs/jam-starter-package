@@ -118,8 +118,14 @@ namespace JamStarter.Editor.WebGLTemplate
             if (GUILayout.Button("Create Template"))
             {
                 CreateTemplate();
+                PlayerSettings.WebGL.template = "PROJECT:JamTemplate";
                 SaveSettings();
-                SettingsService.OpenProjectSettings("Project/Player");
+                
+                EditorUtility.DisplayDialog("Template Saved", "JAM WebGL Template settings have been saved.  It is now set as your default template.", "OK");
+                window.Close();
+                //SettingsService.OpenProjectSettings("Project/Player");
+
+
             }
 
             // GUILayout.Label("Base Settings", EditorStyles.boldLabel);
