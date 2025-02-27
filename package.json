@@ -43,6 +43,11 @@
       "path": "Samples~/GameInput"
     },
     {
+      "displayName": "2D Character Controller",
+      "description": "",
+      "path": "Samples~/2D Character Controller"
+    },    
+    {
       "displayName": "Dialog System",
       "description": "Example of how to use IDisplayDialog",
       "path": "Samples~/DialogSystem"

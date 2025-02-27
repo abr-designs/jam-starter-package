@@ -9,9 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New PR Template into the `/.github/` directory
+- Added `2D Character Controller` Sample
+  - Added `2D Character Controller Sample` scene
+  - Added `CharacterController2D.cs`
+  - Added `CharacterMovementDataScriptableObject.cs`
+  - Added `2D Character Controller` prefab
+  - Added `2D Character Movement Data` scriptable object that contains default settings for sample
 
 ### Changed
-- 
+- Added `2D Character Controller` into the Package samples
+- Adjusted `GameInput` Sample to replace `GrabItem` with `Jump`
+  - This includes a change to `Action<bool>` callback for `OnJumpPressed`
 
 ### Fixed
 -
