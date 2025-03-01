@@ -1,14 +1,15 @@
 using System;
 using UnityEngine;
+using Utilities.Physics;
 
-namespace Utilities.Physics
+namespace Trajectory
 {
     [RequireComponent(typeof(LineRenderer))]
     public class TrajectoryLine : MonoBehaviour
     {
 
-        public Vector2 LaunchVelocity;
-        private Vector2 _cachedLaunchVelocity;
+        public Vector3 LaunchVelocity;
+        private Vector3 _cachedLaunchVelocity;
 
         [Range(1, 5)]
         public int LineResolution = 1;
@@ -18,6 +19,7 @@ namespace Utilities.Physics
         public float LinePreviewTime = 5f;
         private float _cachedLinePreviewTime;
 
+
         private bool _needsUpdate = true;
 
         private LineRenderer _lineRenderer;
@@ -25,11 +27,6 @@ namespace Utilities.Physics
 
         //Unity Functions
         //============================================================================================================//
-
-
-        void Start()
-        {
-        }
 
         void Update()
         {
@@ -44,6 +41,7 @@ namespace Utilities.Physics
 
         private void OnValidate()
         {
+            // Update the line points when values are changed in the editor
             RecalcLinePoints();
         }
 
@@ -69,19 +67,11 @@ namespace Utilities.Physics
             if (_lineRenderer == null)
                 _lineRenderer = GetComponent<LineRenderer>();
 
-            float launchSpeed = LaunchVelocity.magnitude;
+            Vector3[] points;
+            points = ProjectileMath.ProjectileArcPoints3D(LaunchVelocity, Physics2D.gravity, LinePreviewTime, 20 * LineResolution);
 
-            Vector2[] points;
-            points = ProjectileMath.ProjectileArcPoints(LaunchVelocity, Physics2D.gravity.y, LinePreviewTime, 20 * LineResolution);
-
-            Vector3[] pts = new Vector3[points.Length];
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                pts[i] = new Vector3(points[i].x, points[i].y, 0);
-            }
-            _lineRenderer.positionCount = pts.Length;
-            _lineRenderer.SetPositions(pts);
+            _lineRenderer.positionCount = points.Length;
+            _lineRenderer.SetPositions(points);
 
         }
 

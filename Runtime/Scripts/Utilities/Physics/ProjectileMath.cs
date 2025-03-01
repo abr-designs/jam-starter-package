@@ -81,19 +81,42 @@ namespace Utilities.Physics
         /// <param name="duration">Number of seconds to sample the arc</param>
         /// <param name="numPoints">Number of points to split sample time into</param>
         /// <returns>Array of sampled points with the length of numPoints</returns>
-        public static Vector2[] ProjectileArcPoints(Vector2 velocity, float gravity, float duration, int numPoints)
+        public static Vector2[] ProjectileArcPoints(Vector2 velocity, Vector2 gravity, float duration, int numPoints)
         {
 
             // With the starting given resolution we calculate points on the arc
             float timeStep = duration / (numPoints - 1);
 
             Vector2[] arcPoints = new Vector2[numPoints];
-            float[] arcLengths = new float[numPoints];
-            arcLengths[0] = 0;
             for (int i = 0; i < numPoints; i++)
             {
                 float t = timeStep * i;
-                arcPoints[i] = new Vector2(velocity.x * t, velocity.y * t + 0.5f * gravity * t * t);
+                arcPoints[i] = velocity * t + 0.5f * gravity * t * t;
+            }
+
+            return arcPoints;
+        }
+
+        /// <summary>
+        /// Samples a series of points along a projectile arc in 3D space
+        /// </summary>
+        /// <param name="velocity">Initial velocity of projectile</param>
+        /// <param name="gravity">Downward acceleration in m/s^2</param>
+        /// <param name="duration">Number of seconds to sample the arc</param>
+        /// <param name="numPoints">Number of points to split sample time into</param>
+        /// <returns>Array of sampled points with the length of numPoints</returns>
+        public static Vector3[] ProjectileArcPoints3D(Vector3 velocity, Vector3 gravity, float duration, int numPoints)
+        {
+            // gravity is assume to be on the Y axis
+
+            // With the starting given resolution we calculate points on the arc
+            float timeStep = duration / (numPoints - 1);
+
+            Vector3[] arcPoints = new Vector3[numPoints];
+            for (int i = 0; i < numPoints; i++)
+            {
+                float t = timeStep * i;
+                arcPoints[i] = velocity * t + 0.5f * gravity * t * t;
             }
 
             return arcPoints;
