@@ -20,8 +20,11 @@ namespace JamStarter.Editor.WebGLTemplate
         private Color progressLeft;
         private Color progressRight;
 
+        // Loading message
         private string loadingText;
         private Color loadingTextColor;
+        private GUIStyle loadingTextStyle;
+        private bool loadingTextNeedsUpdate = true;
 
         // Progress bar gradient texture
         private Texture2D progressGradientTexture;
@@ -29,25 +32,24 @@ namespace JamStarter.Editor.WebGLTemplate
 
         private static WebGLEditorWindow window;
 
-        /*string myString = "Hello World";
-        bool groupEnabled;
-        bool myBool = true;
-        float myFloat = 1.23f;*/
-
         //Add menu named "My Window" to the Window menu
         [MenuItem("WebGL/Template Wizard")]
         private static void ShowWindow()
         {
-            // if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.WebGL)
-            // {
-            //     Debug.LogWarning("WebGL is not the active build target!");
-            //     return;
-            // }
-
             // Get existing open window or if none, make a new one:
             window = (WebGLEditorWindow)EditorWindow.GetWindow(typeof(WebGLEditorWindow));
             window.LoadSettings();
             window.Show();
+        }
+
+        [MenuItem("WebGL/Template Wizard", true)]
+        private static bool ValidateTemplateWizard()
+        {
+#if UNITY_6000_0_OR_NEWER
+            return true;
+#else
+            return false;
+#endif
         }
 
         private void LoadSettings()
@@ -111,8 +113,13 @@ namespace JamStarter.Editor.WebGLTemplate
                 progressGradientTexture = null;
             }
 
+            EditorGUI.BeginChangeCheck();
             loadingText = EditorGUILayout.TextField("Loading Text", loadingText);
             loadingTextColor = EditorGUILayout.ColorField("Loading Color", loadingTextColor);
+            if (EditorGUI.EndChangeCheck())
+            {
+                loadingTextNeedsUpdate = true;
+            }
 
 
             if (GUILayout.Button("Create Template"))
@@ -120,21 +127,13 @@ namespace JamStarter.Editor.WebGLTemplate
                 CreateTemplate();
                 PlayerSettings.WebGL.template = "PROJECT:JamTemplate";
                 SaveSettings();
-                
+
                 EditorUtility.DisplayDialog("Template Saved", "JAM WebGL Template settings have been saved.  It is now set as your default template.", "OK");
                 window.Close();
-                //SettingsService.OpenProjectSettings("Project/Player");
-
+                SettingsService.OpenProjectSettings("Project/Player");
 
             }
 
-            // GUILayout.Label("Base Settings", EditorStyles.boldLabel);
-            // myString = EditorGUILayout.TextField("Text Field", myString);
-
-            // groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
-            // myBool = EditorGUILayout.Toggle("Toggle", myBool);
-            // myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
-            // EditorGUILayout.EndToggleGroup();
         }
 
         // Show the template preview based on current settings
@@ -145,8 +144,6 @@ namespace JamStarter.Editor.WebGLTemplate
             float playerWidth = PlayerSettings.defaultScreenWidth;
             float playerHeight = PlayerSettings.defaultScreenHeight;
             float ratio = playerWidth / playerHeight;
-
-            // Debug.Log($"{playerWidth}, {playerHeight}, {ratio}");
 
             Rect previewRect = GUILayoutUtility.GetRect(position.width, previewHeight + 10);
             previewRect.width = previewHeight * ratio;
@@ -167,13 +164,17 @@ namespace JamStarter.Editor.WebGLTemplate
 
         private void DrawLoadingText(Rect rect, string text)
         {
-            GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
-            style.alignment = TextAnchor.MiddleCenter; // Center alignment
-            style.normal.textColor = loadingTextColor; // Set text color
-            style.active.textColor = loadingTextColor;
-            style.fontSize = 12;
+            if (loadingTextNeedsUpdate)
+            {
+                loadingTextStyle = new GUIStyle(EditorStyles.boldLabel);
+                loadingTextStyle.alignment = TextAnchor.MiddleCenter; // Center alignment
+                loadingTextStyle.normal.textColor = loadingTextColor; // Set text color
+                loadingTextStyle.active.textColor = loadingTextColor;
+                loadingTextStyle.fontSize = 12;
+                loadingTextNeedsUpdate = false;
+            }
 
-            Vector2 textSize = style.CalcSize(new GUIContent(text)); // Measure text size
+            Vector2 textSize = loadingTextStyle.CalcSize(new GUIContent(text)); // Measure text size
 
             // Adjust rect to center text inside
             Rect textRect = new Rect(
@@ -183,7 +184,7 @@ namespace JamStarter.Editor.WebGLTemplate
                 textSize.y
             );
 
-            GUI.Label(textRect, text, style);
+            GUI.Label(textRect, text, loadingTextStyle);
         }
 
         private void DrawProgressBar(Rect rect)
@@ -249,18 +250,12 @@ namespace JamStarter.Editor.WebGLTemplate
                     // Delete the folder
                     AssetDatabase.DeleteAsset(path);
                     AssetDatabase.Refresh(); // Refresh to reflect the changes
-                    // Debug.Log("Folder deleted!");
-                }
-                else
-                {
-                    // Debug.Log("Folder deletion canceled.");
                 }
 
                 return userConfirmed;
             }
             else
             {
-                // Debug.Log("Folder does not exist.");
                 return true;
             }
         }

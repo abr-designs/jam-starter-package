@@ -8,7 +8,10 @@ You can follow the [Unity Documentation](https://docs.unity3d.com/Manual/web-tem
 Open the template wizard window in your project by navigating to `WebGL -> Template Wizard`
 ![webgl-wizard.png](../Documentation~/Images/webgl-wizard.png)
 
-The wizard will allow you to configure settings of the WebGL template to be loaded at build time. The top of the window shows a small preview of what the current settings will look like.
+The wizard will allow you to configure settings of the WebGL template to be loaded at build time. The preview image displays how the settings will appear once generated.
 
-Once you are satisfied with the look you can select `Create Template`.  If it doesn't exist, his will create a new directory in `/Assets/` called `/WebGLTemplates/`.  All the settings will be copied over to the `Player Settings` template variables.  Finally the `Player Settings` window will launch for any additional values to be configured.
+Once you are satisfied with the look you can select `Create Template`.  
+    - If it doesn't exist, his will create a new directory in `/Assets/` called `/WebGLTemplates/`.  
+    - All the settings will be copied over to the `Player Settings` template variables.  
+    - Finally the `Player Settings` window will launch for any additional values to be configured.
 ![webgl-player-settings.png](../Documentation~/Images/webgl-player-settings.png)
