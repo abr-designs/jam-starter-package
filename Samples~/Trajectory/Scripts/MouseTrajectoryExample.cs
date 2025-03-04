@@ -5,9 +5,8 @@ using Utilities.Physics;
 
 namespace Trajectory
 {
-    [RequireComponent(typeof(TrajectoryLine))]
-    [RequireComponent(typeof(MouseCaster))]
-    public class MouseTrajectory : MonoBehaviour
+    [RequireComponent(typeof(TrajectoryLine),typeof(MouseCaster))]
+    public class MouseTrajectoryExample : MonoBehaviour
     {
         private TrajectoryLine _trajectoryLine;
         private MouseCaster _mouseCaster;
@@ -20,7 +19,7 @@ namespace Trajectory
         //Unity Functions
         //============================================================================================================//
 
-        void Update()
+        private void Update()
         {
             if (_trajectoryLine == null)
                 _trajectoryLine = GetComponent<TrajectoryLine>();
@@ -52,14 +51,13 @@ namespace Trajectory
             float range = groundVector.magnitude;
             float yOffset = dir.y;
 
-            float angle1, angle2;
-            float angle = Mathf.PI / 4; // 45 degrees will be the default angle
-            if (ProjectileMath.LaunchAngle(LaunchSpeed, range, yOffset, Mathf.Abs(Physics2D.gravity.y), out angle1, out angle2))
+            float angleRadians = Mathf.PI / 4; // 45 degrees will be the default angle
+            if (ProjectileMath.LaunchAngle(LaunchSpeed, range, yOffset, Mathf.Abs(Physics2D.gravity.y), out float angle1, out float angle2))
             {
                 // Pick smaller angle
-                angle = Mathf.Min(angle1, angle2);
+                angleRadians = Mathf.Min(angle1, angle2);
             }
-            Vector3 launchVelocity = (groundVector.normalized * (Mathf.Cos(angle) * LaunchSpeed)) + (Vector3.up * (Mathf.Sin(angle) * LaunchSpeed));
+            Vector3 launchVelocity = (groundVector.normalized * (Mathf.Cos(angleRadians) * LaunchSpeed)) + (Vector3.up * (Mathf.Sin(angleRadians) * LaunchSpeed));
             _trajectoryLine.LaunchVelocity = launchVelocity;
 
             if (_reticle != null)

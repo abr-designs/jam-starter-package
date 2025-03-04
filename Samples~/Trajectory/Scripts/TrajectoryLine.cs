@@ -28,7 +28,7 @@ namespace Trajectory
         //Unity Functions
         //============================================================================================================//
 
-        void Update()
+        private void Update()
         {
             CacheValues();
 
@@ -36,13 +36,6 @@ namespace Trajectory
             {
                 RecalcLinePoints();
             }
-        }
-
-
-        private void OnValidate()
-        {
-            // Update the line points when values are changed in the editor
-            RecalcLinePoints();
         }
 
         //TrajectoryLine Functions
@@ -75,6 +68,16 @@ namespace Trajectory
 
         }
 
+        //Editor Functions
+        //============================================================================================================//
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            // Update the line points when values are changed in the editor
+            RecalcLinePoints();
+        }
+#endif
 
     }
+
 }
