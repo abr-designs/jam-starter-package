@@ -31,6 +31,7 @@ projects & Game jams.
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
 - ### [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - ### [Materials](Documentation~/Samples/samples-materials.md)
+- ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features
 - ### [Level Loading](Documentation~/Levels.md)
