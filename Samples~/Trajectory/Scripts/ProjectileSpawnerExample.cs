@@ -54,7 +54,6 @@ public class ProjectileSpawnerExample : MonoBehaviour
         {
             
             int index = GetFreeProjectileIndex();
-            Debug.Log($"Mouse click, {index}");
             if(index >= 0) {
                 FireProjectile(index);
             }
@@ -90,8 +89,6 @@ public class ProjectileSpawnerExample : MonoBehaviour
         for (int i = 0; i < _projectilePool.Length; i++)
         {
             var p = _projectilePool[i];
-            if(i==0)
-                Debug.Log(p.lifetime);
             if (p.lifetime <= 0f && p.obj.activeSelf)
             {
                 p.obj.SetActive(false);
@@ -109,6 +106,7 @@ public class ProjectileSpawnerExample : MonoBehaviour
         p.obj.transform.position = transform.position;
         var rb = p.obj.GetComponent<Rigidbody>();
         rb.linearVelocity = _trajectoryLine.LaunchVelocity;
+        Debug.Log(_trajectoryLine.LaunchVelocity);
         p.lifetime = projectileLife;
         _projectilePool[index] = p;
 

@@ -23,6 +23,7 @@ namespace Trajectory
         private bool _needsUpdate = true;
 
         private LineRenderer _lineRenderer;
+        private Vector3[] _linePoints = new Vector3[20];
 
 
         //Unity Functions
@@ -50,6 +51,11 @@ namespace Trajectory
                 || LinePreviewTime != _cachedLinePreviewTime
             );
 
+            // Resize points array if resolution was changed
+            if(LineResolution != _cachedLineResolution || _linePoints.Length == 0) {
+                _linePoints = new Vector3[20 * LineResolution];
+            }
+
             _cachedLaunchVelocity = LaunchVelocity;
             _cachedLineResolution = LineResolution;
             _cachedLinePreviewTime = LinePreviewTime;
@@ -60,11 +66,10 @@ namespace Trajectory
             if (_lineRenderer == null)
                 _lineRenderer = GetComponent<LineRenderer>();
 
-            Vector3[] points;
-            points = ProjectileMath.ProjectileArcPoints3D(LaunchVelocity, Physics2D.gravity, LinePreviewTime, 20 * LineResolution);
+            ProjectileMath.ProjectileArcPointsNonAlloc3D(LaunchVelocity, Physics.gravity, LinePreviewTime, ref _linePoints);
 
-            _lineRenderer.positionCount = points.Length;
-            _lineRenderer.SetPositions(points);
+            _lineRenderer.positionCount = _linePoints.Length;
+            _lineRenderer.SetPositions(_linePoints);
 
         }
 

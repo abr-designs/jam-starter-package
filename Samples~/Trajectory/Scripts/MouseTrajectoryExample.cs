@@ -5,7 +5,7 @@ using Utilities.Physics;
 
 namespace Trajectory
 {
-    [RequireComponent(typeof(TrajectoryLine),typeof(MouseCaster))]
+    [RequireComponent(typeof(TrajectoryLine), typeof(MouseCaster))]
     public class MouseTrajectoryExample : MonoBehaviour
     {
         private TrajectoryLine _trajectoryLine;
@@ -13,6 +13,9 @@ namespace Trajectory
 
         [SerializeField]
         private GameObject _reticle;
+
+        [SerializeField]
+        private bool alwaysLob = false;
 
         public float LaunchSpeed = 5.0f;
 
@@ -54,8 +57,16 @@ namespace Trajectory
             float angleRadians = Mathf.PI / 4; // 45 degrees will be the default angle
             if (ProjectileMath.LaunchAngle(LaunchSpeed, range, yOffset, Mathf.Abs(Physics2D.gravity.y), out float angle1, out float angle2))
             {
-                // Pick smaller angle
-                angleRadians = Mathf.Min(angle1, angle2);
+                if (alwaysLob)
+                {
+                    // Pick larger angle
+                    angleRadians = Mathf.Max(angle1, angle2);
+                }
+                else
+                {
+                    // Pick smaller angle
+                    angleRadians = Mathf.Min(angle1, angle2);
+                }
             }
             Vector3 launchVelocity = (groundVector.normalized * (Mathf.Cos(angleRadians) * LaunchSpeed)) + (Vector3.up * (Mathf.Sin(angleRadians) * LaunchSpeed));
             _trajectoryLine.LaunchVelocity = launchVelocity;

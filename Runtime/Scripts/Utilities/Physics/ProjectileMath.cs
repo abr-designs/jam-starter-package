@@ -98,6 +98,27 @@ namespace Utilities.Physics
         }
 
         /// <summary>
+        /// Samples a series of points along a projectile arc
+        /// </summary>
+        /// <param name="velocity">Initial velocity of projectile</param>
+        /// <param name="gravity">Downward acceleration in m/s^2</param>
+        /// <param name="duration">Number of seconds to sample the arc</param>
+        /// <param name="arcPoints">Reference to an array to fill with the points</param>
+        public static void ProjectileArcPointsNonAlloc(Vector2 velocity, Vector2 gravity, float duration, ref Vector2[] arcPoints)
+        {
+            int numPoints = arcPoints.Length;
+
+            // With the starting given resolution we calculate points on the arc
+            float timeStep = duration / (numPoints - 1);
+
+            for (int i = 0; i < numPoints; i++)
+            {
+                float t = timeStep * i;
+                arcPoints[i] = velocity * t + 0.5f * gravity * t * t;
+            }
+        }
+
+        /// <summary>
         /// Samples a series of points along a projectile arc in 3D space
         /// </summary>
         /// <param name="velocity">Initial velocity of projectile</param>
@@ -120,6 +141,30 @@ namespace Utilities.Physics
             }
 
             return arcPoints;
+        }
+
+        /// <summary>
+        /// Samples a series of points along a projectile arc in 3D space
+        /// </summary>
+        /// <param name="velocity">Initial velocity of projectile</param>
+        /// <param name="gravity">Downward acceleration in m/s^2</param>
+        /// <param name="duration">Number of seconds to sample the arc</param>
+        /// <param name="arcPoints">Reference to an array to fill with the points</param>
+        public static void ProjectileArcPointsNonAlloc3D(Vector3 velocity, Vector3 gravity, float duration, ref Vector3[] arcPoints)
+        {
+            // gravity is assume to be on the Y axis
+
+            int numPoints = arcPoints.Length;
+
+            // With the starting given resolution we calculate points on the arc
+            float timeStep = duration / (numPoints - 1);
+
+            for (int i = 0; i < numPoints; i++)
+            {
+                float t = timeStep * i;
+                arcPoints[i] = velocity * t + 0.5f * gravity * t * t;
+            }
+
         }
 
     }
