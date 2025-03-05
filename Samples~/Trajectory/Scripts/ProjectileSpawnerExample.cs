@@ -1,29 +1,32 @@
 using Trajectory;
 using UnityEngine;
-using UnityEngine.AI;
 
 [RequireComponent(typeof(MouseTrajectoryExample), typeof(TrajectoryLine))]
 public class ProjectileSpawnerExample : MonoBehaviour
 {
+    private class Projectile
+    {
+        public readonly GameObject GameObject;
+        public readonly Rigidbody Rigidbody;
+        
+        public float Lifetime;
+        public Projectile(GameObject gameObject)
+        {
+            GameObject = gameObject;
+            Rigidbody = gameObject.GetComponent<Rigidbody>();
+            
+            Lifetime = 0f;
+        }
+    }
+    
     [SerializeField]
-    private GameObject _projectilePrefab;
+    private GameObject projectilePrefab;
 
     [SerializeField]
     private int maxProjectiles = 10;
 
     [SerializeField]
     private float projectileLife = 5f;
-
-    private struct Projectile
-    {
-        public GameObject obj;
-        public float lifetime;
-        public Projectile(GameObject o)
-        {
-            this.obj = o;
-            this.lifetime = 0f;
-        }
-    }
 
     private Projectile[] _projectilePool;
 
@@ -35,35 +38,31 @@ public class ProjectileSpawnerExample : MonoBehaviour
 
     private void Start()
     {
+        _trajectoryLine = GetComponent<TrajectoryLine>();
+        
         // Create object pool
         _projectilePool = new Projectile[maxProjectiles];
         for (int i = 0; i < _projectilePool.Length; i++)
         {
-            var gObj = Instantiate(_projectilePrefab, transform);
-            gObj.SetActive(false);
-            _projectilePool[i] = new Projectile(gObj);
+            var projectileGameObject = Instantiate(projectilePrefab, transform);
+            projectileGameObject.SetActive(false);
+            _projectilePool[i] = new Projectile(projectileGameObject);
         }
-
-        _trajectoryLine = GetComponent<TrajectoryLine>();
-
     }
 
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            
             int index = GetFreeProjectileIndex();
-            if(index >= 0) {
+            if(index >= 0) 
+            {
                 FireProjectile(index);
             }
-
             
         }
 
         UpdateProjectiles();
-
-
     }
 
     //ProjectileSpawner Functions
@@ -75,8 +74,8 @@ public class ProjectileSpawnerExample : MonoBehaviour
     { 
         for (int i = 0; i < _projectilePool.Length; i++)
         {
-            var p = _projectilePool[i];
-            if (!p.obj.activeSelf)
+            var projectile = _projectilePool[i];
+            if (!projectile.GameObject.activeSelf)
                 return i;
         }
         return -1;
@@ -89,11 +88,11 @@ public class ProjectileSpawnerExample : MonoBehaviour
         for (int i = 0; i < _projectilePool.Length; i++)
         {
             var p = _projectilePool[i];
-            if (p.lifetime <= 0f && p.obj.activeSelf)
+            if (p.Lifetime <= 0f && p.GameObject.activeSelf)
             {
-                p.obj.SetActive(false);
-            } else if(p.obj.activeSelf) {
-                p.lifetime -= Time.deltaTime;
+                p.GameObject.SetActive(false);
+            } else if(p.GameObject.activeSelf) {
+                p.Lifetime -= Time.deltaTime;
                 _projectilePool[i] = p;
             }
         }
@@ -101,15 +100,15 @@ public class ProjectileSpawnerExample : MonoBehaviour
 
     private void FireProjectile(int index)
     {
-        var p = _projectilePool[index];
-        p.obj.SetActive(true);
-        p.obj.transform.position = transform.position;
-        var rb = p.obj.GetComponent<Rigidbody>();
-        rb.linearVelocity = _trajectoryLine.LaunchVelocity;
+        var projectile = _projectilePool[index];
+        projectile.GameObject.SetActive(true);
+        projectile.GameObject.transform.position = transform.position;
+        
+        projectile.Rigidbody.linearVelocity = _trajectoryLine.LaunchVelocity;
+        projectile.Lifetime = projectileLife;
+        _projectilePool[index] = projectile;
+        
         Debug.Log(_trajectoryLine.LaunchVelocity);
-        p.lifetime = projectileLife;
-        _projectilePool[index] = p;
-
     }
 
 }

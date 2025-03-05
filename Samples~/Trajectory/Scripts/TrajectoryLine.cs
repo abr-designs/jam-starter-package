@@ -1,4 +1,5 @@
 using System;
+using NaughtyAttributes;
 using UnityEngine;
 using Utilities.Physics;
 
@@ -8,6 +9,7 @@ namespace Trajectory
     public class TrajectoryLine : MonoBehaviour
     {
 
+        [ReadOnly]
         public Vector3 LaunchVelocity;
         private Vector3 _cachedLaunchVelocity;
 
@@ -35,7 +37,7 @@ namespace Trajectory
 
             if (_needsUpdate)
             {
-                RecalcLinePoints();
+                RecalculateLinePoints();
             }
         }
 
@@ -61,7 +63,7 @@ namespace Trajectory
             _cachedLinePreviewTime = LinePreviewTime;
         }
 
-        private void RecalcLinePoints()
+        private void RecalculateLinePoints()
         {
             if (_lineRenderer == null)
                 _lineRenderer = GetComponent<LineRenderer>();
@@ -70,7 +72,6 @@ namespace Trajectory
 
             _lineRenderer.positionCount = _linePoints.Length;
             _lineRenderer.SetPositions(_linePoints);
-
         }
 
         //Editor Functions
@@ -79,7 +80,7 @@ namespace Trajectory
         private void OnValidate()
         {
             // Update the line points when values are changed in the editor
-            RecalcLinePoints();
+            RecalculateLinePoints();
         }
 #endif
 
