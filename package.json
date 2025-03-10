@@ -71,6 +71,11 @@
       "displayName": "Recycling Example",
       "description": "Example of how to utilize the Recycling Utility provided.",
       "path": "Samples~/Recycling"
+    },
+    {
+      "displayName": "Trajectory",
+      "description": "Example of how to utilize the trajectory visual system.",
+      "path": "Samples~/Trajectory"
     }
   ]
 }

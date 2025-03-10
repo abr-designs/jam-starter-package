@@ -15,11 +15,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `CharacterMovementDataScriptableObject.cs`
   - Added `2D Character Controller` prefab
   - Added `2D Character Movement Data` scriptable object that contains default settings for sample
+- Added [`ProjectileMath.cs`](Runtime/Scripts/Utilities/Physics/ProjectileMath.cs) with various helpers for trajectory calculations
+- Added [`Trajectory Sample`](Samples~/Trajectory/) scene, scripts and prefabs for working with trajectory components
+- Added [`Trajectory Sample`](Documentation~/Samples/trajectory.md) documentation
 
 ### Changed
+- Added `HitPoint` property to [`MouseCaster.cs`](Runtime/Scripts/Utilities/MouseCaster.cs)
 - Added `2D Character Controller` into the Package samples
 - Adjusted `GameInput` Sample to replace `GrabItem` with `Jump`
   - This includes a change to `Action<bool>` callback for `OnJumpPressed`
+
 
 ### Fixed
 -
@@ -29,9 +34,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added missing `Circle2Circle()` function in [`CollisionChecks.cs`](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs)
   - Includes overload for `Vector2` parameters
-- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds _**(Unity 6 Only!)**_
-- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates _**(Unity 6 Only!)**_
-  - There's a Menu Item at `WebGL/Create Template` that will copy the package directory into the Local Assets directory
+- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds
+- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates
+  - There's a Menu Item at `WebGL/Template Wizard` that will open the WebGL template customizer.
+  - The Create Template button will copy the template from the package directory into the Local Assets directory and setup all the appropriate build time variables for customization
 
 ### Changed
 - 

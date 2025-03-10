@@ -7,12 +7,20 @@ namespace Utilities
 {
     public class MouseCaster : MonoBehaviour
     {
-        public GameObject HitObject 
+        public GameObject HitObject
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get; 
+            get;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private set; 
+            private set;
+        }
+
+        public Vector3 HitPoint
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
         }
 
         [SerializeField]
@@ -25,7 +33,7 @@ namespace Utilities
 
         //Unity Functions
         //============================================================================================================//
-        
+
         private void Start()
         {
             Assert.IsNotNull(camera, "Camera is Null");
@@ -41,10 +49,11 @@ namespace Utilities
                 HitObject = null;
                 return;
             }
-            
+
             DrawRay(cameraRay, raycastHit.distance, Color.green);
 
             //TODO May want to include a callback when the object changes!
+            HitPoint = raycastHit.point;
             if (HitObject == raycastHit.transform.gameObject)
                 return;
 
@@ -53,7 +62,7 @@ namespace Utilities
 
         //MouseCaster Functions
         //============================================================================================================//
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Ray GetCameraRay()
         {
@@ -62,12 +71,12 @@ namespace Utilities
 
         //Unity Editor Functions
         //============================================================================================================//
-        
+
         [Conditional("UNITY_EDITOR")]
         private static void DrawRay(Ray ray, float dist, Color color)
         {
             UnityEngine.Debug.DrawRay(ray.origin, ray.direction * dist, color);
         }
-        
+
     }
 }
