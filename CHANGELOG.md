@@ -18,13 +18,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added [`ProjectileMath.cs`](Runtime/Scripts/Utilities/Physics/ProjectileMath.cs) with various helpers for trajectory calculations
 - Added [`Trajectory Sample`](Samples~/Trajectory/) scene, scripts and prefabs for working with trajectory components
 - Added [`Trajectory Sample`](Documentation~/Samples/trajectory.md) documentation
+- Added [`TextureAtlasSlicer.cs`](Editor/KennySpriteSlicer/TextureAtlasSlicer.cs) as tool to help parse [Kenny Asset](https://kenney.nl/data/itch/preview/) sprite sheets
 
 ### Changed
 - Added `HitPoint` property to [`MouseCaster.cs`](Runtime/Scripts/Utilities/MouseCaster.cs)
 - Added `2D Character Controller` into the Package samples
 - Adjusted `GameInput` Sample to replace `GrabItem` with `Jump`
   - This includes a change to `Action<bool>` callback for `OnJumpPressed`
-
 
 ### Fixed
 -
