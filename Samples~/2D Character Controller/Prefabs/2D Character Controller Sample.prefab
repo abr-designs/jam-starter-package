@@ -10,11 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 9000972927506260289}
   - component: {fileID: 127724595909565575}
+  - component: {fileID: 2144966934689906691}
   - component: {fileID: 4063823149938398148}
   - component: {fileID: 4911681052619522296}
   - component: {fileID: 6637357287966468962}
   m_Layer: 0
-  m_Name: 2D Character Controller
+  m_Name: 2D Character Controller Sample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,9 +49,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f473ddba32773044904753a2cbe20b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveStats: {fileID: 11400000, guid: 8bf5941d77363e94585a93a6175d6ce9, type: 2}
-  _feetColl: {fileID: 6637357287966468962}
-  _bodyColl: {fileID: 4911681052619522296}
+  characterMovementData: {fileID: 11400000, guid: 8bf5941d77363e94585a93a6175d6ce9, type: 2}
+  feetCollider: {fileID: 6637357287966468962}
+  bodyCollider: {fileID: 4911681052619522296}
+--- !u!114 &2144966934689906691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955805508170038515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b022f5a4ba2e45d18aebda4028cae64c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 5532529347018168670}
 --- !u!50 &4063823149938398148
 Rigidbody2D:
   serializedVersion: 5
@@ -112,8 +126,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.10253942}
-  m_Size: {x: 1, y: 1.7671461}
+  m_Offset: {x: 0, y: 0.10721791}
+  m_Size: {x: 0.863703, y: 1.2855642}
   m_Direction: 0
 --- !u!61 &6637357287966468962
 BoxCollider2D:
@@ -149,7 +163,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.76448107}
+  m_Offset: {x: 0, y: -0.5216596}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -159,7 +173,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.5, y: 0.3845325}
+  m_Size: {x: 0.51175296, y: 0.26388675}
   m_EdgeRadius: 0
 --- !u!1 &7961445582114701828
 GameObject:
@@ -172,7 +186,7 @@ GameObject:
   - component: {fileID: 942222764735257213}
   - component: {fileID: 5532529347018168670}
   m_Layer: 0
-  m_Name: CapsuleSprite
+  m_Name: CharacterSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,7 +202,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9000972927506260289}
@@ -237,8 +251,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 1}
+  m_Sprite: {fileID: 141201964651277993, guid: ff1eebd1dd77853439a365ff47c00cfb, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

@@ -12,21 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d913b02851960489cc8dedbdc6c033, type: 3}
   m_Name: 2D Character Movement Data
   m_EditorClassIdentifier: 
-  MaxWalkSpeed: 12.5
-  GroundAcceleration: 12.7
-  GroundDeceleration: 16
-  AirAcceleration: 2
-  AirDeceleration: 2
-  MaxRunSpeed: 18
+  MaxWalkSpeed: 15.8
+  GroundAcceleration: 12.4
+  GroundDeceleration: 7.7
+  AirAcceleration: 5
+  AirDeceleration: 5
+  MaxRunSpeed: 9.5
   GroundLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
-  GroundDetectionRayLength: 0.1
-  HeadDetectionRayLength: 0.1
+    m_Bits: 128
+  GroundDetectionRayLength: 0.02
+  HeadDetectionRayLength: 0.04
   HeadWidth: 0.75
-  JumpVelocity: 18
-  JumpHorizontalDampening: 0.5
-  FallGravityMultiplier: 6
-  MaxFallSpeed: 20
+  JumpHeightCompensationFactor: 1.054
+  MaxVerticalVelocity: 50
+  JumpHeight: 3
+  TimeTillJumpApex: 0.45
+  GravityOnReleaseMultiplier: 2
+  MaxFallSpeed: 26
+  NumberOfJumpsAllowed: 1
+  TimeForUpwardsCancel: 0.027
+  ApexThreshold: 0.97
+  ApexHangTime: 0.04
   JumpBufferTime: 0.125
   JumpCoyoteTime: 0.1
+  WallDetectionRayLength: 0.02
+  JumpHorizontalDampening: 0.5
+  DebugDraw: -1
+  ArcResolution: 20
+  VisualizationSteps: 90

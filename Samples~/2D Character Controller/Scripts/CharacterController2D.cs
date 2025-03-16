@@ -1,62 +1,83 @@
+using System;
 using GameInput;
 using UnityEngine;
 using Utilities.Debugging;
 
+namespace Samples.CharacterController2D.Scripts
+{
     // Based on the controller from Sasquatch Studios
     // https://www.youtube.com/watch?v=zHSWG05byEc
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class CharacterController2D : MonoBehaviour
     {
+        [SerializeField, Header("Data")] 
+        private CharacterMovementDataScriptableObject characterMovementData;
+        
+        [Header("Colliders")] 
+        [SerializeField] 
+        private Collider2D feetCollider;
+        [SerializeField] 
+        private Collider2D bodyCollider;
+        
+        //------------------------------------------------//
 
-        [SerializeField, Header("References")]
-        private CharacterMovementDataScriptableObject MoveStats;
-        [SerializeField] private Collider2D _feetColl;
-        [SerializeField] private Collider2D _bodyColl;
-
-        private Rigidbody2D Rigidbody2D;
+        private Rigidbody2D m_rigidbody2D;
 
         // move vars (horizontal input)
-        private Vector2 _moveVelocity;
-        private bool _isFacingRight;
+        private Vector2 m_moveVelocity;
+        private bool m_isFacingRight;
 
         // collision check
-        private RaycastHit2D _groundHit;
-        private RaycastHit2D _headHit;
-        private RaycastHit2D _leftSideBodyHit;
-        private RaycastHit2D _leftSideFeetHit;
-        private RaycastHit2D _leftSideHeadHit;
+        private bool LeftSideHeadHit => m_wallHitChecks[0];
+        private bool LeftSideBodyHit => m_wallHitChecks[1];
+        private bool LeftSideFeetHit => m_wallHitChecks[2];
+        
+        private bool RightSideHeadHit => m_wallHitChecks[3];
+        private bool RightSideBodyHit => m_wallHitChecks[4];
+        private bool RightSideFeetHit => m_wallHitChecks[5];
+        
 
-        private RaycastHit2D _rightSideBodyHit;
-        private RaycastHit2D _rightSideFeetHit;
-        private RaycastHit2D _rightSideHeadHit;
-        private bool _isOnWall;
-        private Vector2 _wallNormal;
+        private readonly bool[] m_wallHitChecks = new bool[6];
+        
+        private bool m_isOnWall;
+        private Vector2 m_wallNormal;
 
-
-        private bool _isGrounded;
-        public bool IsGrounded => _isGrounded;
-        private bool _bumpedHead;
+        public bool IsGrounded => m_isGrounded;
+        private bool m_isGrounded;
+        private bool m_bumpedHead;
 
         // jump vars
         public float VerticalVelocity { get; private set; }
-        private bool _isJumping;
-        private bool _isJumpAvailable;
-        private bool _isFalling;
+        private bool m_isJumping;
+        private bool m_isJumpAvailable;
+        private bool m_isFalling;
+        private bool m_isFastFalling;
+        private float m_fastFallTime;
+        private float m_fastFallReleaseSpeed;
+        private int m_numberOfJumpsUsed;
+        private bool m_isPastApexThreshold;
 
         // jump buffer vars
-        private float _jumpBufferTimer;
+        private float m_jumpBufferTimer;
+        private bool m_jumpReleasedDuringBuffer;
 
         // coyote time vars
-        private float _coyoteTimer;
+        private float m_coyoteTimer;
 
         // input
-        private Vector2 _lastFrameInput = Vector2.zero;
-        private Vector2 _moveInput;
-        private bool _lastFrameJumpPressed;
-        private bool _isJumpPressed;
+        private Vector2 m_lastFrameInput = Vector2.zero;
+        private Vector2 m_moveInput;
+        private bool m_lastFrameJumpPressed;
+        private bool m_isJumpPressed;
+        private bool m_isRunPressed;
 
         // external force
-        private Vector2 _externalVel = Vector2.zero;
+        private Vector2 m_externalVel = Vector2.zero;
+        
+        private float m_apexPoint;
+        private float m_timePastApexThreshold;
+        
+        private readonly RaycastHit2D[] m_nonAllocRaycastHit2Ds = new RaycastHit2D[1];
 
         //Unity Functions
         //============================================================================================================//
@@ -65,7 +86,8 @@ using Utilities.Debugging;
 
         private void Awake()
         {
-            _isFacingRight = true;
+            m_isFacingRight = true;
+            m_isGrounded = false;
         }
 
         private void OnEnable()
@@ -73,10 +95,10 @@ using Utilities.Debugging;
             GameInputDelegator.OnMovementChanged += OnMovementChanged;
             GameInputDelegator.OnJumpPressed += OnJumpPressed;
         }
-        
+
         private void Start()
         {
-            Rigidbody2D = GetComponent<Rigidbody2D>();
+            m_rigidbody2D = GetComponent<Rigidbody2D>();
         }
 
         // Update is called once per frame
@@ -85,23 +107,29 @@ using Utilities.Debugging;
             CountTimers();
             JumpInputChecks();
 
-            _lastFrameInput = _moveInput;
-            _lastFrameJumpPressed = _isJumpPressed;
+            m_lastFrameInput = m_moveInput;
+            m_lastFrameJumpPressed = m_isJumpPressed;
         }
 
         private void FixedUpdate()
         {
-            CollisionChecks();
-            VerticalPhysics();
+            //Collision Checks
+            //------------------------------------------------//
+            GroundCheck();
+            BumpHeadCheck();
+            WallCheck();
+            //------------------------------------------------//
+            
+            Jump();
 
             // Use air/ground acceleration values for horizontal velocity
-            if (_isGrounded)
+            if (m_isGrounded)
             {
-                Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, _moveInput);
+                Move(characterMovementData.GroundAcceleration, characterMovementData.GroundDeceleration, m_moveInput);
             }
             else
             {
-                Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, _moveInput);
+                Move(characterMovementData.AirAcceleration, characterMovementData.AirDeceleration, m_moveInput);
             }
 
         }
@@ -118,389 +146,518 @@ using Utilities.Debugging;
         //============================================================================================================//
 
         #region Movement
-        
 
         // Horizontal movement
         private void Move(float acceleration, float deceleration, Vector2 moveInput)
         {
-
             // Apply any external velocity this frame
-            if (Mathf.Abs(_externalVel.x) > 0f)
+            if (Math.Abs(m_externalVel.x) > 0f)
             {
-                Debug.Log($"{_externalVel}");
-                _moveVelocity.x = _externalVel.x;
-                _externalVel = new Vector2(0f, _externalVel.y);
+                m_moveVelocity.x = m_externalVel.x;
+                m_externalVel = new Vector2(0f, m_externalVel.y);
             }
 
+            //------------------------------------------------//
             if (moveInput != Vector2.zero)
             {
-                Vector2 targetVelocity = Vector2.zero;
+                TurnCheck(moveInput);
+                var targetVelocity = Vector2.right * (moveInput.x * (m_isRunPressed ? characterMovementData.MaxRunSpeed : characterMovementData.MaxWalkSpeed));
 
-                // TODO -- here is where you would add run support (run button check)
-                // for now the character will always be running
-                targetVelocity = new Vector2(moveInput.x, 0f) * MoveStats.MaxRunSpeed;
-
-                _moveVelocity = Vector2.Lerp(_moveVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
+                m_moveVelocity = Vector2.Lerp(m_moveVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
+                m_rigidbody2D.linearVelocity = new Vector2(m_moveVelocity.x, m_rigidbody2D.linearVelocity.y);
             }
             else if (moveInput == Vector2.zero)
             {
-                _moveVelocity = Vector2.Lerp(_moveVelocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
+                m_moveVelocity = Vector2.Lerp(m_moveVelocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
+                m_rigidbody2D.linearVelocity = new Vector2(m_moveVelocity.x, m_rigidbody2D.linearVelocity.y);
             }
-
-            Rigidbody2D.linearVelocity = new Vector2(_moveVelocity.x, Rigidbody2D.linearVelocity.y);
-
+            //------------------------------------------------//
+            
             // Apply correction for being against a wall (we need to immediately stop the velocity)
-            bool leftWall = _leftSideHeadHit || _leftSideBodyHit || _leftSideHeadHit;
-            bool rightWall = _rightSideHeadHit || _rightSideBodyHit || _rightSideFeetHit;
-            if (rightWall && Rigidbody2D.linearVelocity.x > 0f)
+            bool leftWall = LeftSideHeadHit || LeftSideBodyHit || LeftSideHeadHit;
+            bool rightWall = RightSideHeadHit || RightSideBodyHit || RightSideFeetHit;
+            if (rightWall && m_rigidbody2D.linearVelocity.x > 0f)
             {
-                Rigidbody2D.linearVelocity = new Vector2(0f, Rigidbody2D.linearVelocity.y);
+                m_rigidbody2D.linearVelocity = new Vector2(0f, m_rigidbody2D.linearVelocity.y);
             }
-            if (leftWall && Rigidbody2D.linearVelocity.x < 0f)
+
+            if (leftWall && m_rigidbody2D.linearVelocity.x < 0f)
             {
-                Rigidbody2D.linearVelocity = new Vector2(0f, Rigidbody2D.linearVelocity.y);
+                m_rigidbody2D.linearVelocity = new Vector2(0f, m_rigidbody2D.linearVelocity.y);
             }
 
             // If character has a body above a ledge but feet below we shimmy them up
             // TODO -- this is where ledge grab would kick in
-            if (!_leftSideBodyHit && _leftSideFeetHit && _moveInput.x < 0f)
+            if (!LeftSideBodyHit && LeftSideFeetHit && m_moveInput.x < 0f)
             {
-                Rigidbody2D.position = Rigidbody2D.position + Vector2.up * 0.1f;
+                m_rigidbody2D.position += Vector2.up * 0.1f;
             }
 
-            if (!_rightSideBodyHit && _rightSideFeetHit && _moveInput.x > 0f)
+            if (!RightSideBodyHit && RightSideFeetHit && m_moveInput.x > 0f)
             {
-                Rigidbody2D.position = Rigidbody2D.position + Vector2.up * 0.1f;
+                m_rigidbody2D.position += Vector2.up * 0.1f;
             }
 
+        }
+
+        private void TurnCheck(Vector2 moveInput)
+        {
+            if (m_isFacingRight && moveInput.x < 0)
+                m_isFacingRight = false;
+            else if (!m_isFacingRight && moveInput.x > 0)
+                m_isFacingRight = true;
         }
 
         #endregion
 
         //Collision Checks
         //============================================================================================================//
-        
+
         #region Collision Checks
 
         private void GroundCheck()
         {
-            Vector2 boxCastOrigin = new Vector2(_feetColl.bounds.center.x, _feetColl.bounds.min.y);
-            Vector2 boxCastSize = new Vector2(_feetColl.bounds.size.x, MoveStats.GroundDetectionRayLength);
-            _groundHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.down, MoveStats.GroundDetectionRayLength, MoveStats.GroundLayer);
+            Vector2 boxCastOrigin = new Vector2(feetCollider.bounds.center.x, feetCollider.bounds.min.y);
+            Vector2 boxCastSize = new Vector2(feetCollider.bounds.size.x, characterMovementData.GroundDetectionRayLength);
 
-            _isGrounded = _groundHit.collider != null;
-            
-#if UNITY_EDITOR
-            
-            Color rayColor;
-            if (_isGrounded)
+            var contactFilter = new ContactFilter2D
             {
-                rayColor = Color.green;
+                useLayerMask = true,
+                layerMask = characterMovementData.GroundLayer,
+            };
+
+            var hitCount = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.down, contactFilter, m_nonAllocRaycastHit2Ds, characterMovementData.GroundDetectionRayLength);
+            m_isGrounded = hitCount > 0;
+
+            #region Ground Check Debug
+
+#if UNITY_EDITOR
+            if (characterMovementData.CanDraw(DEBUG_DRAW.GROUND_CHECK))
+            {
+                var rayColor = m_isGrounded ? Color.green : Color.red;
+
+                Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * characterMovementData.GroundDetectionRayLength, rayColor);
+                Debug.DrawRay(new Vector2(boxCastOrigin.x + boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * characterMovementData.GroundDetectionRayLength, rayColor);
+                Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y - characterMovementData.GroundDetectionRayLength), Vector2.right * boxCastSize.x, rayColor);
             }
-            else rayColor = Color.red;
+#endif
 
-            Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * MoveStats.GroundDetectionRayLength, rayColor);
-            Debug.DrawRay(new Vector2(boxCastOrigin.x + boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * MoveStats.GroundDetectionRayLength, rayColor);
-            Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y - MoveStats.GroundDetectionRayLength), Vector2.right * boxCastSize.x, rayColor);
- #endif
-
+            #endregion //Ground Check Debug
         }
 
         private void BumpHeadCheck()
         {
-            Vector2 boxCastOrigin = new Vector2(_feetColl.bounds.center.x, _bodyColl.bounds.max.y);
-            Vector2 boxCastSize = new Vector2(MoveStats.HeadWidth, MoveStats.HeadDetectionRayLength);
+            var boxCastOrigin = new Vector2(feetCollider.bounds.center.x, bodyCollider.bounds.max.y);
+            var boxCastSize   = new Vector2(characterMovementData.HeadWidth, characterMovementData.HeadDetectionRayLength);
+            
+            var contactFilter = new ContactFilter2D
+            {
+                useLayerMask = true,
+                layerMask = characterMovementData.GroundLayer,
+            };
 
-            _headHit = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.up, MoveStats.HeadDetectionRayLength, MoveStats.GroundLayer);
-            _bumpedHead = _headHit.collider != null;
+            var hitCount = Physics2D.BoxCast(boxCastOrigin, boxCastSize, 0f, Vector2.up, contactFilter, m_nonAllocRaycastHit2Ds, characterMovementData.HeadDetectionRayLength);
+            m_bumpedHead = hitCount > 0;
 
             #region HeadHitDebug
-            float headWidth = MoveStats.HeadWidth;
-            Color rayColor;
-            if (_bumpedHead)
-            {
-                rayColor = Color.green;
-            }
-            else
-            {
-                rayColor = Color.red;
-            }
 
-            Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y), Vector2.up * MoveStats.HeadDetectionRayLength, rayColor);
-            Debug.DrawRay(new Vector2(boxCastOrigin.x + (boxCastSize.x / 2), boxCastOrigin.y), Vector2.up * MoveStats.HeadDetectionRayLength, rayColor);
-            Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y + MoveStats.HeadDetectionRayLength), Vector2.right * headWidth, rayColor);
+#if UNITY_EDITOR
+            if (characterMovementData.CanDraw(DEBUG_DRAW.HEAD_CHECK))
+            {
+                float headWidth = characterMovementData.HeadWidth;
+                var rayColor = m_bumpedHead ? Color.green : Color.red;
+
+                Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y), Vector2.up * characterMovementData.HeadDetectionRayLength, rayColor);
+                Debug.DrawRay(new Vector2(boxCastOrigin.x + (boxCastSize.x / 2), boxCastOrigin.y), Vector2.up * characterMovementData.HeadDetectionRayLength, rayColor);
+                Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y + characterMovementData.HeadDetectionRayLength), Vector2.right * headWidth, rayColor);
+            }
+#endif
 
             #endregion
         }
 
-        private void CollisionChecks()
-        {
-            GroundCheck();
-            BumpHeadCheck();
-            WallCheck();
-        }
-
         private void WallCheck()
         {
-            Vector2 headPoint = new Vector2(_bodyColl.bounds.center.x, _bodyColl.bounds.max.y);
-            Vector2 bodyPoint = new Vector2(_bodyColl.bounds.center.x, _bodyColl.bounds.center.y);
-            Vector2 feetPoint = new Vector2(_feetColl.bounds.center.x, _feetColl.bounds.min.y);
+            Span<Vector2> checkPoints = stackalloc Vector2[6]
+            {
+                /*Left headPoint*/new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.max.y),
+                /*Left bodyPoint*/new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y),
+                /*Left feetPoint*/new Vector2(feetCollider.bounds.center.x, feetCollider.bounds.min.y),
+                /*Right headPoint*/new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.max.y),
+                /*Right bodyPoint*/new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y),
+                /*Right feetPoint*/new Vector2(feetCollider.bounds.center.x, feetCollider.bounds.min.y),
+            };
+            Span<Vector2> directions = stackalloc Vector2[6]
+            {
+                Vector2.left,
+                Vector2.left,
+                Vector2.left,
+                Vector2.right,
+                Vector2.right,
+                Vector2.right,
+            };
+            var castDistance = bodyCollider.bounds.extents.x + characterMovementData.WallDetectionRayLength;
 
-            var cast_distance = _bodyColl.bounds.extents.x + 0.2f;
+            for (int i = 0; i < checkPoints.Length; i++)
+            {
+                m_wallHitChecks[i] = Physics2D.RaycastNonAlloc(checkPoints[i], directions[i], m_nonAllocRaycastHit2Ds, castDistance, characterMovementData.GroundLayer) > 0;
+            }
 
-            // Check right side
-            var dirVec = Vector2.right;
-            _rightSideHeadHit = Physics2D.Raycast(headPoint, dirVec, cast_distance, MoveStats.GroundLayer);
-            _rightSideBodyHit = Physics2D.Raycast(bodyPoint, dirVec, cast_distance, MoveStats.GroundLayer);
-            _rightSideFeetHit = Physics2D.Raycast(feetPoint, dirVec, cast_distance, MoveStats.GroundLayer);
-
-            // Check left side
-            dirVec = Vector2.left;
-            _leftSideHeadHit = Physics2D.Raycast(headPoint, dirVec, cast_distance, MoveStats.GroundLayer);
-            _leftSideBodyHit = Physics2D.Raycast(bodyPoint, dirVec, cast_distance, MoveStats.GroundLayer);
-            _leftSideFeetHit = Physics2D.Raycast(feetPoint, dirVec, cast_distance, MoveStats.GroundLayer);
+            #region Wallcheck Debug
 
 #if UNITY_EDITOR
-            // Debug lines
-            Debug.DrawRay(headPoint, Vector2.right * cast_distance, _rightSideHeadHit ? Color.green : Color.red);
-            Debug.DrawRay(bodyPoint, Vector2.right * cast_distance, _rightSideBodyHit ? Color.green : Color.red);
-            Debug.DrawRay(feetPoint, Vector2.right * cast_distance, _rightSideFeetHit ? Color.green : Color.red);
-            Debug.DrawRay(headPoint, Vector2.left * cast_distance, _leftSideHeadHit ? Color.green : Color.red);
-            Debug.DrawRay(bodyPoint, Vector2.left * cast_distance, _leftSideBodyHit ? Color.green : Color.red);
-            Debug.DrawRay(feetPoint, Vector2.left * cast_distance, _leftSideFeetHit ? Color.green : Color.red);
+            if(characterMovementData.CanDraw(DEBUG_DRAW.WALL_CHECK))
+            {
+
+                for (int i = 0; i < checkPoints.Length; i++)
+                {
+                    Debug.DrawRay(checkPoints[i], directions[i] * castDistance, m_wallHitChecks[i] ? Color.green : Color.red);
+                }
+            }
 #endif
 
-        }
-
-        #endregion
-
-        //Input Handlers
-        //============================================================================================================//
-        
-        #region Input Handlers
-
-        private void OnMovementChanged(Vector2 moveInput)
-        {
-            _moveInput = moveInput;
-        }
-
-        private void OnJumpPressed(bool pressed)
-        {
-            _isJumpPressed = pressed;
+            #endregion //Wallcheck Debug
         }
 
         #endregion
 
         //Jump
         //============================================================================================================//
-        
+
         #region Jump
 
         // Process vertical velocity
-        // Includes jumps and bounces off bubbles
         private void JumpInputChecks()
         {
-
             // Player pressed jump button this frame -- start the jump buffer
-            bool jumpPressedThisFrame = !_lastFrameJumpPressed && _isJumpPressed;
-            bool jumpReleasedThisFrame = _lastFrameJumpPressed && !_isJumpPressed;
+            bool jumpPressedThisFrame = !m_lastFrameJumpPressed && m_isJumpPressed;
+            bool jumpReleasedThisFrame = m_lastFrameJumpPressed && !m_isJumpPressed;
+            
             // Jumping starts the buffer timer -- hitting ground within this timer will trigger a jump
             if (jumpPressedThisFrame)
             {
-                _jumpBufferTimer = MoveStats.JumpBufferTime;
+                m_jumpBufferTimer = characterMovementData.JumpBufferTime;
+                m_jumpReleasedDuringBuffer = false;
             }
 
-            // We are currently on the ground
-            if (_isGrounded)
+            if (jumpReleasedThisFrame)
             {
-                // Reset coyote timer
-                _coyoteTimer = MoveStats.JumpCoyoteTime;
+                if (m_jumpBufferTimer > 0f)
+                    m_jumpReleasedDuringBuffer = true;
 
-                if (!_isJumping && (jumpPressedThisFrame || _jumpBufferTimer > 0f))
+                if (m_isJumping && VerticalVelocity > 0f)
                 {
-                    DoJump();
+                    if (m_isPastApexThreshold)
+                    {
+                        m_isPastApexThreshold = false;
+                        m_isFastFalling = true;
+                        m_fastFallTime = characterMovementData.TimeForUpwardsCancel;
+                        VerticalVelocity = 0f;
+                    }
+                    else
+                    {
+                        m_isFastFalling = true;
+                        m_fastFallReleaseSpeed = VerticalVelocity;
+                    }
                 }
-
             }
-            else
+
+            //Initiate Jump with Jump buffering & coyote time
+            //------------------------------------------------//
+
+            if (m_jumpBufferTimer > 0f && !m_isJumping && (m_isGrounded || m_coyoteTimer > 0f))
             {
-                // Handle coyote time jump
-                if (!_isJumping && _coyoteTimer > 0f && jumpPressedThisFrame)
+                DoJump(1);
+
+                if (m_jumpReleasedDuringBuffer)
                 {
-                    DoJump();
+                    m_isFastFalling = true;
+                    m_fastFallReleaseSpeed = VerticalVelocity;
                 }
-
+            }
+            //Double Jump
+            //------------------------------------------------//
+            else if (m_jumpBufferTimer > 0f && m_isJumping &&
+                     m_numberOfJumpsUsed < characterMovementData.NumberOfJumpsAllowed)
+            {
+                m_isFastFalling = false;
+                DoJump(1);
+            }
+            //Air Jump after Coyote Time Lapsed
+            //------------------------------------------------//
+            else if (m_jumpBufferTimer > 0f && m_isFalling && m_numberOfJumpsUsed < characterMovementData.NumberOfJumpsAllowed - 1)
+            {
+                DoJump(2);
+                m_isFastFalling = false;
             }
 
-
-            // Bump head causes jump apex right away (no floating)
-            if (_bumpedHead && VerticalVelocity > 0f)
+            //Landed
+            //------------------------------------------------//
+            if ((m_isJumping || m_isFalling) && m_isGrounded && VerticalVelocity <= 0f)
             {
-                VerticalVelocity = 0f;
-            }
+                m_isJumping = false;
+                m_isFalling = false;
+                m_isFastFalling = false;
+                m_fastFallTime = 0f;
+                m_isPastApexThreshold = false;
+                m_numberOfJumpsUsed = 0;
 
-
-            // Landed
-            if ((_isJumping || _isFalling) && _isGrounded && VerticalVelocity <= 0f)
-            {
-                _isJumping = false;
-                _isFalling = false;
                 VerticalVelocity = Physics2D.gravity.y;
             }
-
-            return;
         }
 
         // Set velocity and animations for jump
-        private void DoJump()
+        private void DoJump(int numberOfJumpsUsed)
         {
-            if (!_isJumping)
+            if (!m_isJumping)
             {
-                _isJumping = true;
+                m_isJumping = true;
             }
-            _jumpBufferTimer = 0f;
-            _moveVelocity.x = _moveVelocity.x * MoveStats.JumpHorizontalDampening;
-            VerticalVelocity = MoveStats.JumpVelocity; //MoveStats.InitialJumpVelocity;
+
+            m_jumpBufferTimer = 0f;
+            VerticalVelocity = characterMovementData.InitialJumpVelocity;
+            m_numberOfJumpsUsed += numberOfJumpsUsed;
         }
 
-        private void VerticalPhysics()
+        private void Jump()
         {
-            _isFalling = VerticalVelocity < 0f;
 
-            // TODO -- play with fall state modifiers here
-            // for now we just have one gravity once the play has left the ground
-            if (!_isGrounded)
+            //Apply Gravity While Jumping
+            //------------------------------------------------//
+            if (m_isJumping)
             {
-                VerticalVelocity += Physics2D.gravity.y * MoveStats.FallGravityMultiplier * Time.fixedDeltaTime;
-            }
+                //Check for Head Bump
+                //------------------------------------------------//
+                if (m_bumpedHead)
+                    m_isFastFalling = true;
+                //Gravity on Ascending
+                //------------------------------------------------//
+                if (VerticalVelocity >= 0f)
+                {
+                    //Apex Controls
+                    //------------------------------------------------//
+                    m_apexPoint = Mathf.InverseLerp(characterMovementData.InitialJumpVelocity, 0f, VerticalVelocity);
 
-            // Apply external velocity
-            if (Mathf.Abs(_externalVel.y) > 0f)
+                    if (m_apexPoint > characterMovementData.ApexThreshold)
+                    {
+                        if (!m_isPastApexThreshold)
+                        {
+                            m_isPastApexThreshold = true;
+                            m_timePastApexThreshold = 0f;
+                        }
+
+                        if (m_isPastApexThreshold)
+                        {
+                            m_timePastApexThreshold += Time.fixedDeltaTime;
+                            if (m_timePastApexThreshold < characterMovementData.ApexHangTime)
+                                VerticalVelocity = 0f;
+                            else
+                                VerticalVelocity = -0.01f;
+                        }
+                    }
+                    //Gravity on Ascending but not past Apex Threshold
+                    //------------------------------------------------//
+                    else
+                    {
+                        VerticalVelocity += characterMovementData.Gravity * Time.fixedDeltaTime;
+                        if (m_isPastApexThreshold)
+                        {
+                            m_isPastApexThreshold = false;
+                        }
+                    }
+                }
+                //Gravity on Descending
+                //------------------------------------------------//
+                else if(!m_isFastFalling)
+                {
+                    VerticalVelocity += characterMovementData.Gravity * characterMovementData.GravityOnReleaseMultiplier * Time.fixedDeltaTime;
+                }
+                else if (VerticalVelocity < 0f)
+                {
+                    if (!m_isFalling)
+                        m_isFalling = true;
+                }
+            }
+            
+
+            //Jump Cut
+            //------------------------------------------------//
+            if (m_isFastFalling)
             {
-                VerticalVelocity += _externalVel.y;
-                _externalVel = new Vector2(_externalVel.x, 0f);
+                if (m_fastFallTime >= characterMovementData.TimeForUpwardsCancel)
+                {
+                    VerticalVelocity += characterMovementData.Gravity * characterMovementData.GravityOnReleaseMultiplier * Time.fixedDeltaTime;
+                }
+                else if (m_fastFallTime < characterMovementData.TimeForUpwardsCancel)
+                {
+                    VerticalVelocity = Mathf.Lerp(m_fastFallReleaseSpeed, 0f, (m_fastFallTime / characterMovementData.TimeForUpwardsCancel));
+                }
+
+                m_fastFallTime += Time.fixedDeltaTime;
             }
-            if (VerticalVelocity < 0f)
+            
+            //Normal Gravity While Falling
+            //------------------------------------------------//
+
+            if (!m_isGrounded && !m_isJumping)
             {
-                //anim.SetBool("jumping", false);
-                //anim.SetBool("falling", true);
+                if (!m_isFalling)
+                    m_isFalling = true;
 
+                VerticalVelocity += characterMovementData.Gravity * Time.fixedDeltaTime;
             }
-            // If we are falling we apply fall modifier
-            // if (VerticalVelocity < 0f)
-            // {
-            //     VerticalVelocity += Physics2D.gravity.y * MoveStats.FallGravityMultiplier * Time.fixedDeltaTime;
-            // }
-            // If we are going up but not pressing jump we apply more gravity to shorten jump
-            // else if (Rigidbody2D.linearVelocityY > 0f && !_isJumpPressed)
-            // {
-            //     VerticalVelocity += Physics2D.gravity.y * MoveStats.FallGravityMultiplier * Time.fixedDeltaTime;
-            // }
-            // else
-            // {
-            //     VerticalVelocity += Physics2D.gravity.y * Time.fixedDeltaTime;
-            // }
-
-            // clamp fall speed
-            // TODO -- put 50f into max upwards velocity setting?
-            VerticalVelocity = Mathf.Clamp(VerticalVelocity, -MoveStats.MaxFallSpeed, 50f);
-            Rigidbody2D.linearVelocity = new Vector2(Rigidbody2D.linearVelocity.x, VerticalVelocity);
-
+            
+            //Clamp Fall Speed
+            //------------------------------------------------//
+            VerticalVelocity = Math.Clamp(VerticalVelocity, -characterMovementData.MaxFallSpeed, characterMovementData.MaxVerticalVelocity);
+            m_rigidbody2D.linearVelocity = new Vector2(m_rigidbody2D.linearVelocity.x, VerticalVelocity);
         }
 
         #endregion
 
         //Timers
         //============================================================================================================//
-        
+
         #region Timers
 
         private void CountTimers()
         {
-            _jumpBufferTimer -= Time.deltaTime;
-            if (!_isGrounded)
+            m_jumpBufferTimer -= Time.deltaTime;
+            if (!m_isGrounded)
             {
-                _coyoteTimer -= Time.deltaTime;
+                m_coyoteTimer -= Time.deltaTime;
             }
             else
             {
-                _coyoteTimer = MoveStats.JumpCoyoteTime;
+                m_coyoteTimer = characterMovementData.JumpCoyoteTime;
             }
+        }
+
+        #endregion
+        
+        //Input Handlers
+        //============================================================================================================//
+
+        #region Input Handlers
+
+        private void OnMovementChanged(Vector2 moveInput)
+        {
+            m_moveInput = moveInput;
+        }
+
+        private void OnJumpPressed(bool pressed)
+        {
+            m_isJumpPressed = pressed;
+        }
+        
+        private void OnRunPressed(bool pressed)
+        {
+            m_isRunPressed = pressed;
         }
 
         #endregion
 
         //Misc
         //============================================================================================================//
-        
+
         // Add speed from a source outside the input
         public void AddExternalVel(Vector2 vel)
         {
-            Debug.Log($"Adding external vel {vel}");
-            _externalVel += vel;
+            //Debug.Log($"Adding external vel {vel}");
+            m_externalVel += vel;
         }
-
-        //TODO This should live on an Animation Controller
-        //============================================================================================================//
-        /*#region Effects/Animations
-
-        private void DoAnimations()
-        {
-            if (Mathf.Abs(_moveInput.x) > 0 && _isGrounded)
-            {
-                WalkAnimation(true);
-                var emission = dustParticleSystem.emission;
-                emission.enabled = true;
-
-            }
-            else
-            {
-                WalkAnimation(false);
-                var emission = dustParticleSystem.emission;
-                emission.enabled = false;
-            }
-
-            if (_moveInput.x > 0)
-            {
-                playerModel.transform.forward = Vector3.right + Vector3.down * .2f;
-            }
-            else if (_moveInput.x < 0)
-            {
-                playerModel.transform.forward = Vector3.left + Vector3.down * .2f;
-            }
-
-        }
-
-        private void WalkAnimation(bool isWalking)
-        {
-            bool animatorIsWalking = anim.GetCurrentAnimatorStateInfo(0).IsName("Walking");
-
-            if (isWalking)
-            {
-                anim.SetBool("walking", true);
-                if (!animatorIsWalking)
-                    anim.Play("Walking");
-            }
-            else
-            {
-                anim.SetBool("walking", false);
-            }
-        }
-
-        #endregion*/
 
         //Unity Editor
         //============================================================================================================//
-        
+
+        #region Unity Editor
+
 #if UNITY_EDITOR
+        
+        [NonSerialized]
+        private readonly RaycastHit2D[] m_editorNonAllocRaycastHits = new RaycastHit2D[1];
 
         private void OnDrawGizmos()
         {
-            var vel = Rigidbody2D == null ? Vector2.zero : Rigidbody2D.linearVelocity;
-            Draw.Label(transform.position, $"Grounded: {_isGrounded} Jump: {_isJumping} \n Velocity: {vel}");
+            if (Application.isPlaying)
+            {
+                var vel = m_rigidbody2D == null ? Vector2.zero : m_rigidbody2D.linearVelocity;
+                Draw.Label(transform.position, $"Grounded: {m_isGrounded} Jump: {m_isJumping}\nVelocity: {vel}\nExtern: {m_externalVel}");
+            }
 
+            if (characterMovementData.CanDraw(DEBUG_DRAW.JUMP_ARC))
+                DrawJumpArc(characterMovementData.MaxRunSpeed, Color.red);
+            if (characterMovementData.CanDraw(DEBUG_DRAW.JUMP_RUN_ARC))
+                DrawJumpArc(characterMovementData.MaxWalkSpeed, Color.green);
         }
 
+
+        
+        private void DrawJumpArc(float moveSpeed, Color gizmoColor)
+        {
+            var startPosition = new Vector2(feetCollider.bounds.center.x, feetCollider.bounds.min.y);
+            var previousPos = startPosition;
+
+            var speed = characterMovementData.CanDraw(DEBUG_DRAW.FACE_RIGHT) ? moveSpeed : -moveSpeed;
+
+            var velocity = new Vector2(speed, characterMovementData.InitialJumpVelocity);
+
+            Gizmos.color = gizmoColor;
+            var timeStep = 2 * characterMovementData.TimeTillJumpApex / characterMovementData.ArcResolution;
+
+            var count = characterMovementData.VisualizationSteps;
+            for (int i = 0; i < count; i++)
+            {
+                var timeTillJumpApex = characterMovementData.TimeTillJumpApex;
+                
+                var simTime = i * timeStep;
+                Vector2 displacement;
+
+                if (simTime < timeTillJumpApex) //Ascending
+                {
+                    displacement = velocity * simTime + 0.5f * new Vector2(0f, characterMovementData.Gravity) * simTime * simTime;
+                }
+                else if (simTime < timeTillJumpApex + characterMovementData.ApexHangTime) //Apex Hang Time
+                {
+                    var apexTime = simTime - timeTillJumpApex;
+                    displacement = velocity * timeTillJumpApex + 0.5f * new Vector2(0f, characterMovementData.Gravity) * timeTillJumpApex * timeTillJumpApex;
+                    displacement += new Vector2(speed, 0) * apexTime;
+                }
+                else //Descending
+                {
+                    float descendTime = simTime - (timeTillJumpApex + characterMovementData.ApexHangTime);
+                    displacement = velocity * timeTillJumpApex + 0.5f * new Vector2(0f, characterMovementData.Gravity) * timeTillJumpApex * timeTillJumpApex;
+                    displacement += new Vector2(speed, 0f) * characterMovementData.ApexHangTime;
+                    displacement += new Vector2(speed, 0f) * descendTime + 0.5f * new Vector2(0f, characterMovementData.Gravity) * descendTime * descendTime;
+                }
+
+                var drawPoint = startPosition + displacement;
+
+                if (characterMovementData.CanDraw(DEBUG_DRAW.JUMP_WITH_COLLISION))
+                {
+                    var dir = drawPoint - previousPos;
+                    var length = dir.magnitude;
+                    var hitCount = Physics2D.RaycastNonAlloc(previousPos, dir, m_editorNonAllocRaycastHits, length, characterMovementData.GroundLayer.value);
+
+                    if (hitCount > 0)
+                    {
+                        Gizmos.DrawLine(previousPos, m_editorNonAllocRaycastHits[0].point);
+                        break;
+                    }
+                }
+                
+                Gizmos.DrawLine(previousPos, drawPoint);
+                previousPos = drawPoint;
+            }
+            
+        }
+        
+        
+
 #endif
+
+        #endregion //Unity Editor
+        
         //============================================================================================================//
     }
+}
