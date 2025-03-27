@@ -43,6 +43,11 @@
       "path": "Samples~/GameInput"
     },
     {
+      "displayName": "3D Character Controller",
+      "description": "<u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a>",
+      "path": "Samples~/3DCharacterController"
+    },
+    {
       "displayName": "Dialog System",
       "description": "Example of how to use IDisplayDialog",
       "path": "Samples~/DialogSystem"
