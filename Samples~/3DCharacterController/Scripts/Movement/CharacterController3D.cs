@@ -6,6 +6,8 @@ namespace Samples.CharacterController3D.Scripts
     [RequireComponent(typeof(Rigidbody))]
     public class CharacterController3D : MonoBehaviour
     {
+        public bool IsGrounded => m_3dBalancer.Grounded;
+        
         [SerializeField]
         private CharacterMovement3DDataScriptableObject characterMovementData;
 
