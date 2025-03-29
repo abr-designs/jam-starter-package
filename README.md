@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.5` - Feb 24, 2025
+### `v0.0.6-preview` - mmm dd, yyyy
 ### Supports Unity 6000.0
 
 ## Samples
@@ -27,6 +27,7 @@ projects & Game jams.
 - ### [SFX Manager](Documentation~/Samples/sfx-manager.md)
 - ### [Music Manager](Documentation~/Samples/music-manager.md)
 - ### [Dialog System](Documentation~/Samples/dialog-system.md)
+- ### [3D Character Controller](Documentation~/Samples/3d-character-controller.md)
 - ### [Game Input](Documentation~/Samples/game-input.md)
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
 - ### [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
