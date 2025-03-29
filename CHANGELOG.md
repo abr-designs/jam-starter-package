@@ -12,13 +12,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added [`ProjectileMath.cs`](Runtime/Scripts/Utilities/Physics/ProjectileMath.cs) with various helpers for trajectory calculations
 - Added [`Trajectory Sample`](Samples~/Trajectory/) scene, scripts and prefabs for working with trajectory components
 - Added [`Trajectory Sample`](Documentation~/Samples/trajectory.md) documentation
-- Added 3D Character Controller Sample, based on [Making A Physics Based Character Controller In Unity](https://youtu.be/qdskE8PJy6Q?si=yGx9nWuwtoum0v6n)
+- Added **3D Character Controller Sample**, based on [Making A Physics Based Character Controller In Unity](https://youtu.be/qdskE8PJy6Q?si=yGx9nWuwtoum0v6n)
   - Added models from the [Kenny Prototype Kit](https://kenney.nl/data/itch/preview/Previews/Prototype%20Kit.png)
   - Added [CharacterMovement3DDataScriptableObject.cs](Samples~/3DCharacterController/Scripts/CharacterMovement3DDataScriptableObject.cs) as Data container
   - Added [Character3DBalancer.cs](Samples~/3DCharacterController/Scripts/Character3DBalancer.cs) as script to apply floating forces, checking grounded state & keeping character upright
   - Added [CharacterController3D.cs](Samples~/3DCharacterController/Scripts/CharacterController3D.cs) as movement & jumping source
   - Added [PlayerCapsule prefab](Samples~/3DCharacterController/Prefabs/PlayerCapsule.prefab) which represents a basic implementation of the Character Controller
   - Added Sample Scene with all the 3D Character Controller elements implemented
+  - Added Player Capsule variant [Animated Player](Samples~/3DCharacterController/Prefabs/Animated%20Player.prefab) which contains the new animations & the Kenny figurine model
+  - Added [FigurineAnimationController](Samples~/3DCharacterController/Animation/FigurineAnimationController.controller) with some pre-set animation states
+  - Added [CharacterAnimationController.cs](Samples~/3DCharacterController/Scripts/Animation/CharacterAnimationController.cs) as script in charge of updating its `Animator`
+  - Added a **Cinemachine Freelook Camera** into the sample scene
+  - Added [LockPlayerMouse.cs](Samples~/3DCharacterController/Scripts/LockPlayerMouse.cs) as a way to prevent the mouse from drifting when moving player camera
+  - 
 
 ### Changed
 - Added `HitPoint` property to [`MouseCaster.cs`](Runtime/Scripts/Utilities/MouseCaster.cs)
