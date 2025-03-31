@@ -43,10 +43,15 @@
       "path": "Samples~/GameInput"
     },
     {
+      "displayName": "2D Character Controller",
+      "description": "Based on <a href=\"https://www.youtube.com/watch?v=zHSWG05byEc\">ULTIMATE 2D Platformer Controller for Unity</a><br><u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a>",
+      "path": "Samples~/2D Character Controller"
+    },
+    {      
       "displayName": "3D Character Controller",
       "description": "<u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a><br>- <a href=\"url\">Cinemachine</a>",
       "path": "Samples~/3DCharacterController"
-    },
+    },    
     {
       "displayName": "Dialog System",
       "description": "Example of how to use IDisplayDialog",

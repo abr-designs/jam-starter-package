@@ -27,6 +27,7 @@ projects & Game jams.
 - ### [SFX Manager](Documentation~/Samples/sfx-manager.md)
 - ### [Music Manager](Documentation~/Samples/music-manager.md)
 - ### [Dialog System](Documentation~/Samples/dialog-system.md)
+- ### [2D Character Controller](Documentation~/Samples/2d-character-controller.md)
 - ### [3D Character Controller](Documentation~/Samples/3d-character-controller.md)
 - ### [Game Input](Documentation~/Samples/game-input.md)
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
