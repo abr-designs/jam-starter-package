@@ -99,7 +99,7 @@ MonoBehaviour:
   ApexHangTime: 0.04
   JumpBufferTime: 0.125
   JumpCoyoteTime: 0.1
-  rideHeight: 0.45
+  rideHeight: 0.5
   springStrength: 1317.9
   springDamper: 0.1
   uprightStrength: 70.58
