@@ -81,7 +81,7 @@ namespace Samples.CharacterController3D.Scripts
                 return;
             }
 
-            var rayHit = m_raycastHits[0];
+            var rayHit = m_raycastHits.GetNearestHit(hitCount);
 
             //Check if Grounded
             //------------------------------------------------//

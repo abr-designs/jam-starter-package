@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added [`ProjectileMath.cs`](Runtime/Scripts/Utilities/Physics/ProjectileMath.cs) with various helpers for trajectory calculations
 - Added [`Trajectory Sample`](Samples~/Trajectory/) scene, scripts and prefabs for working with trajectory components
 - Added [`Trajectory Sample`](Documentation~/Samples/trajectory.md) documentation
+- Added [`RaycastHitExtensions.cs`](Runtime/Scripts/Utilities/Extensions/RaycastHitExtensions.cs) to add methods to sort through non-alloc `RaycastHit` arrays for specific items
+  - Includes `GetNearestHit()` & `GetFurthestHit()`
 - Added [`TextureAtlasSlicer.cs`](Editor/KennySpriteSlicer/TextureAtlasSlicer.cs) as tool to help parse [Kenny Asset](https://kenney.nl/data/itch/preview/) sprite sheets
 - Added **3D Character Controller Sample**, based on [Making A Physics Based Character Controller In Unity](https://youtu.be/qdskE8PJy6Q?si=yGx9nWuwtoum0v6n)
   - Added models from the [Kenny Prototype Kit](https://kenney.nl/data/itch/preview/Previews/Prototype%20Kit.png)
