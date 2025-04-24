@@ -1,7 +1,7 @@
 {
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
-  "version": "0.0.6-preview",
+  "version": "0.0.6",
   "unity": "6000.0",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
