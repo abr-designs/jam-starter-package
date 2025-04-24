@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.6-preview] - yyyy-mm-dd
+## [0.0.6] - 2025-04-24
 
 ### Added
 - New PR Template into the `/.github/` directory

@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.6-preview` - mmm dd, yyyy
+### `v0.0.6` - Apr 24, 2025
 ### Supports Unity 6000.0
 
 ## Samples
