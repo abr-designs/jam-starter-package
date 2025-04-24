@@ -72,10 +72,13 @@
 				//canvas.style.background = 'linear-gradient(to right, white, white ' + percent + ', transparent ' + percent + ', transparent) no-repeat center';
 				//canvas.style.backgroundSize = '100% 1rem';
 
-				canvas.style.background = `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%2230%22%3E%3Ctext%20x%3D%2250%22%20y%3D%2222%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20fill%3D%22%23fff%22%3ELOADING...%3C%2Ftext%3E%3C%2Fsvg%3E') no-repeat center calc(50% - 2rem),
-			linear-gradient(195deg, #ff00c3, #d123ba, #a42dab, #7b2f97, #552b80, #342465, #181a48, #050b2b) no-repeat calc(50% - ${5-progress*5.0}rem) center / ${progress*10.0}rem 1rem, 
-				linear-gradient(to right, #000, #000) no-repeat center / 10.5rem 1.5rem, 
-				linear-gradient(to right, #fff, #fff) no-repeat center / 11rem 2rem, black`
+				// example gradients for a more advanced progress bar	
+				// linear-gradient(195deg, #ff00c3, #d123ba, #a42dab, #7b2f97, #552b80, #342465, #181a48, #050b2b) no-repeat calc(50% - ${5-progress*5.0}rem) center / ${progress*10.0}rem 1rem, 
+
+				canvas.style.background = `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%2230%22%3E%3Ctext%20x%3D%2250%22%20y%3D%2222%22%20font-family%3D%22Arial%22%20font-size%3D%2220%22%20fill%3D%22{{{ LOAD_TEXT_COLOR.replace('#','%23') }}}%22%3E{{{ LOAD_TEXT }}}%3C%2Ftext%3E%3C%2Fsvg%3E') no-repeat center calc(50% - 2rem),
+					linear-gradient(to right, {{{ PROGRESS_LEFT_COLOR }}}, {{{ PROGRESS_RIGHT_COLOR }}}) no-repeat calc(50% - ${5-progress*5.0}rem) center / ${progress*10.0}rem 1rem, 
+					linear-gradient(to right, {{{ PROGRESS_BACKGROUND_COLOR }}}, {{{ PROGRESS_BACKGROUND_COLOR }}}) no-repeat center / 10.5rem 1.5rem, 
+					linear-gradient(to right, {{{ PROGRESS_BORDER_COLOR }}}, {{{ PROGRESS_BORDER_COLOR }}}) no-repeat center / 11rem 2rem, {{{ BACKGROUND || '#000' }}}`
 
 			}
 			function onResize() {

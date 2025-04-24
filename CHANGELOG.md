@@ -5,15 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.6] - 2025-04-24
+
+### Added
+- New PR Template into the `/.github/` directory
+- Added `2D Character Controller` Sample
+  - Added `2D Character Controller Sample` scene
+  - Added `CharacterController2D.cs`
+  - Added `CharacterMovementDataScriptableObject.cs`
+  - Added `2D Character Controller` prefab
+  - Added `2D Character Movement Data` scriptable object that contains default settings for sample
+- Added [`ProjectileMath.cs`](Runtime/Scripts/Utilities/Physics/ProjectileMath.cs) with various helpers for trajectory calculations
+- Added [`Trajectory Sample`](Samples~/Trajectory/) scene, scripts and prefabs for working with trajectory components
+- Added [`Trajectory Sample`](Documentation~/Samples/trajectory.md) documentation
+- Added [`RaycastHitExtensions.cs`](Runtime/Scripts/Utilities/Extensions/RaycastHitExtensions.cs) to add methods to sort through non-alloc `RaycastHit` arrays for specific items
+  - Includes `GetNearestHit()` & `GetFurthestHit()`
+- Added [`TextureAtlasSlicer.cs`](Editor/KennySpriteSlicer/TextureAtlasSlicer.cs) as tool to help parse [Kenny Asset](https://kenney.nl/data/itch/preview/) sprite sheets
+- Added **3D Character Controller Sample**, based on [Making A Physics Based Character Controller In Unity](https://youtu.be/qdskE8PJy6Q?si=yGx9nWuwtoum0v6n)
+  - Added models from the [Kenny Prototype Kit](https://kenney.nl/data/itch/preview/Previews/Prototype%20Kit.png)
+  - Added [CharacterMovement3DDataScriptableObject.cs](Samples~/3DCharacterController/Scripts/CharacterMovement3DDataScriptableObject.cs) as Data container
+  - Added [Character3DBalancer.cs](Samples~/3DCharacterController/Scripts/Character3DBalancer.cs) as script to apply floating forces, checking grounded state & keeping character upright
+  - Added [CharacterController3D.cs](Samples~/3DCharacterController/Scripts/CharacterController3D.cs) as movement & jumping source
+  - Added [PlayerCapsule prefab](Samples~/3DCharacterController/Prefabs/PlayerCapsule.prefab) which represents a basic implementation of the Character Controller
+  - Added Sample Scene with all the 3D Character Controller elements implemented
+  - Added Player Capsule variant [Animated Player](Samples~/3DCharacterController/Prefabs/Animated%20Player.prefab) which contains the new animations & the Kenny figurine model
+  - Added [FigurineAnimationController](Samples~/3DCharacterController/Animation/FigurineAnimationController.controller) with some pre-set animation states
+  - Added [CharacterAnimationController.cs](Samples~/3DCharacterController/Scripts/Animation/CharacterAnimationController.cs) as script in charge of updating its `Animator`
+  - Added a **Cinemachine Freelook Camera** into the sample scene
+  - Added [LockPlayerMouse.cs](Samples~/3DCharacterController/Scripts/LockPlayerMouse.cs) as a way to prevent the mouse from drifting when moving player camera
+
+### Changed
+- Added `HitPoint` property to [`MouseCaster.cs`](Runtime/Scripts/Utilities/MouseCaster.cs)
+- Added `ShortestRotation()` to [`JMath.cs`](Runtime/Scripts/Utilities/JMath.cs)
+- Added `2D Character Controller` into the Package samples
+- Adjusted `GameInput` Sample to replace `GrabItem` with `Jump`
+  - This includes a change to `Action<bool>` callback for `OnJumpPressed`
+
+### Fixed
+-
 
 ## [0.0.5] - 2025-02-24
 
 ### Added
 - Added missing `Circle2Circle()` function in [`CollisionChecks.cs`](Runtime/Scripts/Utilities/Physics/CollisionChecks.cs)
   - Includes overload for `Vector2` parameters
-- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds _**(Unity 6 Only!)**_
-- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates _**(Unity 6 Only!)**_
-  - There's a Menu Item at `WebGL/Create Template` that will copy the package directory into the Local Assets directory
+- Added `/WebGLTemplates~/` for a custom HTML player for WebGL builds
+- Added `WebGLEditorWindow.cs` to allow the creation of local WebGL Templates
+  - There's a Menu Item at `WebGL/Template Wizard` that will open the WebGL template customizer.
+  - The Create Template button will copy the template from the package directory into the Local Assets directory and setup all the appropriate build time variables for customization
 
 ### Changed
 - 
