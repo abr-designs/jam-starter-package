@@ -18,14 +18,19 @@ const fixCsLinks = (content) => {
         return `[${text}](${absoluteUrl})`;
     });
 };
-// Function to replace links starting with 'Documentation~' to be relative to the root
+// Function to replace links starting with 'Documentation~' or 'WebGLTemplates~' to be relative to the root
 const fixDocLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\((Documentation(?:~|%7E)[^\)]+)\)/g, (match, text, docPath) => {
+    return content.replace(/\[([^\]]+)\]\((((?:.*\/)*(?:Documentation|WebGLTemplates)(?:~|%7E))[^\)]+)\)/g, (match, text, docPath, replacePart) => {
       // Replace 'Documentation~' with the correct URL for documentation links
-      const relativeUrl = `${docPath.replace('Documentation~', '').replace('Documentation%7E', '')}`; // Adjust URL
+      let relativeUrl = `${docPath.replace(replacePart,'')}`; // Adjust URL
+
+      if (replacePart.includes('WebGLTemplates'))
+        relativeUrl = relativeUrl.replace('README','WebGL');
+    
       return `[${text}](${relativeUrl})`;
     });
   };
+
 
 // Function to replace containing capital extensions (ex .PNG)
 const fixCapitalLinks = (content) => {
