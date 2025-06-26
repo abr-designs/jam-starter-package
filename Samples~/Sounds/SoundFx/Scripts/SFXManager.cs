@@ -49,6 +49,8 @@ namespace Audio
 
         private Dictionary<SFX, SfxData> _sfxDataDictionary;
         private Dictionary<SFX, int> _sfxAntiSpam;
+        
+        private bool _isReady;
 
         //Unity Functions
         //============================================================================================================//
@@ -88,12 +90,16 @@ namespace Audio
             //------------------------------------------------//
 
             _audioSources = new List<AudioSource>();
+            _isReady = true;
         }
 
         //============================================================================================================//
 
         internal void PlaySound(SFX sfx, float volume = 1f)
         {
+            if(!_isReady)
+                return;
+            
             var sfxData = GetSFXData(sfx);
 
             var hasAntiSpam = _sfxAntiSpam.TryGetValue(sfx, out var count);
@@ -116,6 +122,9 @@ namespace Audio
         //This is meant to be called via the VFXExtensions class
         internal void PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
         {
+            if(!_isReady)
+                return;
+                        
             var sfxData = GetSFXData(vfx);
 
             var audioSource = TryGet3DAudioSource();
