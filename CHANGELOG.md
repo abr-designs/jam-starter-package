@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.7-preview] - 2025-06-25
 
 ### Added
-
+- Added `Singleton.cs` as a Singleton behaviour where the instance is publicly visible
 
 ### Changed
 
