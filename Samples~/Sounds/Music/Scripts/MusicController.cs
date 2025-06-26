@@ -47,6 +47,8 @@ namespace Audio.Music
         
         private Dictionary<MUSIC, MusicData> _musicDataDictionary;
         
+        public bool _isReady;
+        
         //Unity Functions
         //============================================================================================================//
 
@@ -84,12 +86,17 @@ namespace Audio.Music
                 var vfxData = musicDatas[i];
                 _musicDataDictionary.Add(vfxData.type, vfxData);
             }
+            
+            _isReady = true;
         }
 
         //============================================================================================================//
 
         internal void PlayMusic(MUSIC music)
         {
+            if (!_isReady)
+                return;
+            
             //Don't need to fade into music that is already playing
             if (music == _currentMusic)
                 return;

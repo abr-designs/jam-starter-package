@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.7-preview] - 2025-06-25
+
+### Added
+
+
+### Changed
+
+
+### Fixed
+- Resolved potential race condition with `SFXManager.cs` sample when attempting to call `PlaySound()` on the first frame
+- Resolved potential race condition with `MusicController.cs` sample when attempting to call `PlayMusic()` on the first frame
+
 ## [0.0.6] - 2025-04-24
 
 ### Added
