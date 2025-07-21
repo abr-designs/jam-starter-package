@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Utilities;
 
 namespace VisualFX
 {
-    internal class VFXManager : MonoBehaviour
+    internal class VFXManager : HiddenSingleton<VFXManager>
     {
         //============================================================================================================//
         [Serializable]
@@ -22,8 +23,6 @@ namespace VisualFX
 
         //============================================================================================================//
 
-        internal static VFXManager Instance;
-
         [SerializeField]
         private VfxData[] vfxDatas;
 
@@ -31,17 +30,6 @@ namespace VisualFX
         
         //Unity Functions
         //============================================================================================================//
-
-        private void Awake()
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            
-            Instance = this;
-        }
 
         // Start is called before the first frame update
         private void Start()
@@ -64,8 +52,14 @@ namespace VisualFX
         
         //============================================================================================================//
 
+        public static GameObject PlayAtLocation(VFX vfx, Vector3 worldPosition, float scale = 1f, bool keepAlive = false)
+        {
+            Assert.IsNotNull(Instance, $"Missing the {nameof(VFXManager)} in the Scene!!");
+            
+            return Instance._PlayAtLocation(vfx, worldPosition, scale, keepAlive);
+        }
         //This is meant to be called via the VFXExtensions class
-        internal GameObject PlayAtLocation(VFX vfx, Vector3 worldPosition, float scale = 1f, bool keepAlive = false)
+        private GameObject _PlayAtLocation(VFX vfx, Vector3 worldPosition, float scale, bool keepAlive)
         {
             var vfxData = GetVFXData(vfx);
 

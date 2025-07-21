@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.7-preview] - 2025-06-25
 
 ### Added
-
+- Added `Singleton.cs` as a Singleton behaviour where the instance is publicly visible
 
 ### Changed
+- Set `SFXManager.cs`, `MusicController.cs` & `VFXManager.cs` to each utilize the `HiddenSingleton.cs` as a base class to maintain standard use
+  - Added static functions in each of these managers that be called from their relative extension classes to help enforce the `HiddenSingleton` structure
+- Updated `MusicController._isReady` to be `private` instead of `public`
 
 
 ### Fixed
