@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Resolved potential race condition with `SFXManager.cs` sample when attempting to call `PlaySound()` on the first frame
 - Resolved potential race condition with `MusicController.cs` sample when attempting to call `PlayMusic()` on the first frame
+- Resolved `CollectionExtensions.PickRandomElement()` & `CollectionExtensions.Shuffle()` not catching null or empty list cases with clear exception
 
 ## [0.0.6] - 2025-04-24
 
