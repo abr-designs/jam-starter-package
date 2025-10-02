@@ -14,11 +14,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Set `SFXManager.cs`, `MusicController.cs` & `VFXManager.cs` to each utilize the `HiddenSingleton.cs` as a base class to maintain standard use
   - Added static functions in each of these managers that be called from their relative extension classes to help enforce the `HiddenSingleton` structure
 - Updated `MusicController._isReady` to be `private` instead of `public`
+- Added `null` catch for `TweenController.cs`
+- Added `Debug.LogError()` to `TweenController.InstantTween()` to advise avoiding using a `0s` tween time
 
 
 ### Fixed
 - Resolved potential race condition with `SFXManager.cs` sample when attempting to call `PlaySound()` on the first frame
 - Resolved potential race condition with `MusicController.cs` sample when attempting to call `PlayMusic()` on the first frame
+- Resolved divide by `0.0` in `TweenController.cs` that would cause a `NaN` error when setting the tween time to `0.0`
+  - This was resolved by auo-completing the tween in the event that the `time` value is `0f` by calling `InstantTween()`
 
 ## [0.0.6] - 2025-04-24
 
