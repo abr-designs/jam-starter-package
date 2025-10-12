@@ -9,7 +9,7 @@ using UnityEngine.TestTools;
 using Utilities.Tweening;
 using Object = UnityEngine.Object;
 
-namespace Tests.Tweens
+namespace Tests.Utilities.Extensions.Tweens
 {
     public class RotationTweenToTests
     {
