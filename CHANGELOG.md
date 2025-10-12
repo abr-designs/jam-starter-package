@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Resolved divide by `0.0` in `TweenController.cs` that would cause a `NaN` error when setting the tween time to `0.0`
   - This was resolved by auo-completing the tween in the event that the `time` value is `0f` by calling `InstantTween()`
 - Resolved `CollectionExtensions.PickRandomElement()` & `CollectionExtensions.Shuffle()` not catching null or empty list cases with clear exception
+- Resolved `TweenToController` spamming `Debug.LogError()` due to `InstantTween()` not setting `Active = false`
 
 ## [0.0.6] - 2025-04-24
 

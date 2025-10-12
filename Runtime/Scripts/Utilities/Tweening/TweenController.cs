@@ -178,6 +178,7 @@ namespace Utilities.Tweening
             if (_totalTime <= 0f)
             {
                 InstantTween();
+                Active = false;
                 return true;
             }
             
