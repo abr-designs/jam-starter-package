@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `Singleton.cs` as a Singleton behaviour where the instance is publicly visible
+- Added TestFramework & NUnit support for some of the built in utilities, with Editmode & playmode tests
+  - Added tests for `TweenTo`
+  - Added tests for `RaycastHitExtensions.cs`
+  - Added tests for `JMath.cs`
+  - Added tests for `CollisionChecks.cs`
 
 ### Changed
 - Set `SFXManager.cs`, `MusicController.cs` & `VFXManager.cs` to each utilize the `HiddenSingleton.cs` as a base class to maintain standard use
