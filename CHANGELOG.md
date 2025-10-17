@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+
+## [0.0.7] - 2025-10-17
+
+### Added
+- Added `Singleton.cs` as a Singleton behaviour where the instance is publicly visible
+- Added TestFramework & NUnit support for some of the built in utilities, with Editmode & playmode tests
+  - Added tests for `TweenTo`
+  - Added tests for `RaycastHitExtensions.cs`
+  - Added tests for `JMath.cs`
+  - Added tests for `CollisionChecks.cs`
+
+### Changed
+- Set `SFXManager.cs`, `MusicController.cs` & `VFXManager.cs` to each utilize the `HiddenSingleton.cs` as a base class to maintain standard use
+  - Added static functions in each of these managers that be called from their relative extension classes to help enforce the `HiddenSingleton` structure
+- Updated `MusicController._isReady` to be `private` instead of `public`
+- Added `null` catch for `TweenController.cs`
+- Added `Debug.LogError()` to `TweenController.InstantTween()` to advise avoiding using a `0s` tween time
+- Updated `Pull_request_template.md` to better match use case & include a passed tests check
+
+
+### Fixed
+- Resolved potential race condition with `SFXManager.cs` sample when attempting to call `PlaySound()` on the first frame
+- Resolved potential race condition with `MusicController.cs` sample when attempting to call `PlayMusic()` on the first frame
+- Resolved divide by `0.0` in `TweenController.cs` that would cause a `NaN` error when setting the tween time to `0.0`
+  - This was resolved by auo-completing the tween in the event that the `time` value is `0f` by calling `InstantTween()`
+- Resolved `CollectionExtensions.PickRandomElement()` & `CollectionExtensions.Shuffle()` not catching null or empty list cases with clear exception
+- Resolved `TweenToController` spamming `Debug.LogError()` due to `InstantTween()` not setting `Active = false`
+
 ## [0.0.6f1] - 2025-04-26
 
 ### Fixed

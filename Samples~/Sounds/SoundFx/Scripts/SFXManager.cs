@@ -6,12 +6,15 @@ using Sounds;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Audio;
+using Utilities;
 using Random = UnityEngine.Random;
 
 namespace Audio
 {
-    public class SFXManager : MonoBehaviour, ISetVolume
+    public class SFXManager : HiddenSingleton<SFXManager>, ISetVolume
     {
+        internal static SFXManager instance => Instance;
+        
         //============================================================================================================//
         [Serializable]
         private class SfxData
@@ -43,32 +46,23 @@ namespace Audio
         [SerializeField]
         private AudioSource sfxSourcePrefab;
         private List<AudioSource> _audioSources;
-        internal static SFXManager Instance;
 
         [SerializeField] private SfxData[] sfxDatas;
 
         private Dictionary<SFX, SfxData> _sfxDataDictionary;
         private Dictionary<SFX, int> _sfxAntiSpam;
+        
+        private bool _isReady;
 
         //Unity Functions
         //============================================================================================================//
 
-        private void Awake()
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            Assert.IsNotNull(sfxAudioMixer);
-            
-        }
-
         // Start is called before the first frame update
         private void Start()
         {
+            Assert.IsNotNull(sfxAudioMixer);
+
+            
             InitVfxLibrary();
 
             _sfxAntiSpam = new Dictionary<SFX, int>();
@@ -88,12 +82,20 @@ namespace Audio
             //------------------------------------------------//
 
             _audioSources = new List<AudioSource>();
+            _isReady = true;
         }
 
         //============================================================================================================//
-
-        internal void PlaySound(SFX sfx, float volume = 1f)
+        public static void PlaySound(SFX sfx, float volume = 1f)
         {
+            Assert.IsNotNull(Instance, $"Missing the {nameof(SFXManager)} in the Scene!!");
+            Instance._PlaySound(sfx, volume);
+        }
+        private void _PlaySound(SFX sfx, float volume)
+        {
+            if(!_isReady)
+                return;
+            
             var sfxData = GetSFXData(sfx);
 
             var hasAntiSpam = _sfxAntiSpam.TryGetValue(sfx, out var count);
@@ -113,9 +115,17 @@ namespace Audio
             //FIXME This should just use a loop, and not a coroutine
             StartCoroutine(DequeueSFXCoroutine(sfx, audioClip.length));
         }
-        //This is meant to be called via the VFXExtensions class
-        internal void PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
+        public static void PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
         {
+            Assert.IsNotNull(Instance, $"Missing the {nameof(SFXManager)} in the Scene!!");
+            Instance._PlaySoundAtLocation(vfx, worldPosition);
+        }
+        //This is meant to be called via the VFXExtensions class
+        private void _PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
+        {
+            if(!_isReady)
+                return;
+                        
             var sfxData = GetSFXData(vfx);
 
             var audioSource = TryGet3DAudioSource();

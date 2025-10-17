@@ -6,10 +6,11 @@ using Sounds;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Audio;
+using Utilities;
 
 namespace Audio.Music
 {
-    public class MusicController : MonoBehaviour, ISetVolume
+    public class MusicController : HiddenSingleton<MusicController>, ISetVolume
     {
         //------------------------------------------------//
         
@@ -24,8 +25,6 @@ namespace Audio.Music
         }
 
         //------------------------------------------------//
-
-        internal static MusicController Instance;
 
         [SerializeField]
         private AudioMixer musicAudioMixer;
@@ -47,24 +46,16 @@ namespace Audio.Music
         
         private Dictionary<MUSIC, MusicData> _musicDataDictionary;
         
+        private bool _isReady;
+        
         //Unity Functions
         //============================================================================================================//
-
-        private void Awake()
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            Assert.IsNotNull(musicAudioMixer);
-        }
 
         // Start is called before the first frame update
         private void Start()
         {
+            Assert.IsNotNull(musicAudioMixer);
+            
             InitMusicLibrary();
 
             if (startMusic == MUSIC.NONE)
@@ -84,12 +75,21 @@ namespace Audio.Music
                 var vfxData = musicDatas[i];
                 _musicDataDictionary.Add(vfxData.type, vfxData);
             }
+            
+            _isReady = true;
         }
 
         //============================================================================================================//
-
-        internal void PlayMusic(MUSIC music)
+        public static void PlayMusic(MUSIC music)
         {
+            Assert.IsNotNull(Instance, $"Missing the {nameof(MusicController)} in the Scene!!");
+            Instance._PlayMusic(music);
+        }
+        private void _PlayMusic(MUSIC music)
+        {
+            if (!_isReady)
+                return;
+            
             //Don't need to fade into music that is already playing
             if (music == _currentMusic)
                 return;

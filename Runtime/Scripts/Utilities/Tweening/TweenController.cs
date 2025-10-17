@@ -131,6 +131,9 @@ namespace Utilities.Tweening
         
         internal TweenData SetData(bool worldSpace, TRANSFORM transformation, Transform targetTransform, float time, CURVE curve, Action onTweenComplete)
         {
+            if (targetTransform == null)
+                throw new ArgumentOutOfRangeException(nameof(targetTransform), $"{nameof(targetTransform)} should not be null!");
+            
             //Is the requested tween in Local or World space?
             _localTransformation = !worldSpace;
             Transformation = transformation;
@@ -171,6 +174,14 @@ namespace Utilities.Tweening
 
         internal bool Update(float deltaTime)
         {
+            //This circumstance should be avoided when possible, as it should just set the transformation
+            if (_totalTime <= 0f)
+            {
+                InstantTween();
+                Active = false;
+                return true;
+            }
+            
             //We want to countdown the time to the target
             _time = Math.Clamp(_time - deltaTime, 0f, _totalTime);
 
@@ -213,6 +224,45 @@ namespace Utilities.Tweening
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// In the event that the tween should be happening instantly, such as when the total tween time is zero, we do
+        /// so here. Returning True to indicate that the tween is completed.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private void InstantTween()
+        {
+            Debug.LogError($"Attempting to apply {Transformation} to {TargetTransform.gameObject.name} with a time of {_totalTime:#0.0s}.\n" +
+                           "Tween's should only be used for movement over time, to instantly apply a tween, just set the transform.");
+            switch (Transformation)
+            {
+                case TRANSFORM.MOVE:
+                {
+                    if (_localTransformation)
+                        TargetTransform.localPosition = _targetPosition;
+                    else
+                        TargetTransform.position = _targetPosition;
+
+                    break;
+                }
+                case TRANSFORM.ROTATE:
+                {
+                    if (_localTransformation)
+                        TargetTransform.localRotation = _targetRotation;
+                    else
+                        TargetTransform.rotation = _targetRotation;
+                    break;
+                }
+                case TRANSFORM.SCALE:
+                {
+                    TargetTransform.localScale = _targetScale;
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
         
         private static float GetCurveT(CURVE curve, float t)

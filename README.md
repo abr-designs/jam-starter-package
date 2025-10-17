@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.6` - Apr 24, 2025
+### `v0.0.7` - Oct 17, 2025
 ### Supports Unity 6000.0
 
 ## Samples
@@ -46,6 +46,7 @@ projects & Game jams.
   - #### [Transform Tweens](Documentation~/Utilities/utilities-extensions-transform.md)
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
+  - #### [Singletons](Documentation~/Utilities/utilities-singletons.md)
 - ### [WebGL Templates](WebGLTemplates~/README.md)
 
 ---
