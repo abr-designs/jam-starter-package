@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+
 ## [0.0.7] - 2025-10-17
 
 ### Added
@@ -31,6 +33,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - This was resolved by auo-completing the tween in the event that the `time` value is `0f` by calling `InstantTween()`
 - Resolved `CollectionExtensions.PickRandomElement()` & `CollectionExtensions.Shuffle()` not catching null or empty list cases with clear exception
 - Resolved `TweenToController` spamming `Debug.LogError()` due to `InstantTween()` not setting `Active = false`
+
+## [0.0.6f1] - 2025-04-26
+
+### Fixed
+- Resolved build crash on Unity `6000.1` caused by `ProjectileMath.cs` use of `Mono.Cecil` 
 
 ## [0.0.6] - 2025-04-24
 

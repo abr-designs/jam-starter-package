@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "process-docs": "shx rm -rf ./site && shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md && node .vitepress/prebuild.js",
+    "process-docs": "shx rm -rf ./site && shx cp ../WebGLTemplates~/README.md ../Documentation~/WebGL.md && shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md && node .vitepress/prebuild.js",
     "copy-assets": "shx mkdir -p ./site/public && shx cp -r ./site/Images ./site/public",
     "predocs:dev": "npm run process-docs",
     "docs:dev": "vitepress dev",

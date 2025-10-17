@@ -1,9 +1,5 @@
 // Based on https://github.com/IronWarrior/ProjectileShooting/blob/master/Assets/Scripts/ProjectileMath.cs
-using System;
-using System.Collections.Generic;
-using Mono.Cecil;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Utilities.Physics
 {
