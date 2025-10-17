@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.7-preview] - 2025-06-25
+## [0.0.7] - 2025-10-17
 
 ### Added
 - Added `Singleton.cs` as a Singleton behaviour where the instance is publicly visible
@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated `MusicController._isReady` to be `private` instead of `public`
 - Added `null` catch for `TweenController.cs`
 - Added `Debug.LogError()` to `TweenController.InstantTween()` to advise avoiding using a `0s` tween time
+- Updated `Pull_request_template.md` to better match use case & include a passed tests check
 
 
 ### Fixed
