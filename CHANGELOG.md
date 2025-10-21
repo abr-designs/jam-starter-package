@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.8-preview] - DATE
 
 ### Added
-- 
+- Added `SPACE.cs` enum, that is used for `PingPongAnimator.cs` & `SimpleSpin.cs` to allow space specific assignments
+- Added `TransformExtensions.cs` to provide Setting `position` & `rotation` functions that use `enum SPACE` as a parameter
 
 ### Changed
-- 
+- Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
+  - Added `Assert` to `Start()` to help catch potential issues early
+- Updated `SimpleSpin.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
 
 ### Fixed
 - 

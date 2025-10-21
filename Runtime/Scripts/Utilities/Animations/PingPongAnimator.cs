@@ -1,4 +1,8 @@
+using System;
 using UnityEngine;
+using UnityEngine.Assertions;
+using Utilities.Enums;
+using Utilities.Extensions;
 
 namespace Utilities.Animations
 {
@@ -7,7 +11,10 @@ namespace Utilities.Animations
     /// </summary>
     public class PingPongAnimator : MonoBehaviour
     {
-        [SerializeField, Min(0)]
+        [SerializeField]
+        private SPACE space = SPACE.WORLD;
+        
+        [SerializeField, Min(0f)]
         private float speed;
         private float _current;
 
@@ -25,6 +32,12 @@ namespace Utilities.Animations
 
         [SerializeField, Space(10f)]
         private AnimationCurve curve;
+
+        private void Start()
+        {
+            Assert.IsNotNull(curve, $"{nameof(curve)} needs to be set!");
+        }
+
         // Start is called before the first frame update// Update is called once per frame
         private void Update()
         {
@@ -32,13 +45,13 @@ namespace Utilities.Animations
             var t = curve.Evaluate(Mathf.PingPong(_current, 1f));
 
             if(usePosition)
-                transform.position = Vector3.Lerp(startPosition, endPosition, t);
+                transform.SetPosition(space, Vector3.Lerp(startPosition, endPosition, t));
+            
+            if(useRotation)
+                transform.SetRotation(space,Quaternion.Euler(Vector3.Lerp(startRotation, endRotation, t)));
             
             if(useScale)
                 transform.localScale = Vector3.Lerp(startScale, endScale, t);
-            
-            if(useRotation)
-                transform.rotation = Quaternion.Euler(Vector3.Lerp(startRotation, endRotation, t));
         }
     }
 }
