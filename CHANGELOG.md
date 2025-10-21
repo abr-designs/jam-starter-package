@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [0.0.8-preview] - DATE
 
 ### Added
@@ -15,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - 
+
+## [0.0.7f1] - 2025-10-18
+### Fixed
+- Resolved crash caused by Testframework Assemblies missing a constraint
 
 ## [0.0.7] - 2025-10-17
 
