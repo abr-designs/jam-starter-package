@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEngine;
+using Utilities.Enums;
 
 namespace Utilities.Tweening
 {
@@ -140,7 +141,7 @@ namespace Utilities.Tweening
             Active = true;
         }
         
-        internal TweenData SetData(bool worldSpace, TRANSFORM transformation, Transform targetTransform, float time, CURVE curve, Action onTweenComplete)
+        internal TweenData SetData(SPACE transformSpace, TRANSFORM transformation, Transform targetTransform, float time, CURVE curve, Action onTweenComplete)
         {
             if (targetTransform == null)
                 throw new ArgumentOutOfRangeException(nameof(targetTransform), $"{nameof(targetTransform)} should not be null!");
@@ -148,7 +149,7 @@ namespace Utilities.Tweening
             UpdateType = UPDATE_TYPE.UPDATE;
             
             //Is the requested tween in Local or World space?
-            _localTransformation = !worldSpace;
+            _localTransformation = transformSpace == SPACE.LOCAL;
             Transformation = transformation;
             
             TargetTransform = targetTransform;
