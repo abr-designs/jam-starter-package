@@ -11,11 +11,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `SPACE.cs` enum, that is used for `PingPongAnimator.cs` & `SimpleSpin.cs` to allow space specific assignments
 - Added `TransformExtensions.cs` to provide Setting `position` & `rotation` functions that use `enum SPACE` as a parameter
+- Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
+  - Still operates using the `Update()` loop, but allows yielding
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
   - Added `Assert` to `Start()` to help catch potential issues early
 - Updated `SimpleSpin.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
+- Updated `TweenData.SetData()` to use a [`enum SPACE`](../../Runtime/Scripts/Utilities/Enums/SPACE.cs) instead of a `bool` to set how it transforms
+- Added `enum TweenController.UPDATE_TYPE` to allow sorting of the `TweenData`
+- Added `TweenData.AsCoroutine()` to allow yielding as Coroutine
+  - Waits until `Active == false` then executes the callback if there was one set
+- Added `TweenData.AsAsncTask()` for future implementation of `async`
+- Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
 
 ### Fixed
 - 
