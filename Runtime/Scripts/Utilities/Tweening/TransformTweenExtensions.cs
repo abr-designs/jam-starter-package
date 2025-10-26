@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -22,6 +23,8 @@ namespace Utilities.Tweening
         }
         private static TweenController _tweenController;
 
+
+        #region Sync Calls
 
         #region Transform Move
 
@@ -68,6 +71,54 @@ namespace Utilities.Tweening
         }
 
         #endregion //Transform Rotate
+
+        #endregion //Synchronous Calls
+        
+        #region Coroutine Calls
+
+        #region Transform Move
+
+        public static IEnumerator TweenToCoroutine(this Transform transform, Vector3 targetWorldPosition, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
+        {
+            yield return TweenController.GetTweenData(transform, TRANSFORM.MOVE)
+                .SetData(true, TRANSFORM.MOVE, transform, time, curve, onCompleted)
+                .SetTargetPosition(targetWorldPosition)
+                .AsCoroutine();
+        }
+        public static IEnumerator TweenToLocalCoroutine(this Transform transform, Vector3 targetLocalPosition, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
+        {
+            yield return TweenController.GetTweenData(transform, TRANSFORM.MOVE)
+                .SetData(false, TRANSFORM.MOVE, transform, time, curve, onCompleted)
+                .SetTargetPosition(targetLocalPosition)
+                .AsCoroutine();
+        }
+
+        #endregion //Transform Move
+        
+        #region Transform Rotate
+
+        public static void TweenToCoroutine(this Transform transform, Quaternion targetWorldRotation, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
+        {
+            throw new NotImplementedException();
+        }
+        public static void TweenToLocalCoroutine(this Transform transform, Quaternion targetLocalRotation, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion //Transform Rotate
+        
+        #region Transform Scale
+
+        public static void TweenScaleToCoroutine(this Transform transform, Vector3 targetScale, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion //Transform Rotate
+
+        #endregion //Coroutine Calls
+
 
         //TransformTweenExtensions Setup Functions
         //============================================================================================================//
