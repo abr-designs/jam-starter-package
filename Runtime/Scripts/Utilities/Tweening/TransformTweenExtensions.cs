@@ -60,8 +60,8 @@ namespace Utilities.Tweening
         
         public static IEnumerator TweenToCoroutine(this Transform transform, SPACE transformSpace, Quaternion targetRotation, float time, CURVE curve = CURVE.LINEAR, Action onCompleted = null)
         {
-            yield return TweenController.GetTweenData(transform, TRANSFORM.MOVE)
-                .SetData(transformSpace, TRANSFORM.MOVE, transform, time, curve, null)
+            yield return TweenController.GetTweenData(transform, TRANSFORM.ROTATE)
+                .SetData(transformSpace, TRANSFORM.ROTATE, transform, time, curve, null)
                 .SetTargetRotation(targetRotation)
                 .AsCoroutine();
             

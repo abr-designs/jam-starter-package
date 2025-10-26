@@ -58,6 +58,22 @@ namespace Tests.Utilities.Extensions.Tweens
 
             Assert.AreEqual(m_transform.localScale, target);
         }
+        
+        [UnityTest]
+        public IEnumerator TweenScaleCoroutineTests(
+            [Values(0f, 0.5f, 1f)] float time,
+            [Values(CURVE.LINEAR, CURVE.EASE_IN, CURVE.EASE_OUT, CURVE.EASE_IN_OUT)]
+            CURVE curve,
+            [ValueSource(nameof(TestTargetValues))]
+            Vector3 target)
+        {
+            if (time == 0f)
+                LogAssert.Expect(LogType.Error, new Regex(".*Attempting to apply.*"));
+
+            yield return m_transform.TweenScaleToCoroutine(target, time, curve);
+
+            Assert.AreEqual(m_transform.localScale, target);
+        }
 
         #endregion
 

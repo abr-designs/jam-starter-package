@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Waits until `Active == false` then executes the callback if there was one set
 - Added `TweenData.AsAsncTask()` for future implementation of `async`
 - Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
+- Updated `TweenTo()` tests to use Coroutine & remove deprecated calls
 
 ### Fixed
 - 
