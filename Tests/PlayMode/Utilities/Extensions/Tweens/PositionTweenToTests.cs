@@ -6,6 +6,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Utilities.Enums;
 using Utilities.Tweening;
 using Object = UnityEngine.Object;
 
@@ -30,6 +31,8 @@ namespace Tests.Utilities.Extensions.Tweens
 
         [UnityTest]
         public IEnumerator TweenPositionTests(
+            [Values(SPACE.LOCAL, SPACE.WORLD)]
+            SPACE transformSpace,
             [Values(0f, 0.5f, 1f)] float time,
             [Values(CURVE.LINEAR, CURVE.EASE_IN, CURVE.EASE_OUT, CURVE.EASE_IN_OUT)]
             CURVE curve,
@@ -42,7 +45,7 @@ namespace Tests.Utilities.Extensions.Tweens
                 if (time == 0f)
                     LogAssert.Expect(LogType.Error, new Regex(".*Attempting to apply.*"));
 
-                m_transform.TweenTo(target, time, curve, () => { hasCompleted = true; });
+                m_transform.TweenTo(transformSpace, target, time, curve, () => { hasCompleted = true; });
             }
             catch (Exception e)
             {
@@ -53,36 +56,25 @@ namespace Tests.Utilities.Extensions.Tweens
 
             yield return new WaitUntil(() => hasCompleted);
 
-            Assert.AreEqual(m_transform.position, target);
+            Assert.AreEqual(transformSpace == SPACE.WORLD ? m_transform.position : m_transform.localPosition, target);
         }
-
+        
         [UnityTest]
-        public IEnumerator TweenLocalPositionTests(
+        public IEnumerator TweenPositionCoroutineTests(
+            [Values(SPACE.LOCAL, SPACE.WORLD)]
+            SPACE transformSpace,
             [Values(0f, 0.5f, 1f)] float time,
             [Values(CURVE.LINEAR, CURVE.EASE_IN, CURVE.EASE_OUT, CURVE.EASE_IN_OUT)]
             CURVE curve,
             [ValueSource(nameof(TestTargetValues))]
             Vector3 target)
         {
-            yield return null;
-            bool hasCompleted = false;
-            try
-            {
-                if (time == 0f)
-                    LogAssert.Expect(LogType.Error, new Regex(".*Attempting to apply.*"));
+            if (time == 0f)
+                LogAssert.Expect(LogType.Error, new Regex(".*Attempting to apply.*"));
+            
+            yield return m_transform.TweenToCoroutine(transformSpace, target, time, curve);
 
-                m_transform.TweenToLocal(target, time, curve, () => { hasCompleted = true; });
-            }
-            catch (Exception e)
-            {
-                hasCompleted = true;
-                Console.WriteLine(e);
-                throw;
-            }
-
-            yield return new WaitUntil(() => hasCompleted);
-
-            Assert.AreEqual(m_transform.localPosition, target);
+            Assert.AreEqual(transformSpace == SPACE.WORLD ? m_transform.position : m_transform.localPosition, target);
         }
 
         #endregion

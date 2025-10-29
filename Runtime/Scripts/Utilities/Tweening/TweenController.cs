@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEngine;
+using Utilities.Enums;
 
 namespace Utilities.Tweening
 {
@@ -99,8 +102,17 @@ namespace Utilities.Tweening
         ROTATE = 2 << 1,
         SCALE = 3 << 1,
     }
+
+    internal enum UPDATE_TYPE
+    {
+        UPDATE,
+        COROUTINE,
+        ASYNC
+    }
+    
     internal sealed class TweenData
     {
+        internal UPDATE_TYPE UpdateType;
         internal int CachedHash;
         internal Transform TargetTransform;
 
@@ -129,13 +141,15 @@ namespace Utilities.Tweening
             Active = true;
         }
         
-        internal TweenData SetData(bool worldSpace, TRANSFORM transformation, Transform targetTransform, float time, CURVE curve, Action onTweenComplete)
+        internal TweenData SetData(SPACE transformSpace, TRANSFORM transformation, Transform targetTransform, float time, CURVE curve, Action onTweenComplete)
         {
             if (targetTransform == null)
                 throw new ArgumentOutOfRangeException(nameof(targetTransform), $"{nameof(targetTransform)} should not be null!");
+
+            UpdateType = UPDATE_TYPE.UPDATE;
             
             //Is the requested tween in Local or World space?
-            _localTransformation = !worldSpace;
+            _localTransformation = transformSpace == SPACE.LOCAL;
             Transformation = transformation;
             
             TargetTransform = targetTransform;
@@ -168,9 +182,31 @@ namespace Utilities.Tweening
             return this;
         }
 
-        internal void SetTargetPosition(Vector3 targetPosition) => _targetPosition = targetPosition;
-        internal void SetTargetRotation(Quaternion targetRotation) => _targetRotation = targetRotation;
-        internal void SetTargetScale(Vector3 targetScale) => _targetScale = targetScale;
+        internal TweenData SetTargetPosition(Vector3 targetPosition)
+        {
+            _targetPosition = targetPosition;
+            return this;
+        }
+        internal TweenData SetTargetRotation(Quaternion targetRotation)
+        {
+            _targetRotation = targetRotation;
+            return this;
+        }
+        internal TweenData SetTargetScale(Vector3 targetScale)
+        {
+            _targetScale = targetScale;
+            return this;
+        }
+
+        internal IEnumerator AsCoroutine()
+        {
+            UpdateType = UPDATE_TYPE.COROUTINE;
+
+            while (Active)
+                yield return null;
+        }
+        
+        internal async Task AsAsncTask() => throw new NotImplementedException();
 
         internal bool Update(float deltaTime)
         {
