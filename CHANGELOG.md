@@ -26,10 +26,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
 - Updated `TweenTo()` tests to use Coroutine & remove deprecated calls
 - Added Pitch to SDXExtensions.cs
--  Changed `SFXManager.TryGet3DAudioSource()` to `TryGetAudioSourceInstance()`
--  Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
--  Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
--  Added optional parameter pitch to `SFXManager.PlaySound()`
+- Changed `SFXManager.TryGet3DAudioSource()` to `TryGetAudioSourceInstance()`
+- Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
+- Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
+- Added optional parameter pitch to `SFXManager.PlaySound()`
 
 ### Fixed
 - 
