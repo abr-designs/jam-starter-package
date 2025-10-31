@@ -85,11 +85,15 @@ namespace Audio
             _isReady = true;
         }
 
+        //Play 2D Sound
         //============================================================================================================//
-        public static void PlaySound(SFX sfx, float volume = 1f)
+        public static void PlaySound(SFX sfx, float volume = 1f, float pitch = 1f)
         {
             Assert.IsNotNull(Instance, $"Missing the {nameof(SFXManager)} in the Scene!!");
-            Instance._PlaySound(sfx, volume);
+            if (!Mathf.Approximately(pitch, 1.0f))
+                Instance._PlaySoundWithPitch(sfx, volume, pitch);
+            else
+                Instance._PlaySound(sfx, volume);
         }
         private void _PlaySound(SFX sfx, float volume)
         {
@@ -115,26 +119,59 @@ namespace Audio
             //FIXME This should just use a loop, and not a coroutine
             StartCoroutine(DequeueSFXCoroutine(sfx, audioClip.length));
         }
-        public static void PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
+        private void _PlaySoundWithPitch(SFX sfx, float volume, float pitch)
+        {
+            if(!_isReady)
+                return;
+            
+            var sfxData = GetSFXData(sfx);
+
+            var hasAntiSpam = _sfxAntiSpam.TryGetValue(sfx, out var count);
+            if (sfxData.maxPlaying > 0 && hasAntiSpam && count > sfxData.maxPlaying)
+                return;
+            
+            if(hasAntiSpam == false)
+                _sfxAntiSpam.Add(sfx, 0);
+            
+            //Get an AudioSource but apply a 2D spatial setting of 0.0f
+            var audioSource = TryGetAudioSourceInstance(0f);
+            audioSource.transform.position = Vector3.zero;
+
+
+            var audioClip = sfxData.GetRandomAudioClip();
+            audioSource.clip = audioClip;
+            audioSource.volume = sfxData.volume;
+            audioSource.pitch = pitch;
+            audioSource.Play();
+
+            StartCoroutine(WaitForSoundFinishCoroutine(audioSource, audioClip.length));
+            //FIXME This should just use a loop, and not a coroutine
+            StartCoroutine(DequeueSFXCoroutine(sfx, audioClip.length));
+        }
+        
+        //Play 3D Sound At Location
+        //============================================================================================================//
+        public static void PlaySoundAtLocation(SFX vfx, Vector3 worldPosition, float pitch = 1f)
         {
             Assert.IsNotNull(Instance, $"Missing the {nameof(SFXManager)} in the Scene!!");
-            Instance._PlaySoundAtLocation(vfx, worldPosition);
+            Instance._PlaySoundAtLocation(vfx, worldPosition, pitch);
         }
         //This is meant to be called via the VFXExtensions class
-        private void _PlaySoundAtLocation(SFX vfx, Vector3 worldPosition)
+        private void _PlaySoundAtLocation(SFX vfx, Vector3 worldPosition, float pitch)
         {
             if(!_isReady)
                 return;
                         
             var sfxData = GetSFXData(vfx);
 
-            var audioSource = TryGet3DAudioSource();
+            var audioSource = TryGetAudioSourceInstance();
             audioSource.transform.position = worldPosition;
 
 
             var audioClip = sfxData.GetRandomAudioClip();
             audioSource.clip = audioClip;
             audioSource.volume = sfxData.volume;
+            audioSource.pitch = pitch;
             audioSource.Play();
 
             StartCoroutine(WaitForSoundFinishCoroutine(audioSource, audioClip.length));
@@ -152,7 +189,7 @@ namespace Audio
             return vfxData;
         }
 
-        private AudioSource TryGet3DAudioSource()
+        private AudioSource TryGetAudioSourceInstance(float spatialBlend = 1f)
         {
             AudioSource audioSource = null;
             if (_audioSources.Count > 0)
@@ -161,13 +198,18 @@ namespace Audio
             if (audioSource != null)
             {
                 audioSource.gameObject.SetActive(true);
+                //Force to 3D
+                audioSource.spatialBlend = spatialBlend;
+                
                 return audioSource;
             }
 
             audioSource = Instantiate(sfxSourcePrefab, transform);
             audioSource.name = $"[{_audioSources.Count}]_SFX_AudioSource";
             _audioSources.Add(audioSource);
-
+            //Force to 3D
+            audioSource.spatialBlend = spatialBlend;
+            
             return audioSource;
         }
 
@@ -177,6 +219,9 @@ namespace Audio
 
             targetAudioSource.gameObject.SetActive(false);
             targetAudioSource.Stop();
+            //Reset Pitch in case it changed
+            targetAudioSource.pitch = 1f;
+            targetAudioSource.spatialBlend = 1f;
         }
         
         private IEnumerator DequeueSFXCoroutine(SFX sfx, float time)
