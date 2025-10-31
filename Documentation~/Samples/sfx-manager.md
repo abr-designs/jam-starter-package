@@ -26,3 +26,11 @@ You can add new enum values into `SFX.cs`, as this will operate in two locations
       SFX.MY_SOUND.PlaySound(volume: 1f);
     - ```csharp
       SFX.MY_SOUND.PlaySoundAtLocation(transform.position);
+3. You can also optionally include a pitch value!
+   > [!WARNING]
+   > It should be noted that to have pitch functional for 2D sounds, a new `AudioSource` is instantiated, and the pitch value is applied there. Be cautious for sounds used multiple times in a single frame.
+
+    - ```csharp
+      SFX.MY_SOUND.PlaySound(volume: 1f, pitch 1f);
+    - ```csharp
+      SFX.MY_SOUND.PlaySoundAtLocation(transform.position, pitch: 1f);
