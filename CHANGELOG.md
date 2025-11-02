@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenData.AsAsncTask()` for future implementation of `async`
 - Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
 - Updated `TweenTo()` tests to use Coroutine & remove deprecated calls
+- Added `defaultFadeTime` to `ScreenFader.cs` to allow setting value in the inspector, with a starting default of `0.5f`
+- Added overloads for `ScreenFader.cs` `FadeIn()`, `FadeOut()`, `FadeInOut()` without `float time` parameter to fallback to value set in inspector
+- Added Automatic Singleton generation for `ScreenFader.cs` which creates the scene Hierarchy
+  - No longer inheriting from `HiddenSingleton<>` in favor of managing locally for lifecycle
 
 ### Fixed
 - 
