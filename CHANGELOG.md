@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TransformExtensions.cs` to provide Setting `position` & `rotation` functions that use `enum SPACE` as a parameter
 - Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
   - Still operates using the `Update()` loop, but allows yielding
+- Added Playmode tests for `ScreenFader.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use

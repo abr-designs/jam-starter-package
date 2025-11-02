@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -18,6 +19,7 @@ namespace Tests.Utilities
             _fader = ScreenFader.Instance;
             _image ??=  _fader.GetComponentInChildren<Image>();
         }
+        
         [UnityTest]
         public IEnumerator FadeInDefaultTest()
         {
@@ -41,24 +43,65 @@ namespace Tests.Utilities
     
         [UnityTest]
         public IEnumerator FadeInTimed(
-            [Values(0f, 0.5f, 1f)]float time)
+            [Values(-1f, 0f, 0.5f, 1f)]float time)
         {
+            if(time < 0f)
+                LogAssert.Expect(LogType.Assert, "Time must be greater than or equal to zero");
+            
+            var expectedEndTime = Time.time + time;
             yield return ScreenFader.FadeIn(time, null);
+
+            if (time < 0f)
+                yield break;
+            
+            IsWithinThreshold(expectedEndTime);
             Assert.AreEqual(_image.color, Color.clear);
         }
         [UnityTest]
         public IEnumerator FadeOutTimed(
-            [Values(0f, 0.5f, 1f)]float time)
+            [Values(-1f, 0f, 0.5f, 1f)]float time)
         {
+            if(time < 0f)
+                LogAssert.Expect(LogType.Assert, "Time must be greater than or equal to zero");
+            
+            var expectedEndTime = Time.time + time;
             yield return ScreenFader.FadeOut(time, null);
+            
+            if (time < 0f)
+                yield break;
+            
+            IsWithinThreshold(expectedEndTime);
             Assert.AreEqual(_image.color, Color.black);
         }
         [UnityTest]
         public IEnumerator FadeInOutTimed(
-            [Values(0f, 0.5f, 1f)]float time)
+            [Values(-1f, 0f, 0.5f, 1f)]float time)
         {
-            yield return ScreenFader.FadeInOut(time, null, null);
+            if(time < 0f)
+                LogAssert.Expect(LogType.Assert, "Time must be greater than or equal to zero");
+            
+            var expectedEndTime = Time.time + time;
+            yield return ScreenFader.FadeInOut(time, () =>
+            {
+                if(time < 0f)
+                    LogAssert.Expect(LogType.Assert, "Time must be greater than or equal to zero");
+                
+            }, null);
+
+            if (time < 0f)
+                yield break;
+            
+            IsWithinThreshold(expectedEndTime);
             Assert.AreEqual(_image.color, Color.clear);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void IsWithinThreshold(float expectedEndTime)
+        {
+            const float THRESHOLD = 0.05f;
+            
+            var diff = Time.time - expectedEndTime;
+            Assert.IsTrue(diff <= THRESHOLD, $"{expectedEndTime} != {Time.time} [DIFF {Time.time - expectedEndTime}]");
         }
     }
 }

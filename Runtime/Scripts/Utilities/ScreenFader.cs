@@ -43,21 +43,16 @@ namespace Utilities
         
         public static Coroutine FadeInOut(float time, Action onFaded, Action onComplete)
         {
-            Assert.IsTrue(time >= 0f, "Time must be greater than or equal to zero");
             return Instance.StartCoroutine(Instance.FadeInOutCoroutine(time, onFaded, onComplete));
         }
         
         public static Coroutine FadeOut(float time, Action onComplete)
         {
-            Assert.IsTrue(time >= 0f, "Time must be greater than or equal to zero");
-            
             return Instance.StartCoroutine(Instance.FadeCoroutine(Clear, Black, time, onComplete));
         }
         
         public static Coroutine FadeIn(float time, Action onComplete)
         {
-            Assert.IsTrue(time >= 0f, "Time must be greater than or equal to zero");
-            
             return Instance.StartCoroutine(Instance.FadeCoroutine(Black, Clear, time, onComplete));
         }
         
@@ -75,6 +70,8 @@ namespace Utilities
 
         private IEnumerator FadeCoroutine(Color32 startColor, Color32 endColor, float time, Action onCompleted)
         {
+            Debug.Assert(time >= 0f, "Time must be greater than or equal to zero");
+            
             blackImage.color = startColor;
 
             for (float t = 0; t < time; t += Time.deltaTime)
