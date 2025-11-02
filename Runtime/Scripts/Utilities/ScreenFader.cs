@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 namespace Utilities
@@ -11,7 +10,7 @@ namespace Utilities
         private static readonly Color32 Black = new Color32(0, 0, 0, 255);
         private static readonly Color32 Clear = new Color32(0, 0, 0, 0);
 
-        [SerializeField] 
+        [SerializeField, Min(0f)] 
         private float defaultFadeTime = 0.5f;
         [SerializeField]
         private Image blackImage;
