@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added overloads for `ScreenFader.cs` `FadeIn()`, `FadeOut()`, `FadeInOut()` without `float time` parameter to fallback to value set in inspector
 - Added Automatic Singleton generation for `ScreenFader.cs` which creates the scene Hierarchy
   - No longer inheriting from `HiddenSingleton<>` in favor of managing locally for lifecycle
+- Added Pitch to `SDXExtensions.cs`
+- Changed `SFXManager.TryGet3DAudioSource()` to `TryGetAudioSourceInstance()`
+- Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
+- Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
+- Added optional parameter pitch to `SFXManager.PlaySound()`
 
 ### Fixed
 - 
