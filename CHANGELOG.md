@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TransformExtensions.cs` to provide Setting `position` & `rotation` functions that use `enum SPACE` as a parameter
 - Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
   - Still operates using the `Update()` loop, but allows yielding
+- Added Playmode tests for `ScreenFader.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
@@ -25,6 +26,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenData.AsAsncTask()` for future implementation of `async`
 - Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
 - Updated `TweenTo()` tests to use Coroutine & remove deprecated calls
+- Added `defaultFadeTime` to `ScreenFader.cs` to allow setting value in the inspector, with a starting default of `0.5f`
+- Added overloads for `ScreenFader.cs` `FadeIn()`, `FadeOut()`, `FadeInOut()` without `float time` parameter to fallback to value set in inspector
+- Added Automatic Singleton generation for `ScreenFader.cs` which creates the scene Hierarchy
+  - No longer inheriting from `HiddenSingleton<>` in favor of managing locally for lifecycle
 
 ### Fixed
 - 
