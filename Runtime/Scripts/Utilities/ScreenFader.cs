@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 namespace Utilities
 {
-    public class ScreenFader : HiddenSingleton<ScreenFader>
+    public class ScreenFader : MonoBehaviour
     {
         private static readonly Color32 Black = new Color32(0, 0, 0, 255);
         private static readonly Color32 Clear = new Color32(0, 0, 0, 0);
-        
+
+        [SerializeField, Min(0f)] 
+        private float defaultFadeTime = 0.5f;
         [SerializeField]
         private Image blackImage;
 
@@ -23,6 +25,21 @@ namespace Utilities
             Instance.blackImage.color = Clear;
         }
 
+        public static Coroutine FadeInOut(Action onFaded, Action onComplete)
+        {
+            return FadeInOut(Instance.defaultFadeTime, onFaded, onComplete);
+        }
+        
+        public static Coroutine FadeOut(Action onComplete)
+        {
+            return FadeOut(Instance.defaultFadeTime, onComplete);
+        }
+        
+        public static Coroutine FadeIn(Action onComplete)
+        {
+            return FadeIn(Instance.defaultFadeTime, onComplete);
+        }
+        
         public static Coroutine FadeInOut(float time, Action onFaded, Action onComplete)
         {
             return Instance.StartCoroutine(Instance.FadeInOutCoroutine(time, onFaded, onComplete));
@@ -52,6 +69,8 @@ namespace Utilities
 
         private IEnumerator FadeCoroutine(Color32 startColor, Color32 endColor, float time, Action onCompleted)
         {
+            Debug.Assert(time >= 0f, "Time must be greater than or equal to zero");
+            
             blackImage.color = startColor;
 
             for (float t = 0; t < time; t += Time.deltaTime)
@@ -64,5 +83,48 @@ namespace Utilities
             onCompleted?.Invoke();
         }
         //============================================================================================================//
+
+        public static ScreenFader Instance => GetOrCreateSingleton();
+        private static ScreenFader _instance;
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogError($"Attempted to create Multiple instances of {nameof(ScreenFader)}");
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this;
+        }
+
+        private static ScreenFader GetOrCreateSingleton()
+        {
+            if (_instance != null)
+                return _instance;
+            
+            var container = new GameObject("=== GENERATED SCREEN FADER ===");
+            var screenFader = container.AddComponent<ScreenFader>();
+            var canvas = container.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            var childImage = new GameObject("BlackImage").AddComponent<Image>();
+            childImage.color = Color.clear;
+            childImage.transform.SetParent(canvas.transform, false);
+            
+            var childRectTransform = childImage.transform as RectTransform;
+            childRectTransform.anchorMin =  Vector2.zero;
+            childRectTransform.anchorMax =  Vector2.one;
+            childRectTransform.sizeDelta =  Vector2.zero;
+
+            screenFader.defaultFadeTime = 0.5f;
+            screenFader.blackImage = childImage;
+
+            _instance = screenFader;
+            return screenFader;
+        }
+        //============================================================================================================//
+
     }
 }
