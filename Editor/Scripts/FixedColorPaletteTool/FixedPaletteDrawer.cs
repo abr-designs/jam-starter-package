@@ -8,17 +8,10 @@ namespace FixedColorPaletteTool
     [CustomPropertyDrawer(typeof(FixedPaletteAttribute), true)]
     public class FixedPaletteDrawer : PropertyDrawer
     {
-        //FIXME THESE ARE ONLY TEMPORARY
-        private readonly List<ColorData> options = new()
-        {
-            new ColorData { name = "Fire", color = Color.red },
-            new ColorData { name = "Water", color = Color.cyan },
-            new ColorData { name = "Earth", color = new Color(0.4f, 0.3f, 0.2f) },
-            new ColorData { name = "Air", color = Color.white }
-        };
-
+        //private int m_selectedIndex = -1;
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
+            var colorOptions = FixedPaletteSettings.Instance.selectedPalette.colors;
             // Ensure we’re working with a Color or Color32
             if (property.propertyType != SerializedPropertyType.Color)
             {
@@ -47,7 +40,7 @@ namespace FixedColorPaletteTool
 
             ColorData temp = null;
             var color = property.colorValue;
-            var foundDataIndex = options.FindIndex(x => x.color == color);
+            var foundDataIndex = colorOptions.FindIndex(x => x.color == color);
             if (foundDataIndex < 0)
             {
                 temp ??= new ColorData
@@ -58,7 +51,7 @@ namespace FixedColorPaletteTool
             }
             else
             {
-                temp = options[foundDataIndex];
+                temp = colorOptions[foundDataIndex];
             }
 
             // UI: color square
@@ -103,19 +96,22 @@ namespace FixedColorPaletteTool
                     name = temp.name,
                     color = temp.color
                 };
-                window.Init(options, current, selected =>
+                window.Init(colorOptions, current, (index, selected) =>
                 {
                     temp.name = selected.name;
                     temp.color = selected.color;
+
+                    //FIXME I want to be able to hotswap palettes without breaking refs. I assumed that index would be the ideal replacement
+                    //m_selectedIndex = index;
                     
-                    label.text = selected.name;
+                    label.text = $"[{index}] {selected.name}";
                     colorBox.style.backgroundColor = new StyleColor(selected.color);
                     property.colorValue = selected.color;
                     property.serializedObject.ApplyModifiedProperties();
                 }, GetColorDataName, GetColorDataColor);
 
                 var rect = dropdownButton.worldBound;
-                window.ShowAsDropDown(rect, new Vector2(180, options.Count * 22 + 8));
+                window.ShowAsDropDown(rect, new Vector2(180, colorOptions.Count * 22 + 8));
             };
 
             container.Add(dropdownButton);

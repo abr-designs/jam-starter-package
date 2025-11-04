@@ -1,5 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
 namespace FixedColorPaletteTool
 {
@@ -19,14 +23,14 @@ namespace FixedColorPaletteTool
         public static FixedPaletteSettings Instance => GetOrCreate();
 
 
-        public static UnityEditor.SerializedObject GetSerializedObject() => new(GetOrCreate());
+        public static SerializedObject GetSerializedObject() => new(GetOrCreate());
         
         
         internal static FixedPaletteSettings GetOrCreate()
         {
             const string AssetPath = "Assets/Settings/FixedPaletteSettings.asset";
             
-            var settings = UnityEditor.AssetDatabase.LoadAssetAtPath<FixedPaletteSettings>(AssetPath);
+            var settings = AssetDatabase.LoadAssetAtPath<FixedPaletteSettings>(AssetPath);
             if (settings != null) 
                 return settings;
             
@@ -35,25 +39,38 @@ namespace FixedColorPaletteTool
             palette.name = "Default Color Palette";
             
             settings.selectedPalette = palette;
-            UnityEditor.AssetDatabase.CreateAsset(settings, AssetPath);
-            UnityEditor.AssetDatabase.AddObjectToAsset(palette, AssetPath);
-            UnityEditor.AssetDatabase.SaveAssets();
+            AssetDatabase.CreateAsset(settings, AssetPath);
+            AssetDatabase.AddObjectToAsset(palette, AssetPath);
+            AssetDatabase.SaveAssets();
             return settings;
         }
 
-        /*internal static ColorPaletteScriptableObject GetOrCreateDefaultColorPalette()
+        public static ColorPaletteScriptableObject AddNewPalette()
         {
-            const string AssetPath = "Assets/ColorPalettes/DefaultColorPalette.asset";
+            const string AssetPath = "Assets/Settings/FixedPaletteSettings.asset";
+
+            var settings = GetOrCreate();
+            var palette = CreateInstance<ColorPaletteScriptableObject>();
+            palette.name = "New Color Palette";
+            palette.colors = new List<ColorData>();
             
-            var settings = UnityEditor.AssetDatabase.LoadAssetAtPath<ColorPaletteScriptableObject>(AssetPath);
-            if (settings != null) 
-                return settings;
+            settings.selectedPalette = palette;
+            AssetDatabase.AddObjectToAsset(palette, AssetPath);
+            AssetDatabase.SaveAssets();
+            return palette;
+        }
+        public static void DeletePalette(ColorPaletteScriptableObject toDestroy)
+        {
+            var settings = GetOrCreate();
+
+            AssetDatabase.RemoveObjectFromAsset(toDestroy);
             
-            settings = CreateInstance<ColorPaletteScriptableObject>();
-            UnityEditor.AssetDatabase.CreateAsset(settings, AssetPath);
-            UnityEditor.AssetDatabase.SaveAssets();
-            return settings;
-        }*/
+            DestroyImmediate(toDestroy);
+            
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssetIfDirty(settings);
+        }
+
 #endif
     }
 }

@@ -10,7 +10,7 @@ namespace FixedColorPaletteTool
     {
         private List<ColorData> m_options;
         private ColorData m_current;
-        private System.Action<ColorData> m_onSelect;
+        private System.Action<int, ColorData> m_onSelect;
         
         private Func<ColorData, string> m_getName;
         private Func<ColorData, Color> m_getColor;
@@ -23,7 +23,7 @@ namespace FixedColorPaletteTool
             return wnd;
         }
 
-        public void Init(List<ColorData> options, ColorData current, System.Action<ColorData> onSelect, Func<ColorData, string> getName, Func<ColorData, Color> getColor)
+        public void Init(List<ColorData> options, ColorData current, System.Action<int, ColorData> onSelect, Func<ColorData, string> getName, Func<ColorData, Color> getColor)
         {
             m_getName = getName;
             m_getColor = getColor;
@@ -41,8 +41,11 @@ namespace FixedColorPaletteTool
             root.style.paddingLeft = 6;
             root.style.paddingRight = 6;
 
-            foreach (var opt in m_options)
+            for (var i = 0; i < m_options.Count; i++)
             {
+                var index = i;
+                
+                var opt = m_options[i];
                 var optionName = m_getName(opt);
                 var row = new VisualElement
                 {
@@ -73,7 +76,7 @@ namespace FixedColorPaletteTool
                 };
                 row.Add(colorBox);
 
-                var label = new Label(optionName)
+                var label = new Label($"[{index}] {optionName}")
                 {
                     style =
                     {
@@ -88,7 +91,7 @@ namespace FixedColorPaletteTool
 
                 row.RegisterCallback<ClickEvent>(_ =>
                 {
-                    m_onSelect?.Invoke(opt);
+                    m_onSelect?.Invoke(index, opt);
                     Close();
                 });
 
