@@ -8,8 +8,8 @@ namespace FixedColorPaletteTool
     {
         [SerializeField]
         public string name;
-        [SerializeField]
-        public Color32 color;
+
+        [SerializeField] public Color32 color = new Color32(0, 0, 0, 255);
 
         public bool Equals(ColorData other)
         {

@@ -1,10 +1,10 @@
-﻿using Scripts.Utilities.Extensions;
+﻿using FixedColorPaletteTool.Importing;
+using Scripts.Utilities.Extensions;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
-using Utilities.Debugging;
+
 using Button = UnityEngine.UIElements.Button;
 
 namespace FixedColorPaletteTool.SettingsProviders
