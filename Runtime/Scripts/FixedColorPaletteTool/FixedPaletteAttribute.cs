@@ -2,5 +2,8 @@
 
 namespace FixedColorPaletteTool
 {
-    public class FixedPaletteAttribute : PropertyAttribute { }
+    public class FixedPaletteAttribute : PropertyAttribute
+    {
+        
+    }
 }

@@ -11,7 +11,6 @@ namespace FixedColorPaletteTool
         //private int m_selectedIndex = -1;
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            var colorOptions = FixedPaletteSettings.Instance.selectedPalette.colors;
             // Ensure we’re working with a Color or Color32
             if (property.propertyType != SerializedPropertyType.Color)
             {
@@ -26,7 +25,8 @@ namespace FixedColorPaletteTool
                 };
                 return error;
             }
-
+            
+            var colorOptions = FixedPaletteSettings.Instance.selectedPalette.colors;
             
             var container = new VisualElement
             {

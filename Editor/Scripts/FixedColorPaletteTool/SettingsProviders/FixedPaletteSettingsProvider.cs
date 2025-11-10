@@ -1,7 +1,9 @@
-﻿using FixedColorPaletteTool.Importing;
+﻿using System;
+using FixedColorPaletteTool.Importing;
 using Scripts.Utilities.Extensions;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,8 +11,9 @@ using Button = UnityEngine.UIElements.Button;
 
 namespace FixedColorPaletteTool.SettingsProviders
 {
-    public static class FixedPaletteSettingsProvider 
+    public static class FixedPaletteSettingsProvider
     {
+        public static event Action OnPaletteChanged;
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
         {
@@ -49,6 +52,10 @@ namespace FixedColorPaletteTool.SettingsProviders
             {
                 style = { flexGrow = 1 }
             };
+            palettePropertyField.RegisterValueChangeCallback(_ =>
+            {
+                OnPaletteChanged?.Invoke();
+            });
             headerContainer.Add(palettePropertyField);
             
             headerContainer.Add(newPaletteButton);
@@ -57,22 +64,22 @@ namespace FixedColorPaletteTool.SettingsProviders
 
             //-----------------------------------------------------------------------//
 
-            if (FixedPaletteSettings.Instance.selectedPalette != null) 
-                DrawPalette(container, FixedPaletteSettings.Instance.selectedPalette);
+            if (paletteProperty.objectReferenceValue != null) 
+                //DrawPalette(container, paletteProperty.objectReferenceValue as ScriptableObject);
 
             //-----------------------------------------------------------------------//
             root.Add(container);
             root.Bind(serializedObject);
         }
 
-        private static void DrawPalette(VisualElement container, ColorPaletteScriptableObject myPalette)
+        private static void DrawPalette(VisualElement container, ScriptableObject paletteScriptableObject)
         {
-            var serializedObject = new SerializedObject(myPalette);
+            var serializedObject = new SerializedObject(paletteScriptableObject);
+            var paletteNameProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
 
             //------------------------------------------------------------------//
-            var titleLabel = new Label(myPalette.paletteName)
+            var titleLabel = new Label()
             {
-                bindingPath = nameof(ColorPaletteScriptableObject.paletteName),
                 style =
                 {
                     fontSize = 20,
@@ -81,7 +88,7 @@ namespace FixedColorPaletteTool.SettingsProviders
                     flexShrink = 0
                 }
             };
-            titleLabel.Bind(serializedObject);
+            titleLabel.BindProperty(paletteNameProperty);
             container.Add(titleLabel);
 
             var buttonContainer = new VisualElement()
@@ -94,12 +101,12 @@ namespace FixedColorPaletteTool.SettingsProviders
             };
 
             //------------------------------------------------------------------//
-            var replaceButton = new Button(() => ColorPaletteImporter.ImportColorFile(myPalette, true))
+            var replaceButton = new Button(() => ColorPaletteImporter.ImportColorFile(FixedPaletteSettings.Instance.selectedPalette, true))
             {
                 text = "Replace Colors"
             };
             buttonContainer.Add(replaceButton);
-            var button = new Button(() => ColorPaletteImporter.ImportColorFile(myPalette, false))
+            var button = new Button(() => ColorPaletteImporter.ImportColorFile(FixedPaletteSettings.Instance.selectedPalette, false))
             {
                 text = "Add Colors"
             };
@@ -111,7 +118,7 @@ namespace FixedColorPaletteTool.SettingsProviders
             var nameProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
             var nameField = new PropertyField(nameProperty);
             nameField.style.flexShrink = 0;
-            nameField.Bind(serializedObject);
+            nameField.BindProperty(nameProperty);
             container.Add(nameField);
             //------------------------------------------------------------------//
 
@@ -122,11 +129,16 @@ namespace FixedColorPaletteTool.SettingsProviders
             
             var colorsProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.colors));
             var field = new PropertyField(colorsProperty);
-            field.Bind(serializedObject);
+            field.BindProperty(colorsProperty);
             scrollRect.Add(field);
             //------------------------------------------------------------------//
             
             container.Add(scrollRect);
+            
+            container.TrackSerializedObjectValue(serializedObject, _ =>
+            {
+                serializedObject.Update();
+            });
         }
 
         private static void CreateNewPalette()
