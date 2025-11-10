@@ -14,6 +14,10 @@ namespace FixedColorPaletteTool.SettingsProviders
     public static class FixedPaletteSettingsProvider
     {
         public static event Action OnPaletteChanged;
+
+        private static VisualElement s_paletteDrawerContainer;
+        private static Button s_deletePaletteButton;
+        
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
         {
@@ -41,7 +45,7 @@ namespace FixedColorPaletteTool.SettingsProviders
             {
                 text = "new"
             };
-            var deletePaletteButton = new Button(DeleteCurrentPalette)
+            s_deletePaletteButton = new Button(DeleteCurrentPalette)
             {
                 text = "Delete"
             };
@@ -52,31 +56,31 @@ namespace FixedColorPaletteTool.SettingsProviders
             {
                 style = { flexGrow = 1 }
             };
-            palettePropertyField.RegisterValueChangeCallback(_ =>
-            {
-                OnPaletteChanged?.Invoke();
-            });
+            palettePropertyField.RegisterValueChangeCallback(OnPaletteChangedEvent);
             headerContainer.Add(palettePropertyField);
             
             headerContainer.Add(newPaletteButton);
-            headerContainer.Add(deletePaletteButton);
+            headerContainer.Add(s_deletePaletteButton);
             container.Add(headerContainer);
 
             //-----------------------------------------------------------------------//
 
-            if (paletteProperty.objectReferenceValue != null) 
-                //DrawPalette(container, paletteProperty.objectReferenceValue as ScriptableObject);
+            s_paletteDrawerContainer = new VisualElement();
+            OnPaletteChangedEvent(paletteProperty);
 
             //-----------------------------------------------------------------------//
+            
+            container.Add(s_paletteDrawerContainer);
             root.Add(container);
             root.Bind(serializedObject);
         }
 
-        private static void DrawPalette(VisualElement container, ScriptableObject paletteScriptableObject)
+        private static VisualElement DrawPalette(SerializedObject serializedPaletteObject)
         {
-            var serializedObject = new SerializedObject(paletteScriptableObject);
-            var paletteNameProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
+            VisualElement container = new VisualElement { style = { flexDirection = FlexDirection.Column, } };
 
+            var paletteNameProperty = serializedPaletteObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
+            
             //------------------------------------------------------------------//
             var titleLabel = new Label()
             {
@@ -114,31 +118,36 @@ namespace FixedColorPaletteTool.SettingsProviders
             
             container.Add(buttonContainer);
             
+            
             //------------------------------------------------------------------//
-            var nameProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
+            var nameProperty = serializedPaletteObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
             var nameField = new PropertyField(nameProperty);
             nameField.style.flexShrink = 0;
             nameField.BindProperty(nameProperty);
             container.Add(nameField);
+            
             //------------------------------------------------------------------//
 
-            var scrollRect = new ScrollView()
+            var scrollRect = new VisualElement()
             {
 
             };
             
-            var colorsProperty = serializedObject.FindProperty(nameof(ColorPaletteScriptableObject.colors));
-            var field = new PropertyField(colorsProperty);
+            var colorsProperty = serializedPaletteObject.FindProperty(nameof(ColorPaletteScriptableObject.colors));
+            var field = new PropertyField(colorsProperty)
+            {
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
             field.BindProperty(colorsProperty);
             scrollRect.Add(field);
             //------------------------------------------------------------------//
             
             container.Add(scrollRect);
-            
-            container.TrackSerializedObjectValue(serializedObject, _ =>
-            {
-                serializedObject.Update();
-            });
+
+            return container;
         }
 
         private static void CreateNewPalette()
@@ -174,6 +183,27 @@ namespace FixedColorPaletteTool.SettingsProviders
                 return;
             
             FixedPaletteSettings.DeletePalette(palette);
+        }
+        
+        //============================================================================================================//
+
+        private static void OnPaletteChangedEvent(SerializedPropertyChangeEvent evt) => OnPaletteChangedEvent(evt.changedProperty);
+
+        private static void OnPaletteChangedEvent(SerializedProperty paletteProperty)
+        {
+            OnPaletteChanged?.Invoke();
+
+            s_paletteDrawerContainer.Clear();
+
+            var hasValue = paletteProperty.objectReferenceValue != null;
+            
+            s_deletePaletteButton.SetEnabled(hasValue);
+
+            if (!hasValue)
+                return;
+            
+            var paletteObject = new SerializedObject(paletteProperty.objectReferenceValue as ScriptableObject);
+            s_paletteDrawerContainer.Add(DrawPalette(paletteObject));
         }
     }
 }
