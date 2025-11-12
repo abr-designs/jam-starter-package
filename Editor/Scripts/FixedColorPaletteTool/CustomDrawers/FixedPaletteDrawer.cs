@@ -96,7 +96,7 @@ namespace FixedColorPaletteTool
                     name = temp.name,
                     color = temp.color
                 };
-                window.Init(colorOptions, current, (index, selected) =>
+                window.Init(FixedPaletteSettings.Instance.selectedPalette.colors, current, (index, selected) =>
                 {
                     temp.name = selected.name;
                     temp.color = selected.color;
@@ -104,14 +104,16 @@ namespace FixedColorPaletteTool
                     //FIXME I want to be able to hotswap palettes without breaking refs. I assumed that index would be the ideal replacement
                     //m_selectedIndex = index;
                     
-                    label.text = $"[{index}] {selected.name}";
+                    label.text = $"{selected.name}";
                     colorBox.style.backgroundColor = new StyleColor(selected.color);
                     property.colorValue = selected.color;
                     property.serializedObject.ApplyModifiedProperties();
                 }, GetColorDataName, GetColorDataColor);
 
-                var rect = dropdownButton.worldBound;
-                window.ShowAsDropDown(rect, new Vector2(180, colorOptions.Count * 22 + 8));
+                var rect = dropdownButton.GetScreenBound();
+                rect.x -= 180;
+                window.ShowAsDropDown(rect, new Vector2(180, FixedPaletteSettings.Instance.selectedPalette.colors.Count * 22 + 8));
+                window.position = rect;
             };
 
             container.Add(dropdownButton);
