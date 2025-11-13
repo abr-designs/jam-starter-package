@@ -15,12 +15,6 @@ namespace FixedColorPaletteTool
         //private int m_selectedIndex = -1;
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            /*var myAttr = (FixedPaletteAttribute)attribute;
-            if (myAttr is { DefaultInspector: true })
-            {
-                return base.CreatePropertyGUI(property);
-            }*/
-            
             // Ensure we’re working with a Color or Color32
             if (property.propertyType != SerializedPropertyType.Color)
             {
@@ -36,8 +30,6 @@ namespace FixedColorPaletteTool
                 return error;
             }
             
-            var colorOptions = FixedPaletteSettings.Instance.selectedPalette.colors;
-            
             var container = new VisualElement
             {
                 style =
@@ -48,21 +40,7 @@ namespace FixedColorPaletteTool
                 }
             };
 
-            ColorData temp = null;
-            var color = property.colorValue;
-            var foundDataIndex = colorOptions.FindIndex(x => x.color == color);
-            if (foundDataIndex < 0)
-            {
-                temp ??= new ColorData
-                {
-                    name = "Color not found",
-                    color = Color.magenta
-                };
-            }
-            else
-            {
-                temp = colorOptions[foundDataIndex];
-            }
+            var currentColorData = new ColorData(property.colorValue);
 
             // UI: color square
             var colorBox = new VisualElement
@@ -76,13 +54,13 @@ namespace FixedColorPaletteTool
                     borderTopRightRadius = 2,
                     borderBottomLeftRadius = 2,
                     borderBottomRightRadius = 2,
-                    backgroundColor = new StyleColor(temp.color)
+                    backgroundColor = new StyleColor(currentColorData.color)
                 }
             };
             container.Add(colorBox);
 
             // UI: label for name
-            var label = new Label(temp.name)
+            var label = new Label(currentColorData.name)
             {
                 style = { flexGrow = 1 }
             };
@@ -103,13 +81,13 @@ namespace FixedColorPaletteTool
                 var window = ScriptableObject.CreateInstance<ElementDropdownWindow>();
                 var current = new ColorData
                 {
-                    name = temp.name,
-                    color = temp.color
+                    name = currentColorData.name,
+                    color = currentColorData.color
                 };
                 window.Init(FixedPaletteSettings.Instance.selectedPalette.colors, current, (index, selected) =>
                 {
-                    temp.name = selected.name;
-                    temp.color = selected.color;
+                    currentColorData.name = selected.name;
+                    currentColorData.color = selected.color;
 
                     //FIXME I want to be able to hotswap palettes without breaking refs. I assumed that index would be the ideal replacement
                     //m_selectedIndex = index;

@@ -4,12 +4,19 @@ using UnityEngine;
 namespace FixedColorPaletteTool
 {
     [Serializable]
-    public class ColorData : IEquatable<ColorData>
+    public struct ColorData : IEquatable<ColorData>
     {
         [SerializeField]
         public string name;
 
-        [SerializeField] public Color32 color = new Color32(0, 0, 0, 255);
+        [SerializeField] 
+        public Color32 color;
+
+        public ColorData(Color32 color)
+        {
+            name = $"#{ColorUtility.ToHtmlStringRGB(color)}";
+            this.color = color;
+        }
 
         public bool Equals(ColorData other)
         {
