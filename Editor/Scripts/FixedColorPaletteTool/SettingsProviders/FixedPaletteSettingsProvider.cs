@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using FixedColorPaletteTool.Importing;
 using Scripts.Utilities.Extensions;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
@@ -13,6 +15,8 @@ namespace FixedColorPaletteTool.SettingsProviders
 {
     public static class FixedPaletteSettingsProvider
     {
+        private const string FORCE_INSPECTOR_SYMBOL = "FIXED_COLOR_INSPECTOR";
+        
         public static event Action OnPaletteChanged;
 
         private static VisualElement s_paletteDrawerContainer;
@@ -36,6 +40,22 @@ namespace FixedColorPaletteTool.SettingsProviders
 
             container.Add(new Label("Fixed Palette Settings") { style = { fontSize = 24, unityFontStyleAndWeight = FontStyle.Bold } });
             container.style.SetMargins(10);
+
+            var toggleAllInspectors = new Toggle("Use for all Color Inspectors")
+            {
+                value = HasScriptingDefine(FORCE_INSPECTOR_SYMBOL)
+            };
+            toggleAllInspectors.RegisterValueChangedCallback(a =>
+            {
+                if(a.newValue)
+                    TryAddScriptingDefine(FORCE_INSPECTOR_SYMBOL);
+                else
+                    TryRemoveScriptingDefine(FORCE_INSPECTOR_SYMBOL);
+                
+                toggleAllInspectors.value = a.newValue;
+            });
+
+            container.Add(toggleAllInspectors);
 
             var headerContainer = new VisualElement();
             headerContainer.style.flexDirection = FlexDirection.Row;
@@ -187,6 +207,48 @@ namespace FixedColorPaletteTool.SettingsProviders
         
         //============================================================================================================//
 
+        private static bool HasScriptingDefine(string symbol)
+        {
+            var currentBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            //var symbols = new string[100];
+
+            PlayerSettings.GetScriptingDefineSymbols(currentBuildTarget, out var symbols);
+
+            return symbols.Any(x => x.Equals(symbol));
+        }
+
+        private static void TryAddScriptingDefine(string symbol)
+        {
+            if (HasScriptingDefine(symbol))
+                return;
+            
+            var currentBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            
+            PlayerSettings.GetScriptingDefineSymbols(currentBuildTarget, out var symbols);
+            var hashedSymbols = symbols.ToHashSet();
+            hashedSymbols.Add(symbol);
+            
+            PlayerSettings.SetScriptingDefineSymbols(currentBuildTarget, hashedSymbols.ToArray());
+            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+        }
+        
+        private static void TryRemoveScriptingDefine(string symbol)
+        {
+            if (!HasScriptingDefine(symbol))
+                return;
+            
+            var currentBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            
+            PlayerSettings.GetScriptingDefineSymbols(currentBuildTarget, out var symbols);
+            var hashedSymbols = symbols.ToHashSet();
+            hashedSymbols.Remove(symbol);
+            
+            PlayerSettings.SetScriptingDefineSymbols(currentBuildTarget, hashedSymbols.ToArray());
+            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+        }
+        
+        //============================================================================================================//
+
         private static void OnPaletteChangedEvent(SerializedPropertyChangeEvent evt) => OnPaletteChangedEvent(evt.changedProperty);
 
         private static void OnPaletteChangedEvent(SerializedProperty paletteProperty)
@@ -205,5 +267,8 @@ namespace FixedColorPaletteTool.SettingsProviders
             var paletteObject = new SerializedObject(paletteProperty.objectReferenceValue as ScriptableObject);
             s_paletteDrawerContainer.Add(DrawPalette(paletteObject));
         }
+        
+        //============================================================================================================//
+        
     }
 }

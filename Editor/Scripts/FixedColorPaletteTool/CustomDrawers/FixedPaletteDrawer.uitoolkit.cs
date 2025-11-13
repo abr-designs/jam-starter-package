@@ -5,12 +5,22 @@ using System.Collections.Generic;
 
 namespace FixedColorPaletteTool
 {
+#if FIXED_COLOR_INSPECTOR
+    [CustomPropertyDrawer(typeof(Color), true)]
+    [CustomPropertyDrawer(typeof(Color32), true)]
+#endif
     [CustomPropertyDrawer(typeof(FixedPaletteAttribute), true)]
-    public class FixedPaletteDrawer : PropertyDrawer
+    public partial class FixedPaletteDrawer : PropertyDrawer
     {
         //private int m_selectedIndex = -1;
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
+            /*var myAttr = (FixedPaletteAttribute)attribute;
+            if (myAttr is { DefaultInspector: true })
+            {
+                return base.CreatePropertyGUI(property);
+            }*/
+            
             // Ensure we’re working with a Color or Color32
             if (property.propertyType != SerializedPropertyType.Color)
             {

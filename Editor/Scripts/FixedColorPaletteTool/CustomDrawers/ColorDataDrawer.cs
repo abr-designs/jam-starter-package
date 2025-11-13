@@ -24,7 +24,7 @@ namespace FixedColorPaletteTool.CustomDrawers
             Rect colorRect = new Rect(position.x, position.y, colorWidth, position.height);
             Rect nameRect = new Rect(position.x + colorWidth + spacing, position.y, nameWidth, position.height);
 
-            EditorGUI.PropertyField(colorRect, colorProp, GUIContent.none);
+            colorProp.colorValue = EditorGUI.ColorField(colorRect, colorProp.colorValue);
             EditorGUI.PropertyField(nameRect, nameProp, GUIContent.none);
 
             EditorGUI.indentLevel = oldIndent;
