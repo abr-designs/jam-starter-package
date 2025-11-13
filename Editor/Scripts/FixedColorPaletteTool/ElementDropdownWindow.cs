@@ -9,6 +9,8 @@ namespace FixedColorPaletteTool
 {
     public class ElementDropdownWindow : EditorWindow
     {
+        private const float COLOR_BOX_SIZE = 20;
+        
         private List<ColorData> m_options;
         private ColorData m_current;
         private System.Action<int, ColorData> m_onSelect;
@@ -29,13 +31,19 @@ namespace FixedColorPaletteTool
         private void CreateGUI()
         {
             var root = rootVisualElement;
-            root.style.paddingTop = 4;
-            root.style.paddingBottom = 4;
-            root.style.paddingLeft = 6;
-            root.style.paddingRight = 6;
+            root.style.SetPadding(6, 4);
             root.style.SetBorderColor(Color.grey);
             root.style.SetBorderWidth(0.5f);
 
+            if (FixedPaletteSettings.Instance.dropdownAsGrid)
+                DrawAsGrid(root);
+            else
+                DrawAsList(root);
+        }
+
+        //============================================================================================================//
+        private void DrawAsList(VisualElement root)
+        {
             for (var i = 0; i < m_options.Count; i++)
             {
                 var index = i;
@@ -51,7 +59,7 @@ namespace FixedColorPaletteTool
                         marginBottom = 2,
                         paddingLeft = 2,
                         paddingRight = 2,
-                        height = 20,
+                        height = COLOR_BOX_SIZE * 1.3f,
                     }
                     
                 };
@@ -66,20 +74,8 @@ namespace FixedColorPaletteTool
                     row.style.backgroundColor = color;
                 });
 
-                var colorBox = new VisualElement
-                {
-                    style =
-                    {
-                        width = 14,
-                        height = 14,
-                        marginRight = 6,
-                        backgroundColor = new StyleColor(m_getColor(colorOption)),
-                        borderTopLeftRadius = 2,
-                        borderTopRightRadius = 2,
-                        borderBottomLeftRadius = 2,
-                        borderBottomRightRadius = 2
-                    }
-                };
+                var colorBox = DrawColorBox(colorOption);
+                colorBox.style.SetPadding(6,4);
                 row.Add(colorBox);
 
                 var label = new Label($"{optionName}")
@@ -104,5 +100,123 @@ namespace FixedColorPaletteTool
                 root.Add(row);
             }
         }
+
+        private void DrawAsGrid(VisualElement root)
+        {
+            int itemsPerRow = Mathf.FloorToInt(this.position.width / (COLOR_BOX_SIZE + 4));
+            int numberOfRows = Mathf.FloorToInt(m_options.Count / (float)itemsPerRow);
+            
+            var c = 0;
+            var row = CreateRow();
+            for (var i = 0; i < m_options.Count; i++, c++)
+            {
+                var index = i;
+
+                if (c >= itemsPerRow)
+                {
+                    c = 0;
+                    row = CreateRow();
+                }
+                
+                var colorOption = m_options[i];
+                var gridContainer = CreateGridSlot();
+                var colorBox = DrawColorBox(colorOption);
+
+                gridContainer.Add(colorBox);
+
+                var color = row.style.backgroundColor;
+                gridContainer.RegisterCallback<MouseEnterEvent>(evt =>
+                {
+                    gridContainer.style.backgroundColor = new StyleColor(Color.gray);
+                });
+
+                gridContainer.RegisterCallback<MouseLeaveEvent>(evt =>
+                {
+                    gridContainer.style.backgroundColor = color;
+                });
+
+                // Highlight current
+                if (colorOption.Equals(m_current))
+                    gridContainer.style.backgroundColor = new StyleColor(new Color(0.3f, 0.3f, 0.3f, 0.2f));
+
+                gridContainer.RegisterCallback<ClickEvent>(_ =>
+                {
+                    m_onSelect?.Invoke(index, colorOption);
+                    Close();
+                });
+
+                row.Add(gridContainer);
+            }
+
+            return;
+
+            VisualElement CreateRow()
+            {
+                var newRow = new VisualElement
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        flexShrink = 0
+                    }
+                    
+                };
+                root.Add(newRow);
+                return newRow;
+            }
+            VisualElement CreateGridSlot()
+            {
+                var gridSlot = new VisualElement
+                {
+                    style =
+                    {
+                        alignItems = Align.Center,
+                        flexShrink = 0
+                    }
+                    
+                };
+                gridSlot.style.SetPadding(2);
+                
+                return gridSlot;
+            }
+        }
+        
+        //============================================================================================================//
+
+        private VisualElement DrawColorBox(ColorData colorOption)
+        {
+            var colorBox = new VisualElement
+            {
+                style =
+                {
+                    width = COLOR_BOX_SIZE,
+                    height = COLOR_BOX_SIZE,
+                    backgroundColor = new StyleColor(m_getColor(colorOption)),
+                    flexShrink = 0
+                }
+            };
+
+            return colorBox;
+        }
+
+        public static float GetExpectedHeight(float width, bool asGrid)
+        {
+            const int LINE_HEIGHT = 22;
+            const int LINE_PADDING = 8;
+            
+            var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
+
+            if (!asGrid) 
+                return itemCount * LINE_HEIGHT + LINE_PADDING;
+            
+            
+            int itemsPerRow = Mathf.FloorToInt(width / (COLOR_BOX_SIZE + 4));
+            int numberOfRows = Mathf.FloorToInt(itemCount / (float)itemsPerRow) + 1;
+                
+            return numberOfRows * (COLOR_BOX_SIZE + 4) + LINE_PADDING;
+
+        }
+        
+        //============================================================================================================//
     }
 }

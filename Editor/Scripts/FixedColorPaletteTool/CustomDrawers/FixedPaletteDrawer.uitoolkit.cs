@@ -98,9 +98,13 @@ namespace FixedColorPaletteTool
                     property.serializedObject.ApplyModifiedProperties();
                 }, GetColorDataName, GetColorDataColor);
 
+                var windowWidth = 180;
+                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, FixedPaletteSettings.Instance.dropdownAsGrid);
+                
                 var rect = dropdownButton.GetScreenBound();
-                rect.x -= 180;
-                window.ShowAsDropDown(rect, new Vector2(180, FixedPaletteSettings.Instance.selectedPalette.colors.Count * 22 + 8));
+                rect.x -= windowWidth;
+                
+                window.ShowAsDropDown(rect, new Vector2(windowWidth, windowHeight));
                 window.position = rect;
             };
 

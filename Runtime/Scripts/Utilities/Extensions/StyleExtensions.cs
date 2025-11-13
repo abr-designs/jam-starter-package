@@ -12,6 +12,13 @@ namespace Scripts.Utilities.Extensions
             style.paddingLeft = padding;
             style.paddingRight = padding;
         }
+        public static void SetPadding(this IStyle style, float horizontal, float vertical)
+        {
+            style.paddingBottom = vertical;
+            style.paddingTop = vertical;
+            style.paddingLeft = horizontal;
+            style.paddingRight = horizontal;
+        }
         public static void SetMargins(this IStyle style, float margins)
         {
             style.marginBottom = margins;

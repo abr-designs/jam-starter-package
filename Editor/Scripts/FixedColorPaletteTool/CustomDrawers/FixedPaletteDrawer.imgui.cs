@@ -73,8 +73,10 @@ namespace FixedColorPaletteTool
 
             // Show dropdown near mouse position (since IMGUI doesn’t have VisualElement rects)
             Vector2 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-            Rect rect = new Rect(mousePos.x - 180, mousePos.y - 180, 180, FixedPaletteSettings.Instance.selectedPalette.colors.Count * 22 + 8);
-            window.ShowAsDropDown(rect, new Vector2(180, FixedPaletteSettings.Instance.selectedPalette.colors.Count * 22 + 8));
+            var width = 180;
+            var height = ElementDropdownWindow.GetExpectedHeight(width, FixedPaletteSettings.Instance.dropdownAsGrid);
+            Rect rect = new Rect(mousePos.x - width, mousePos.y - height, width, height);
+            window.ShowAsDropDown(rect, new Vector2(width, height));
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
