@@ -9,6 +9,8 @@ namespace FixedColorPaletteTool
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+
+            
             GUI.enabled = true;
             
             if (property.propertyType != SerializedPropertyType.Color)
@@ -29,6 +31,9 @@ namespace FixedColorPaletteTool
                 EditorGUI.LabelField(errorRect, "[FixedPalette] only works on Color or Color32 fields.", style);
                 return;
             }
+            
+            var fixedPaletteAttribute = (FixedPaletteAttribute)attribute;
+            var colorSelectType = fixedPaletteAttribute.ColorSelect;
 
             // Draw label
             position = EditorGUI.PrefixLabel(position, label);
@@ -58,7 +63,9 @@ namespace FixedColorPaletteTool
             
             var window = ScriptableObject.CreateInstance<ElementDropdownWindow>();
 
-            window.Init(FixedPaletteSettings.Instance.selectedPalette.colors, currentColorData,
+            window.Init(
+                colorSelectType,
+                FixedPaletteSettings.Instance.selectedPalette.colors, currentColorData,
                 (index, selected) =>
                 {
                     currentColorData.name = selected.name;
@@ -73,8 +80,8 @@ namespace FixedColorPaletteTool
 
             // Show dropdown near mouse position (since IMGUI doesn’t have VisualElement rects)
             Vector2 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-            var width = 180;
-            var height = ElementDropdownWindow.GetExpectedHeight(width, FixedPaletteSettings.Instance.dropdownAsGrid);
+            var width = ElementDropdownWindow.GetExpectedWidth(colorSelectType);
+            var height = ElementDropdownWindow.GetExpectedHeight(width, FixedPaletteSettings.Instance.dropdownAsGrid, colorSelectType);
             Rect rect = new Rect(mousePos.x - width, mousePos.y - height, width, height);
             window.ShowAsDropDown(rect, new Vector2(width, height));
         }

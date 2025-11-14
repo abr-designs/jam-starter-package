@@ -30,6 +30,9 @@ namespace FixedColorPaletteTool
                 return error;
             }
             
+            var fixedPaletteAttribute = (FixedPaletteAttribute)attribute;
+            var colorSelectType = fixedPaletteAttribute.ColorSelect;
+            
             var container = new VisualElement
             {
                 style =
@@ -84,7 +87,11 @@ namespace FixedColorPaletteTool
                     name = currentColorData.name,
                     color = currentColorData.color
                 };
-                window.Init(FixedPaletteSettings.Instance.selectedPalette.colors, current, (index, selected) =>
+                window.Init(
+                    colorSelectType,
+                    FixedPaletteSettings.Instance.selectedPalette.colors, 
+                    current, 
+                    (index, selected) =>
                 {
                     currentColorData.name = selected.name;
                     currentColorData.color = selected.color;
@@ -98,8 +105,8 @@ namespace FixedColorPaletteTool
                     property.serializedObject.ApplyModifiedProperties();
                 }, GetColorDataName, GetColorDataColor);
 
-                var windowWidth = 180;
-                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, FixedPaletteSettings.Instance.dropdownAsGrid);
+                var windowWidth = ElementDropdownWindow.GetExpectedWidth(colorSelectType);
+                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, FixedPaletteSettings.Instance.dropdownAsGrid, colorSelectType);
                 
                 var rect = dropdownButton.GetScreenBound();
                 rect.x -= windowWidth;

@@ -1,25 +1,29 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using Scripts.Utilities.Extensions;
-using Unity.Plastic.Antlr3.Runtime.Misc;
 
 namespace FixedColorPaletteTool
 {
-    public class ElementDropdownWindow : EditorWindow
+
+    public partial class ElementDropdownWindow : EditorWindow
     {
-        private const float COLOR_BOX_SIZE = 20;
         
+        private const float COLOR_BOX_SIZE = 20;
+
+        private COLOR_SELECT m_colorSelectType;
         private List<ColorData> m_options;
         private ColorData m_current;
         private System.Action<int, ColorData> m_onSelect;
         
-        private Func<ColorData, string> m_getName;
-        private Func<ColorData, Color> m_getColor;
+        private Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, string> m_getName;
+        private Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, Color> m_getColor;
 
-        public void Init(List<ColorData> options, ColorData current, System.Action<int, ColorData> onSelect, Func<ColorData, string> getName, Func<ColorData, Color> getColor)
+        public void Init(COLOR_SELECT colorSelectType, List<ColorData> options, ColorData current, System.Action<int, ColorData> onSelect, Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, string> getName, Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, Color> getColor)
         {
+            m_colorSelectType = colorSelectType;
             m_getName = getName;
             m_getColor = getColor;
             
@@ -35,14 +39,30 @@ namespace FixedColorPaletteTool
             root.style.SetBorderColor(Color.grey);
             root.style.SetBorderWidth(0.5f);
 
-            if (FixedPaletteSettings.Instance.dropdownAsGrid)
-                DrawAsGrid(root);
-            else
-                DrawAsList(root);
+            switch (m_colorSelectType)
+            {
+                case COLOR_SELECT.DEFAULT:
+                {
+                    if (FixedPaletteSettings.Instance.dropdownAsGrid)
+                        DrawAsGridDefault(root);
+                    else
+                        DrawAsListDefault(root);
+                    break;
+                }
+                case COLOR_SELECT.SHADES:
+                {
+                    DrawAsListShades(root);
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+
         }
 
         //============================================================================================================//
-        private void DrawAsList(VisualElement root)
+        private void DrawAsListDefault(VisualElement root)
         {
             for (var i = 0; i < m_options.Count; i++)
             {
@@ -101,7 +121,7 @@ namespace FixedColorPaletteTool
             }
         }
 
-        private void DrawAsGrid(VisualElement root)
+        private void DrawAsGridDefault(VisualElement root)
         {
             int itemsPerRow = Mathf.FloorToInt(this.position.width / (COLOR_BOX_SIZE + 4));
             int numberOfRows = Mathf.FloorToInt(m_options.Count / (float)itemsPerRow);
@@ -199,15 +219,15 @@ namespace FixedColorPaletteTool
             return colorBox;
         }
 
-        public static float GetExpectedHeight(float width, bool asGrid)
+        public static float GetExpectedHeight(float width, bool asGrid, COLOR_SELECT colorSelect)
         {
             const int LINE_HEIGHT = 22;
             const int LINE_PADDING = 8;
             
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
-            if (!asGrid) 
-                return itemCount * LINE_HEIGHT + LINE_PADDING;
+            if (!asGrid || colorSelect == COLOR_SELECT.SHADES) 
+                return itemCount * (LINE_HEIGHT+ 2) + LINE_PADDING;
             
             
             int itemsPerRow = Mathf.FloorToInt(width / (COLOR_BOX_SIZE + 4));
@@ -216,6 +236,7 @@ namespace FixedColorPaletteTool
             return numberOfRows * (COLOR_BOX_SIZE + 4) + LINE_PADDING;
 
         }
+
         
         //============================================================================================================//
     }
