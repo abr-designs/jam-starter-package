@@ -122,86 +122,6 @@ namespace FixedColorPaletteTool
                 root.Add(row);
             }
         }
-
-        private void DrawAsGridDefault(VisualElement root)
-        {
-            int itemsPerRow = Mathf.FloorToInt(this.position.width / (COLOR_BOX_SIZE + 4));
-            int numberOfRows = Mathf.FloorToInt(m_options.Count / (float)itemsPerRow);
-            
-            var c = 0;
-            var row = CreateRow();
-            for (var i = 0; i < m_options.Count; i++, c++)
-            {
-                var index = i;
-
-                if (c >= itemsPerRow)
-                {
-                    c = 0;
-                    row = CreateRow();
-                }
-                
-                var colorOption = m_options[i];
-                var gridContainer = CreateGridSlot();
-                var colorBox = DrawColorBox(colorOption);
-
-                gridContainer.Add(colorBox);
-
-                var color = row.style.backgroundColor;
-                gridContainer.RegisterCallback<MouseEnterEvent>(evt =>
-                {
-                    gridContainer.style.backgroundColor = new StyleColor(Color.gray);
-                });
-
-                gridContainer.RegisterCallback<MouseLeaveEvent>(evt =>
-                {
-                    gridContainer.style.backgroundColor = color;
-                });
-
-                // Highlight current
-                if (colorOption.Equals(m_current))
-                    gridContainer.style.backgroundColor = new StyleColor(new Color(0.3f, 0.3f, 0.3f, 0.2f));
-
-                gridContainer.RegisterCallback<ClickEvent>(_ =>
-                {
-                    m_onSelect?.Invoke(index, colorOption);
-                    Close();
-                });
-
-                row.Add(gridContainer);
-            }
-
-            return;
-
-            VisualElement CreateRow()
-            {
-                var newRow = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                        flexShrink = 0
-                    }
-                    
-                };
-                root.Add(newRow);
-                return newRow;
-            }
-            VisualElement CreateGridSlot()
-            {
-                var gridSlot = new VisualElement
-                {
-                    style =
-                    {
-                        alignItems = Align.Center,
-                        flexShrink = 0
-                    }
-                    
-                };
-                gridSlot.style.SetPadding(2);
-                
-                return gridSlot;
-            }
-        }
         
         //============================================================================================================//
 
@@ -221,22 +141,41 @@ namespace FixedColorPaletteTool
             return colorBox;
         }
 
-        public static float GetExpectedHeight(float width, COLOR_SELECT colorSelect)
+        internal static void GetExpectedSize(COLOR_SELECT colorSelect, out float width, out float height)
+        {
+            switch (colorSelect)
+            {
+                case COLOR_SELECT.DEFAULT:
+                    width = GetExpectedDefaultWidth();
+                    height = GetExpectedDefaultHeight();
+                    return;
+                case COLOR_SELECT.GRID:
+                    width =  GetExpectedGridWidth();
+                    height =  GetExpectedGridHeight();
+                    return;
+                case COLOR_SELECT.SHADES:
+                    width =  GetExpectedShadesWidth();
+                    height = GetExpectedShadesHeight();
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(colorSelect), colorSelect, null);
+            }
+        }
+        
+        private static float GetExpectedDefaultWidth()
+        {
+            const int DEFAULT_WIDTH = 180;
+            
+            return DEFAULT_WIDTH;
+        }
+        private static float GetExpectedDefaultHeight()
         {
             const int LINE_HEIGHT = 22;
             const int LINE_PADDING = 8;
             
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
-            if (colorSelect != COLOR_SELECT.GRID) 
-                return itemCount * (LINE_HEIGHT+ 2) + LINE_PADDING;
-            
-            
-            int itemsPerRow = Mathf.FloorToInt(width / (COLOR_BOX_SIZE + 4));
-            int numberOfRows = Mathf.FloorToInt(itemCount / (float)itemsPerRow) + 1;
-                
-            return numberOfRows * (COLOR_BOX_SIZE + 4) + LINE_PADDING;
-
+            return itemCount * (LINE_HEIGHT+ 2) + LINE_PADDING;
         }
 
         

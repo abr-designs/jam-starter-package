@@ -108,17 +108,19 @@ namespace FixedColorPaletteTool
             }
         }
         
-        public static float GetExpectedWidth(COLOR_SELECT colorSelect)
+        private static float GetExpectedShadesWidth()
         {
             const int DEFAULT_WIDTH = 180;
             const int LINE_PADDING = 8;
 
-            if (colorSelect == COLOR_SELECT.DEFAULT)
-                return DEFAULT_WIDTH;
-
+            return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + (COLOR_BOX_SIZE + 16);
+        }
+        private static float GetExpectedShadesHeight()
+        {
+            const int DEFAULT_WIDTH = 180;
+            const int LINE_PADDING = 8;
 
             return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + (COLOR_BOX_SIZE + 16);
-
         }
     }
 }

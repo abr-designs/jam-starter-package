@@ -105,8 +105,7 @@ namespace FixedColorPaletteTool
                     property.serializedObject.ApplyModifiedProperties();
                 }, GetColorDataName, GetColorDataColor);
 
-                var windowWidth = ElementDropdownWindow.GetExpectedWidth(colorSelectType);
-                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, colorSelectType);
+                ElementDropdownWindow.GetExpectedSize(colorSelectType, out var windowWidth, out var windowHeight);
                 
                 var rect = dropdownButton.GetScreenBound();
                 rect.x -= windowWidth;
