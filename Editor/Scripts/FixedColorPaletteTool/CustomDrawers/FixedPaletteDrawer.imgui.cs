@@ -42,20 +42,22 @@ namespace FixedColorPaletteTool
             var currentColorData = new ColorData(property.colorValue);
 
             // Layout: color box | label | dropdown
-            float colorBoxSize = 16f;
+            //float colorBoxSize = 16f;
             float buttonWidth = 24f;
             float spacing = 6f;
+            
+            Rect buttonRect = new Rect(position.x + position.width - buttonWidth, 
+                position.y, 
+                buttonWidth, 
+                EditorGUIUtility.singleLineHeight);
 
-            Rect colorRect = new Rect(position.x, position.y + 2, colorBoxSize, colorBoxSize);
-            Rect labelRect = new Rect(position.x + colorBoxSize + spacing, position.y, position.width - colorBoxSize - spacing - buttonWidth, EditorGUIUtility.singleLineHeight);
-            Rect buttonRect = new Rect(position.x + position.width - buttonWidth, position.y, buttonWidth, EditorGUIUtility.singleLineHeight);
+            Rect colorRect = new Rect(position.x, 
+                position.y + 2, 
+                position.width - buttonWidth - spacing, 
+                EditorGUIUtility.singleLineHeight);
 
             // Draw color box
             EditorGUI.DrawRect(colorRect, currentColorData.color);
-            //GUI.Box(colorRect, GUIContent.none); // border
-
-            // Draw label
-            EditorGUI.LabelField(labelRect, currentColorData.name);
 
             // Dropdown button
             if (!GUI.Button(buttonRect, "▼")) 
@@ -82,7 +84,7 @@ namespace FixedColorPaletteTool
             Vector2 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             ElementDropdownWindow.GetExpectedSize(colorSelectType, out var width, out var height);
 
-            Rect rect = new Rect(mousePos.x - width, mousePos.y - height, width, height);
+            Rect rect = new Rect(mousePos.x - width * 1.5f, mousePos.y - height, width, height);
             window.ShowAsDropDown(rect, new Vector2(width, height));
         }
 

@@ -108,7 +108,7 @@ namespace FixedColorPaletteTool
                 ElementDropdownWindow.GetExpectedSize(colorSelectType, out var windowWidth, out var windowHeight);
                 
                 var rect = dropdownButton.GetScreenBound();
-                rect.x -= windowWidth;
+                rect.x -= windowWidth * 1.5f;
                 
                 window.ShowAsDropDown(rect, new Vector2(windowWidth, windowHeight));
                 window.position = rect;

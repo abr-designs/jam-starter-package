@@ -10,9 +10,10 @@ namespace FixedColorPaletteTool
         
         private void DrawAsListShades(VisualElement root)
         {
-            
             const float MIN_VALUE = 0.25f;
             const float MIN_SATURATION = 0.2f;
+
+            root.style.flexDirection = FlexDirection.Row;
             
             for (var i = 0; i < m_options.Count; i++)
             {
@@ -25,23 +26,22 @@ namespace FixedColorPaletteTool
                 var fullDevalued = Color.HSVToRGB(h, s,  v * MIN_VALUE);
                 var fullDesatured = Color.HSVToRGB(h, s * MIN_SATURATION, 1f);
                 
-                //Devalued colors
-                for (int j = 0; j < SHADES_COUNT; j++)
-                {
-                    var valueColor = Color.Lerp(fullDevalued, baseColor, j / (float)SHADES_COUNT);
-                    row.Add(CreateGridSlot(backgroundColor, valueColor));
-                }
-                
                 //Default Color
                 var baseGrid = CreateGridSlot(backgroundColor, baseColor);
-                baseGrid.style.marginLeft = baseGrid.style.marginRight = 8;
                 row.Add(baseGrid);
                 
                 //Desaturated colors
-                for (int j = SHADES_COUNT - 1; j >= 0; j--)
+                for (int j = 0; j < SHADES_COUNT; j++)
                 {
                     var saturateColor = Color.Lerp(fullDesatured, baseColor, j / (float)SHADES_COUNT);
                     row.Add(CreateGridSlot(backgroundColor, saturateColor));
+                }
+                
+                //Devalued colors
+                for (int j = SHADES_COUNT - 1; j >= 0; j--)
+                {
+                    var valueColor = Color.Lerp(fullDevalued, baseColor, j / (float)SHADES_COUNT);
+                    row.Add(CreateGridSlot(backgroundColor, valueColor));
                 }
             }
 
@@ -53,7 +53,7 @@ namespace FixedColorPaletteTool
                 {
                     style =
                     {
-                        flexDirection = FlexDirection.Row,
+                        flexDirection = FlexDirection.Column,
                         flexShrink = 0
                     }
                     
@@ -90,6 +90,7 @@ namespace FixedColorPaletteTool
                 };
 
                 var colorBox = DrawColorBox(colorOption);
+
                 colorBox.style.SetPadding(6,4);
                 
                 gridSlot.Add(colorBox);
@@ -112,15 +113,17 @@ namespace FixedColorPaletteTool
         {
             const int DEFAULT_WIDTH = 180;
             const int LINE_PADDING = 8;
+            
+            var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
-            return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + (COLOR_BOX_SIZE + 16);
+            return (itemCount) * (COLOR_BOX_SIZE + 4) + LINE_PADDING * 2f;
         }
         private static float GetExpectedShadesHeight()
         {
             const int DEFAULT_WIDTH = 180;
             const int LINE_PADDING = 8;
 
-            return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + (COLOR_BOX_SIZE + 16);
+            return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + LINE_PADDING;
         }
     }
 }

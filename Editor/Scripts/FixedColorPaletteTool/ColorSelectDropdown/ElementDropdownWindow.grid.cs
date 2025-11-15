@@ -93,6 +93,14 @@ namespace FixedColorPaletteTool
         private static float GetExpectedGridWidth()
         {
             const int DEFAULT_WIDTH = 180;
+            const int LINE_PADDING = 8;
+            
+            var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
+            
+            int itemsPerRow = Mathf.FloorToInt(DEFAULT_WIDTH / (COLOR_BOX_SIZE + 4));
+
+            if (itemCount < itemsPerRow)
+                return itemCount * (COLOR_BOX_SIZE + 4) + LINE_PADDING * 2f;
             
             return DEFAULT_WIDTH;
         }

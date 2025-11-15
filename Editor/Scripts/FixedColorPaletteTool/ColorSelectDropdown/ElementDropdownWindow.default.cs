@@ -7,21 +7,23 @@ using Scripts.Utilities.Extensions;
 
 namespace FixedColorPaletteTool
 {
-
     public partial class ElementDropdownWindow : EditorWindow
     {
-        
         private const float COLOR_BOX_SIZE = 20;
 
         private COLOR_SELECT m_colorSelectType;
         private List<ColorData> m_options;
         private ColorData m_current;
-        private System.Action<int, ColorData> m_onSelect;
+        private Action<int, ColorData> m_onSelect;
         
-        private Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, string> m_getName;
-        private Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, Color> m_getColor;
+        private Func<ColorData, string> m_getName;
+        private Func<ColorData, Color> m_getColor;
 
-        public void Init(COLOR_SELECT colorSelectType, List<ColorData> options, ColorData current, System.Action<int, ColorData> onSelect, Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, string> getName, Unity.Plastic.Antlr3.Runtime.Misc.Func<ColorData, Color> getColor)
+        public void Init(COLOR_SELECT colorSelectType, 
+            List<ColorData> options, ColorData current,
+            Action<int, ColorData> onSelect, 
+            Func<ColorData, string> getName, 
+            Func<ColorData, Color> getColor)
         {
             m_colorSelectType = colorSelectType;
             m_getName = getName;
@@ -59,8 +61,6 @@ namespace FixedColorPaletteTool
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-
         }
 
         //============================================================================================================//
@@ -137,6 +137,10 @@ namespace FixedColorPaletteTool
                     flexShrink = 0
                 }
             };
+            
+            colorBox.style.SetBorderRadius(COLOR_BOX_SIZE / 2f);
+            colorBox.style.SetBorderWidth(0.5f);
+            colorBox.style.SetBorderColor(new Color32(30,30,30,255));
 
             return colorBox;
         }
@@ -161,6 +165,8 @@ namespace FixedColorPaletteTool
                     throw new ArgumentOutOfRangeException(nameof(colorSelect), colorSelect, null);
             }
         }
+        
+        //============================================================================================================//
         
         private static float GetExpectedDefaultWidth()
         {
