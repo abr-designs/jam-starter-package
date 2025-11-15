@@ -10,7 +10,6 @@ namespace FixedColorPaletteTool
     public class FixedPaletteSettings : ScriptableObject
     {
         public ColorPaletteScriptableObject selectedPalette;
-        public bool dropdownAsGrid;
 
 #if !UNITY_EDITOR
         public static FixedPaletteSettings Instance { get; private set; }

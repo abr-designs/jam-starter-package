@@ -106,7 +106,7 @@ namespace FixedColorPaletteTool
                 }, GetColorDataName, GetColorDataColor);
 
                 var windowWidth = ElementDropdownWindow.GetExpectedWidth(colorSelectType);
-                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, FixedPaletteSettings.Instance.dropdownAsGrid, colorSelectType);
+                var windowHeight = ElementDropdownWindow.GetExpectedHeight(windowWidth, colorSelectType);
                 
                 var rect = dropdownButton.GetScreenBound();
                 rect.x -= windowWidth;

@@ -43,10 +43,12 @@ namespace FixedColorPaletteTool
             {
                 case COLOR_SELECT.DEFAULT:
                 {
-                    if (FixedPaletteSettings.Instance.dropdownAsGrid)
-                        DrawAsGridDefault(root);
-                    else
-                        DrawAsListDefault(root);
+                    DrawAsListDefault(root);
+                    break;
+                }
+                case COLOR_SELECT.GRID:
+                {
+                    DrawAsGridDefault(root);
                     break;
                 }
                 case COLOR_SELECT.SHADES:
@@ -219,14 +221,14 @@ namespace FixedColorPaletteTool
             return colorBox;
         }
 
-        public static float GetExpectedHeight(float width, bool asGrid, COLOR_SELECT colorSelect)
+        public static float GetExpectedHeight(float width, COLOR_SELECT colorSelect)
         {
             const int LINE_HEIGHT = 22;
             const int LINE_PADDING = 8;
             
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
-            if (!asGrid || colorSelect == COLOR_SELECT.SHADES) 
+            if (colorSelect != COLOR_SELECT.GRID) 
                 return itemCount * (LINE_HEIGHT+ 2) + LINE_PADDING;
             
             
