@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool.Importing
 {
-    public static class ColorPaletteImporter
+    internal static class ColorPaletteImporter
     {
-        private static List<IFixedColorPaletteImporter> s_importers = new()
+        private static readonly List<IFixedColorPaletteImporter> Importers = new()
         {
             new PNGFixedColorPaletteImporter(),
             new HEXFixedColorPaletteImporter(),
@@ -19,11 +19,11 @@ namespace FixedColorPaletteTool.Importing
         private static string[] SupportedTypesFilters = 
         {
             
-            $"Pallets ({string.Join( ", ", s_importers.Select(x=> x.FileExtention))})", 
-            $"{string.Join( ',', s_importers.Select(x=> x.FileExtention[1..]))}"
+            $"Pallets ({string.Join( ", ", Importers.Select(x=> x.FileExtension))})", 
+            $"{string.Join( ',', Importers.Select(x=> x.FileExtension[1..]))}"
         };
         
-        public static void ImportColorFile(ColorPaletteScriptableObject container, bool destructive)
+        internal static void ImportColorFile(ColorPaletteScriptableObject container, bool destructive)
         {
             var filePath = EditorUtility.OpenFilePanelWithFilters("Open Color Palette", "", SupportedTypesFilters);
             var selectedFile = new FileInfo(filePath);
@@ -43,7 +43,7 @@ namespace FixedColorPaletteTool.Importing
             //---------------------------------------------------------//
             var foundColors = new List<Color32>();
 
-            var importer = s_importers.FirstOrDefault(x => x.FileExtention == selectedFile.Extension);
+            var importer = Importers.FirstOrDefault(x => x.FileExtension == selectedFile.Extension);
 
             if (importer == null)
                 throw new NotImplementedException($"{selectedFile.Extension} file types are not supported by {nameof(ColorPaletteImporter)}");
@@ -73,7 +73,7 @@ namespace FixedColorPaletteTool.Importing
         {
             if(destructive)
                 currentList.Clear();
-            //var outData = new List<ColorData>(colors.Count);
+
             for (int i = 0; i < colors.Count; i++)
             {
                 var colorData = new ColorData

@@ -1,23 +1,17 @@
-﻿using System;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
 using Scripts.Utilities.Extensions;
 
 namespace FixedColorPaletteTool
 {
-
-    public partial class ElementDropdownWindow
+    internal partial class ColorSelectDropdownWindow
     {
         private void DrawAsGridDefault(VisualElement root)
         {
-            int itemsPerRow = Mathf.FloorToInt(this.position.width / (COLOR_BOX_SIZE + 4));
-            int numberOfRows = Mathf.FloorToInt(m_options.Count / (float)itemsPerRow);
+            var itemsPerRow = Mathf.FloorToInt(this.position.width / (COLOR_BOX_SIZE + 4));
             
-            var c = 0;
             var row = CreateRow();
-            for (var i = 0; i < m_options.Count; i++, c++)
+            for (int i = 0,  c = 0; i < m_options.Count; i++, c++)
             {
                 var index = i;
 
@@ -29,7 +23,7 @@ namespace FixedColorPaletteTool
                 
                 var colorOption = m_options[i];
                 var gridContainer = CreateGridSlot();
-                var colorBox = DrawColorBox(colorOption);
+                var colorBox = DrawColorIcon(colorOption);
 
                 gridContainer.Add(colorBox);
 
@@ -46,11 +40,11 @@ namespace FixedColorPaletteTool
 
                 // Highlight current
                 if (colorOption.Equals(m_current))
-                    gridContainer.style.backgroundColor = new StyleColor(new Color(0.3f, 0.3f, 0.3f, 0.2f));
+                    gridContainer.style.backgroundColor = new StyleColor(HIGHLIGHT_COLOR);
 
                 gridContainer.RegisterCallback<ClickEvent>(_ =>
                 {
-                    m_onSelect?.Invoke(index, colorOption);
+                    m_onSelect?.Invoke(colorOption);
                     Close();
                 });
 
@@ -92,13 +86,10 @@ namespace FixedColorPaletteTool
         
         private static float GetExpectedGridWidth()
         {
-            const int DEFAULT_WIDTH = 180;
-            const int LINE_PADDING = 8;
-            
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
-            
-            int itemsPerRow = Mathf.FloorToInt(DEFAULT_WIDTH / (COLOR_BOX_SIZE + 4));
+            var itemsPerRow = Mathf.FloorToInt(DEFAULT_WIDTH / (COLOR_BOX_SIZE + 4));
 
+            //If the number of options is would be too small, resize the window to fit the new min
             if (itemCount < itemsPerRow)
                 return itemCount * (COLOR_BOX_SIZE + 4) + LINE_PADDING * 2f;
             
@@ -106,9 +97,6 @@ namespace FixedColorPaletteTool
         }
         private static float GetExpectedGridHeight()
         {
-            const int DEFAULT_WIDTH = 180;
-            const int LINE_PADDING = 8;
-            
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
             int itemsPerRow = Mathf.FloorToInt(GetExpectedGridWidth() / (COLOR_BOX_SIZE + 4));

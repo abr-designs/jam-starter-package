@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool.Importing.Importers
 {
-    public class HEXFixedColorPaletteImporter: IFixedColorPaletteImporter
+    internal class HEXFixedColorPaletteImporter: IFixedColorPaletteImporter
     {
-        public string FileExtention => ".hex";
+        public string FileExtension => ".hex";
         public void ParseColorsFromFile(FileInfo file, List<Color32> outColors)
         {
             using var fs = file.OpenRead();

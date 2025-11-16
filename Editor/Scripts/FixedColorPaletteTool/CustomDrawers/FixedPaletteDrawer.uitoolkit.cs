@@ -1,21 +1,22 @@
 ﻿using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace FixedColorPaletteTool
 {
+    //We only add this once
 #if FIXED_COLOR_INSPECTOR
     [CustomPropertyDrawer(typeof(Color), true)]
     [CustomPropertyDrawer(typeof(Color32), true)]
 #endif
     [CustomPropertyDrawer(typeof(FixedPaletteAttribute), true)]
-    public partial class FixedPaletteDrawer : PropertyDrawer
+    internal partial class FixedPaletteDrawer : PropertyDrawer
     {
         //private int m_selectedIndex = -1;
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             // Ensure we’re working with a Color or Color32
+            //------------------------------------------------------------------//
             if (property.propertyType != SerializedPropertyType.Color)
             {
                 var error = new Label("[FixedPalette] only works on Color or Color32 fields.")
@@ -29,6 +30,7 @@ namespace FixedColorPaletteTool
                 };
                 return error;
             }
+            //------------------------------------------------------------------//
             
             var fixedPaletteAttribute = (FixedPaletteAttribute)attribute;
             var colorSelectType = fixedPaletteAttribute.ColorSelect;
@@ -81,7 +83,7 @@ namespace FixedColorPaletteTool
 
             dropdownButton.clicked += () =>
             {
-                var window = ScriptableObject.CreateInstance<ElementDropdownWindow>();
+                var window = ScriptableObject.CreateInstance<ColorSelectDropdownWindow>();
                 var current = new ColorData
                 {
                     name = currentColorData.name,
@@ -91,21 +93,18 @@ namespace FixedColorPaletteTool
                     colorSelectType,
                     FixedPaletteSettings.Instance.selectedPalette.colors, 
                     current, 
-                    (index, selected) =>
+                    (selected) =>
                 {
                     currentColorData.name = selected.name;
                     currentColorData.color = selected.color;
-
-                    //FIXME I want to be able to hotswap palettes without breaking refs. I assumed that index would be the ideal replacement
-                    //m_selectedIndex = index;
                     
                     label.text = $"{selected.name}";
                     colorBox.style.backgroundColor = new StyleColor(selected.color);
                     property.colorValue = selected.color;
                     property.serializedObject.ApplyModifiedProperties();
-                }, GetColorDataName, GetColorDataColor);
+                });
 
-                ElementDropdownWindow.GetExpectedSize(colorSelectType, out var windowWidth, out var windowHeight);
+                ColorSelectDropdownWindow.GetExpectedSize(colorSelectType, out var windowWidth, out var windowHeight);
                 
                 var rect = dropdownButton.GetScreenBound();
                 rect.x -= windowWidth * 1.5f;
@@ -118,10 +117,6 @@ namespace FixedColorPaletteTool
 
             return container;
         }
-
-        private static string GetColorDataName(ColorData colorData) => colorData.name;
-
-        private static Color GetColorDataColor(ColorData colorData) => colorData.color;
     }
 
 }

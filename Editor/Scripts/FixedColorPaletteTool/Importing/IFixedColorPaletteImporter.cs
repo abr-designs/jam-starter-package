@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool
 {
-    public interface IFixedColorPaletteImporter
+    internal interface IFixedColorPaletteImporter
     {
-        string FileExtention { get; }
+        string FileExtension { get; }
 
         void ParseColorsFromFile(FileInfo file, List<Color32> outColors);
     }

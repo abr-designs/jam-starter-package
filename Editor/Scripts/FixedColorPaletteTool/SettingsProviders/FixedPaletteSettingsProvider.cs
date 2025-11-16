@@ -4,6 +4,7 @@ using FixedColorPaletteTool.Importing;
 using Scripts.Utilities.Extensions;
 using UnityEditor;
 using UnityEditor.Build;
+using UnityEditor.Compilation;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
@@ -13,12 +14,10 @@ using Button = UnityEngine.UIElements.Button;
 
 namespace FixedColorPaletteTool.SettingsProviders
 {
-    public static class FixedPaletteSettingsProvider
+    internal static class FixedPaletteSettingsProvider
     {
         private const string FORCE_INSPECTOR_SYMBOL = "FIXED_COLOR_INSPECTOR";
         
-        public static event Action OnPaletteChanged;
-
         private static VisualElement s_paletteDrawerContainer;
         private static Button s_deletePaletteButton;
         
@@ -32,15 +31,21 @@ namespace FixedColorPaletteTool.SettingsProviders
             };
         }
 
+        /// <summary>
+        /// Draws the settings window
+        /// </summary>
+        /// <param name="_"></param>
+        /// <param name="root"></param>
         private static void ActivateHandler(string _, VisualElement root)
         {
-            SerializedObject serializedObject = FixedPaletteSettings.GetSerializedObject();
-
-            VisualElement container = new VisualElement { style = { flexDirection = FlexDirection.Column, } };
+            var serializedObject = FixedPaletteSettings.GetSerializedObject();
+            var container = new VisualElement { style = { flexDirection = FlexDirection.Column, } };
 
             container.Add(new Label("Fixed Palette Settings") { style = { fontSize = 24, unityFontStyleAndWeight = FontStyle.Bold } });
             container.style.SetMargins(10);
 
+            //-----------------------------------------------------------------------//
+            
             var toggleAllInspectors = new Toggle("Use for all Color Inspectors")
             {
                 value = HasScriptingDefine(FORCE_INSPECTOR_SYMBOL)
@@ -61,11 +66,11 @@ namespace FixedColorPaletteTool.SettingsProviders
             headerContainer.style.flexDirection = FlexDirection.Row;
             headerContainer.style.flexGrow = 1;
 
-            var newPaletteButton = new Button(CreateNewPalette)
+            var newPaletteButton = new Button(CreateNewPaletteButtonEvent)
             {
                 text = "new"
             };
-            s_deletePaletteButton = new Button(DeleteCurrentPalette)
+            s_deletePaletteButton = new Button(DeleteCurrentPaletteButtonEvent)
             {
                 text = "Delete"
             };
@@ -102,7 +107,7 @@ namespace FixedColorPaletteTool.SettingsProviders
             var paletteNameProperty = serializedPaletteObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
             
             //------------------------------------------------------------------//
-            var titleLabel = new Label()
+            var titleLabel = new Label
             {
                 style =
                 {
@@ -115,7 +120,7 @@ namespace FixedColorPaletteTool.SettingsProviders
             titleLabel.BindProperty(paletteNameProperty);
             container.Add(titleLabel);
 
-            var buttonContainer = new VisualElement()
+            var buttonContainer = new VisualElement
             {
                 style =
                 {
@@ -141,8 +146,13 @@ namespace FixedColorPaletteTool.SettingsProviders
             
             //------------------------------------------------------------------//
             var nameProperty = serializedPaletteObject.FindProperty(nameof(ColorPaletteScriptableObject.paletteName));
-            var nameField = new PropertyField(nameProperty);
-            nameField.style.flexShrink = 0;
+            var nameField = new PropertyField(nameProperty)
+            {
+                style =
+                {
+                    flexShrink = 0
+                }
+            };
             nameField.BindProperty(nameProperty);
             container.Add(nameField);
             
@@ -170,7 +180,10 @@ namespace FixedColorPaletteTool.SettingsProviders
             return container;
         }
 
-        private static void CreateNewPalette()
+        //Button Events
+        //============================================================================================================//
+        
+        private static void CreateNewPaletteButtonEvent()
         {
             var selectedOption = EditorUtility.DisplayDialogComplex(
                 "Create Palette File",
@@ -191,7 +204,7 @@ namespace FixedColorPaletteTool.SettingsProviders
             ColorPaletteImporter.ImportColorFile(newPalette, true);
         }
 
-        private static void DeleteCurrentPalette()
+        private static void DeleteCurrentPaletteButtonEvent()
         {
             var palette = FixedPaletteSettings.Instance.selectedPalette;
             
@@ -207,16 +220,15 @@ namespace FixedColorPaletteTool.SettingsProviders
         
         //============================================================================================================//
 
+        #region Scripting Definition Utilities
+
         private static bool HasScriptingDefine(string symbol)
         {
             var currentBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-            //var symbols = new string[100];
-
             PlayerSettings.GetScriptingDefineSymbols(currentBuildTarget, out var symbols);
 
             return symbols.Any(x => x.Equals(symbol));
         }
-
         private static void TryAddScriptingDefine(string symbol)
         {
             if (HasScriptingDefine(symbol))
@@ -229,9 +241,8 @@ namespace FixedColorPaletteTool.SettingsProviders
             hashedSymbols.Add(symbol);
             
             PlayerSettings.SetScriptingDefineSymbols(currentBuildTarget, hashedSymbols.ToArray());
-            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+            CompilationPipeline.RequestScriptCompilation();
         }
-        
         private static void TryRemoveScriptingDefine(string symbol)
         {
             if (!HasScriptingDefine(symbol))
@@ -244,17 +255,19 @@ namespace FixedColorPaletteTool.SettingsProviders
             hashedSymbols.Remove(symbol);
             
             PlayerSettings.SetScriptingDefineSymbols(currentBuildTarget, hashedSymbols.ToArray());
-            UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+            CompilationPipeline.RequestScriptCompilation();
         }
+
+        #endregion
         
         //============================================================================================================//
+
+        #region Event Callbacks
 
         private static void OnPaletteChangedEvent(SerializedPropertyChangeEvent evt) => OnPaletteChangedEvent(evt.changedProperty);
 
         private static void OnPaletteChangedEvent(SerializedProperty paletteProperty)
         {
-            OnPaletteChanged?.Invoke();
-
             s_paletteDrawerContainer.Clear();
 
             var hasValue = paletteProperty.objectReferenceValue != null;
@@ -267,6 +280,8 @@ namespace FixedColorPaletteTool.SettingsProviders
             var paletteObject = new SerializedObject(paletteProperty.objectReferenceValue as ScriptableObject);
             s_paletteDrawerContainer.Add(DrawPalette(paletteObject));
         }
+
+        #endregion //Event Callbacks
         
         //============================================================================================================//
         

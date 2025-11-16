@@ -4,13 +4,20 @@ using Scripts.Utilities.Extensions;
 
 namespace FixedColorPaletteTool
 {
-    public partial class ElementDropdownWindow
+    internal partial class ColorSelectDropdownWindow
     {
-        const int SHADES_COUNT = 3;
+        private const int SHADES_COUNT = 3;
         
+        /// <summary>
+        /// Draws a grid of colors, where the horizontal space is taken up by the palette entries & the vertical space
+        /// is taken by the transition of colors from DeSaturated to DeValued.
+        /// </summary>
+        /// <param name="root"></param>
         private void DrawAsListShades(VisualElement root)
         {
+            //We don't want the value to reach 0.0f, since that would be 100% black, we just want a dark variation of the current color
             const float MIN_VALUE = 0.25f;
+            //We don't want the value to reach 0.0f, since that would be 100% white, we just want a lighter variation of the current color
             const float MIN_SATURATION = 0.2f;
 
             root.style.flexDirection = FlexDirection.Row;
@@ -21,6 +28,7 @@ namespace FixedColorPaletteTool
                 var row = CreateRow();
                 var backgroundColor = row.style.backgroundColor;
 
+                //Determine the color targets
                 var baseColor = (Color)colorOption.color;
                 Color.RGBToHSV(baseColor, out var h, out var s, out var v);
                 var fullDevalued = Color.HSVToRGB(h, s,  v * MIN_VALUE);
@@ -89,7 +97,7 @@ namespace FixedColorPaletteTool
                     color = color
                 };
 
-                var colorBox = DrawColorBox(colorOption);
+                var colorBox = DrawColorIcon(colorOption);
 
                 colorBox.style.SetPadding(6,4);
                 
@@ -101,7 +109,7 @@ namespace FixedColorPaletteTool
 
                 gridSlot.RegisterCallback<ClickEvent>(_ =>
                 {
-                    m_onSelect?.Invoke(-1, colorOption);
+                    m_onSelect?.Invoke(colorOption);
                     Close();
                 });
                 
@@ -111,18 +119,12 @@ namespace FixedColorPaletteTool
         
         private static float GetExpectedShadesWidth()
         {
-            const int DEFAULT_WIDTH = 180;
-            const int LINE_PADDING = 8;
-            
             var itemCount = FixedPaletteSettings.Instance.selectedPalette.colors.Count;
 
             return (itemCount) * (COLOR_BOX_SIZE + 4) + LINE_PADDING * 2f;
         }
         private static float GetExpectedShadesHeight()
         {
-            const int DEFAULT_WIDTH = 180;
-            const int LINE_PADDING = 8;
-
             return ((SHADES_COUNT * 2) + 1) * (COLOR_BOX_SIZE + 4) + LINE_PADDING;
         }
     }

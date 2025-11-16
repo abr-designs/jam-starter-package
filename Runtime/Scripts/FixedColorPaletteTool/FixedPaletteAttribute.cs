@@ -2,13 +2,6 @@
 
 namespace FixedColorPaletteTool
 {
-    public enum COLOR_SELECT
-    {
-        DEFAULT,
-        GRID,
-        SHADES
-    }
-    
     public class FixedPaletteAttribute : PropertyAttribute
     {
         public COLOR_SELECT ColorSelect { get; }

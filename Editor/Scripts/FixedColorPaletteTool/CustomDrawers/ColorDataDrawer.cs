@@ -1,9 +1,10 @@
 ﻿using UnityEditor;
 using UnityEngine;
+
 namespace FixedColorPaletteTool.CustomDrawers
 {
     [CustomPropertyDrawer(typeof(ColorData))]
-    public class ColorDataDrawer : PropertyDrawer
+    internal class ColorDataDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -24,6 +25,8 @@ namespace FixedColorPaletteTool.CustomDrawers
             Rect colorRect = new Rect(position.x, position.y, colorWidth, position.height);
             Rect nameRect = new Rect(position.x + colorWidth + spacing, position.y, nameWidth, position.height);
 
+            //Here we have to explicitly draw a ColorField, otherwise, if the user decides to use the override all
+            //colors option, this would not function as expected!
             colorProp.colorValue = EditorGUI.ColorField(colorRect, colorProp.colorValue);
             EditorGUI.PropertyField(nameRect, nameProp, GUIContent.none);
 

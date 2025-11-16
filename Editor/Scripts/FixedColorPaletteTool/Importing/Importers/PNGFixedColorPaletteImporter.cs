@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool.Importing.Importers
 {
-    public class PNGFixedColorPaletteImporter : IFixedColorPaletteImporter
+    internal class PNGFixedColorPaletteImporter : IFixedColorPaletteImporter
     {
-        public string FileExtention => ".png";
+        public string FileExtension => ".png";
         
         public void ParseColorsFromFile(FileInfo file, List<Color32> outColors)
         {

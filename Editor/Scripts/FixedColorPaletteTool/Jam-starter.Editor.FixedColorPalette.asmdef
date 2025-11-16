@@ -1,0 +1,19 @@
+{
+    "name": "Jam-starter.Editor.FixedColorPalette",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ab3afeca2d92a2c449cfb38b8d4a4e66",
+        "GUID:e0a7d29f6751f3e479d83dc8ad7aa437"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

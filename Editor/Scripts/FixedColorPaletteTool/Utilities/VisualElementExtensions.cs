@@ -4,9 +4,9 @@
     using UnityEngine;
     using UnityEngine.UIElements;
 
-    public static class VisualElementExtensions
+    internal static class VisualElementExtensions
     {
-        public static Rect GetScreenBound(this VisualElement element)
+        internal static Rect GetScreenBound(this VisualElement element)
         {
             // Get the worldBound (position within the current EditorWindow)
             var worldBound = element.worldBound;
@@ -25,7 +25,6 @@
             // Convert the window’s position (top-left corner) to screen coordinates
             var windowPos = GUIUtility.GUIToScreenPoint(Vector2.zero);
             var windowTopLeft = new Vector2(window.position.x, window.position.y);
-            var offset = windowTopLeft - windowPos;
 
             // Now add the window’s position to the element’s window-relative bounds
             return new Rect(

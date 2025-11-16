@@ -1,18 +1,16 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace FixedColorPaletteTool
 {
-
-    public partial class FixedPaletteDrawer
+    internal partial class FixedPaletteDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-
-            
             GUI.enabled = true;
             
+            //Legal type safety
+            //------------------------------------------------------------------//
             if (property.propertyType != SerializedPropertyType.Color)
             {
                 var errorRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
@@ -31,6 +29,7 @@ namespace FixedColorPaletteTool
                 EditorGUI.LabelField(errorRect, "[FixedPalette] only works on Color or Color32 fields.", style);
                 return;
             }
+            //------------------------------------------------------------------//
             
             var fixedPaletteAttribute = (FixedPaletteAttribute)attribute;
             var colorSelectType = fixedPaletteAttribute.ColorSelect;
@@ -41,8 +40,7 @@ namespace FixedColorPaletteTool
             // Resolve current color
             var currentColorData = new ColorData(property.colorValue);
 
-            // Layout: color box | label | dropdown
-            //float colorBoxSize = 16f;
+            // Layout: color box | dropdown
             float buttonWidth = 24f;
             float spacing = 6f;
             
@@ -63,26 +61,25 @@ namespace FixedColorPaletteTool
             if (!GUI.Button(buttonRect, "▼")) 
                 return;
             
-            var window = ScriptableObject.CreateInstance<ElementDropdownWindow>();
+            var window = ScriptableObject.CreateInstance<ColorSelectDropdownWindow>();
 
             window.Init(
                 colorSelectType,
                 FixedPaletteSettings.Instance.selectedPalette.colors, currentColorData,
-                (index, selected) =>
+                (selected) =>
                 {
                     currentColorData.name = selected.name;
                     currentColorData.color = selected.color;
 
                     property.colorValue = selected.color;
                     property.serializedObject.ApplyModifiedProperties();
-                },
-                GetColorDataName,
-                GetColorDataColor
+                }
             );
 
-            // Show dropdown near mouse position (since IMGUI doesn’t have VisualElement rects)
+            //FIXME We need to adjust the positioning of the window
+            //Show dropdown near mouse position (since IMGUI doesn’t have VisualElement rects)
             Vector2 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-            ElementDropdownWindow.GetExpectedSize(colorSelectType, out var width, out var height);
+            ColorSelectDropdownWindow.GetExpectedSize(colorSelectType, out var width, out var height);
 
             Rect rect = new Rect(mousePos.x - width * 1.5f, mousePos.y - height, width, height);
             window.ShowAsDropDown(rect, new Vector2(width, height));
