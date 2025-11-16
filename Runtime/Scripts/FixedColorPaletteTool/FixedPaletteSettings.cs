@@ -9,14 +9,21 @@ namespace FixedColorPaletteTool
 {
     public class FixedPaletteSettings : ScriptableObject
     {
+        private const string AssetName = "FixedPaletteSettings";
+        public const string AssetPath = "Assets/Settings/" + AssetName + ".asset";
+        
         public ColorPaletteScriptableObject selectedPalette;
 
 #if !UNITY_EDITOR
-        public static FixedPaletteSettings Instance { get; private set; }
+        public static FixedPaletteSettings Instance => Get();
+        private static FixedPaletteSettings s_instance;
 
-        private void OnEnable()
+        private FixedPaletteSettings Get()
         {
-            Instance = this;
+            if (s_instance == null)
+                s_instance = Resources.Load<FixedPaletteSettings>(AssetName);
+            
+            return s_instance;
         }
         
 #else
@@ -28,7 +35,7 @@ namespace FixedColorPaletteTool
         
         internal static FixedPaletteSettings GetOrCreate()
         {
-            const string AssetPath = "Assets/Settings/FixedPaletteSettings.asset";
+            
             
             var settings = AssetDatabase.LoadAssetAtPath<FixedPaletteSettings>(AssetPath);
             if (settings != null) 

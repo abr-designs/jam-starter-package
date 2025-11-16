@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FixedColorPaletteTool.Importing;
 using Scripts.Utilities.Extensions;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Compilation;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
