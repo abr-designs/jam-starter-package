@@ -39,7 +39,8 @@ namespace FixedColorPaletteTool.SettingsProviders
             var serializedObject = FixedPaletteSettings.GetSerializedObject();
             var container = new VisualElement { style = { flexDirection = FlexDirection.Column, } };
 
-            container.Add(new Label("Fixed Palette Settings") { style = { fontSize = 24, unityFontStyleAndWeight = FontStyle.Bold } });
+            container.Add(new Label("Fixed Palette Settings (Experimental)") 
+                { style = { fontSize = 24, unityFontStyleAndWeight = FontStyle.Bold } });
             container.style.SetMargins(10);
 
             //-----------------------------------------------------------------------//

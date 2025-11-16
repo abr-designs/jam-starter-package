@@ -1,8 +1,9 @@
 {
-    "name": "Jam-starter.Editor.FixedColorPalette",
+    "name": "FixedPaletteTool.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:ab3afeca2d92a2c449cfb38b8d4a4e66",
+        "GUID:d53c6629aef7b544db35d6729e3102d5",
+        "GUID:09efeed86ad53d143bde843967b9daad",
         "GUID:e0a7d29f6751f3e479d83dc8ad7aa437"
     ],
     "includePlatforms": [
