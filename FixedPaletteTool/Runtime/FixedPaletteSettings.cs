@@ -18,7 +18,7 @@ namespace FixedColorPaletteTool
         public static FixedPaletteSettings Instance => Get();
         private static FixedPaletteSettings s_instance;
 
-        private FixedPaletteSettings Get()
+        private static FixedPaletteSettings Get()
         {
             if (s_instance == null)
                 s_instance = Resources.Load<FixedPaletteSettings>(AssetName);
