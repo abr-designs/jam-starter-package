@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool.Preprocessors
 {
+    //FIXME I need to ensure that the required sub-assets get included & the others are excluded to save memory
     public class BuildPreProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {
         public int callbackOrder => 0;
