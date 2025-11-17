@@ -1,4 +1,4 @@
-﻿namespace FixedColorPaletteTool
+﻿namespace FixedColorPaletteTool.Enums
 {
     public enum COLOR_SELECT
     {

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using FixedColorPaletteTool.Enums;
 using Scripts.Utilities.Extensions;
 
 namespace FixedColorPaletteTool

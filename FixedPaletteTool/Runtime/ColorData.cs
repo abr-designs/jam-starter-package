@@ -1,4 +1,5 @@
 ﻿using System;
+using FixedColorPaletteTool.Enums;
 using UnityEngine;
 
 namespace FixedColorPaletteTool
@@ -12,8 +13,12 @@ namespace FixedColorPaletteTool
         [SerializeField] 
         public Color32 color;
 
+        [SerializeField] 
+        public COLOR colorType;
+        
         public ColorData(Color32 color)
         {
+            colorType = COLOR.NONE;
             name = $"#{ColorUtility.ToHtmlStringRGB(color)}";
             this.color = color;
         }
