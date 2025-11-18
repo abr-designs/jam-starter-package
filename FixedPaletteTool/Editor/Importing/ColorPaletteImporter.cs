@@ -71,6 +71,8 @@ namespace FixedColorPaletteTool.Importing
 
         private static void ToColorData(List<ColorData> currentList, List<Color32> colors, bool destructive)
         {
+            currentList ??= new List<ColorData>();
+            
             if(destructive)
                 currentList.Clear();
 

@@ -15,6 +15,8 @@ namespace FixedColorPaletteTool
         public static Color32 Secondary32 => GetColor(COLOR.SECONDARY);
         public static Color32 Tertiary32 => GetColor(COLOR.TERTIARY);
 
+        public static int ColorCount => FixedPaletteSettings.Instance.selectedPalette.colors.Count;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Color32 GetColorAtIndex(int index) => GetColorData(index).color;
         

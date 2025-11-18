@@ -81,7 +81,7 @@ namespace FixedColorPaletteTool
             Vector2 mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             ColorSelectDropdownWindow.GetExpectedSize(colorSelectType, out var width, out var height);
 
-            Rect rect = new Rect(mousePos.x - width * 1.5f, mousePos.y - height, width, height);
+            Rect rect = new Rect(mousePos.x - (width + 20f), mousePos.y - height, width, height);
             window.ShowAsDropDown(rect, new Vector2(width, height));
         }
 
