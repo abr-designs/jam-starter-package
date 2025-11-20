@@ -14,6 +14,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
   - Still operates using the `Update()` loop, but allows yielding
 - Added Playmode tests for `ScreenFader.cs`
+- Added _**Fixed Color Palette Tool**_
+  - Added `FixedPaletteSettingsProvider.cs` to display in Project Settings
+  - Added `FixedPaletteDrawer.uitoolkit.cs` & `FixedPaletteDrawer.imgui.cs` to display property in inspectors
+    - Added `ColorSelectDropdownWindow.TYPE.cs` Custom dropdown window to display as: List, Grid, Shades Grid
+  - Added Build Preprocessor to include the Color Palettes in builds
+  - Added `ColorPaletteImporter.cs` to allow flexible importing of palettes by using `IFixedColorPaletteImporter.cs`
+    - Added `HEXFixedColorPaletteImporter.cs` & `PNGFixedColorPaletteImporter.cs` as default importers
+  - Added `COLOR.cs` as enum to denot Primary, Secondary etc
+  - Added `COLOR_SELECT.cs` to allow denoting how colors are selected
+  - Added `ColorData.cs` as transportable color data
+  - Added `ColorScriptableObject.cs` as container for the Color Palette
+  - Added `FixedPaletteAttribute.cs` as main method of denoting in Monobehaviour that a user wants the color to be selectable
+  - Added `FixedPaletteSettings.cs` as main throughway to accessing `ColorScriptableObject.cs`
+  - Added `PaletteUtility.cs` as helper class to retrieve colors from the selected `ColorScriptableObject.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
