@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
   - Still operates using the `Update()` loop, but allows yielding
 - Added Playmode tests for `ScreenFader.cs`
+- Added UniTask to `AddPackages.cs` as a default included package
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
@@ -35,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
 - Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
 - Added optional parameter pitch to `SFXManager.PlaySound()`
+- Refactored `AddPackages.Packages` to merge the Package Ids & Package URLs into a single data field
 
 ### Fixed
 - 
