@@ -62,8 +62,12 @@ projects & Game jams.
 | [Newtonsoft JSON](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.2/manual/index.html) | 3.2.1   |
 
 #### Custom Packages
-> _See [AddPackages.cs](Editor/AddPackages.cs)_
+> _See [`AddPackages.cs`](Editor/Packages/AddPackages.cs)_
 - [Naughty Attributes](https://github.com/dbrizov/NaughtyAttributes)
 - [Unity Utils](https://github.com/ayellowpaper/SerializedDictionary)
 - [Cast Visualizer](https://www.bgtools.de/page/castvisualizer-manual/)
 - [Timescale Toolbar](https://assetstore.unity.com/packages/tools/utilities/timescale-toolbar-291564?srsltid=AfmBOorUkK2rYmOyD1nEe3st6saUWgPJvKqNkvB6vEWthLqgC344A70Y)
+
+#### Custom NuGet Packages
+> _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
+- [ZLinq](https://github.com/Cysharp/ZLinq)
