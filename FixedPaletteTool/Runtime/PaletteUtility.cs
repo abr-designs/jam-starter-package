@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using FixedColorPaletteTool.Enums;
 using UnityEngine;
@@ -23,6 +25,11 @@ namespace FixedColorPaletteTool
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ColorData GetColorData(int index)
         {
+#if UNITY_EDITOR
+            if (CalledFromConstructor())
+                return TryParseManually(index);
+#endif
+            
             return FixedPaletteSettings.Instance.selectedPalette.colors[index];
         }
         
@@ -32,6 +39,12 @@ namespace FixedColorPaletteTool
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ColorData GetColorData(COLOR colorType)
         {
+
+#if UNITY_EDITOR
+            if (CalledFromConstructor())
+                return TryParseManually(colorType);
+#endif
+            
             switch (colorType)
             {
                 case COLOR.NONE: return default;
@@ -45,5 +58,59 @@ namespace FixedColorPaletteTool
                     throw new ArgumentOutOfRangeException(nameof(colorType), colorType, null);
             }
         }
+
+#if UNITY_EDITOR
+
+        private static List<ColorData> s_initializerSafeColors;
+
+        public static void ClearColors() => s_initializerSafeColors = null;
+
+        private static ColorData TryParseManually(COLOR colorType)
+        {
+            const string AssetName = "FixedPaletteSettings";
+            const string AssetPath = "Assets/Settings/" + AssetName + ".asset";
+
+            if (s_initializerSafeColors == null)
+            {
+                if (!UnityPaletteParser.TryParsePaletteYaml(AssetPath, out s_initializerSafeColors))
+                    return new ColorData();
+            }
+            
+            var found = s_initializerSafeColors.FirstOrDefault(x => x.colorType == colorType);
+
+            if (found.colorType != colorType)
+                Debug.LogError($"No color set to {colorType}");
+
+            return found;
+        }
+        
+        private static ColorData TryParseManually(int colorIndex)
+        {
+            const string AssetName = "FixedPaletteSettings";
+            const string AssetPath = "Assets/Settings/" + AssetName + ".asset";
+
+            if (s_initializerSafeColors == null)
+            {
+                if (!UnityPaletteParser.TryParsePaletteYaml(AssetPath, out s_initializerSafeColors))
+                    return new ColorData();
+            }
+
+            return s_initializerSafeColors[colorIndex];
+        }
+        
+        private static bool CalledFromConstructor()
+        {
+            var st = new System.Diagnostics.StackTrace();
+            foreach (var frame in st.GetFrames())
+            {
+                var method = frame.GetMethod();
+                if (method.IsConstructor)      // instance ctor
+                    return true;
+                if (method.Name is ".cctor" or ".ctor")   // type initializer (static ctor)
+                    return true;
+            }
+            return false;
+        }
+#endif
     }
 }
