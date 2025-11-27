@@ -65,7 +65,7 @@ public static class UnityPaletteParser
 
         if (paletteDoc == null)
         {
-            LogError($"No document with anchor &{selectedFileID} found.");//
+            Debug.LogError($"Palette not found! [ID {selectedFileID}]");//
             return false;
         }
 
@@ -83,7 +83,10 @@ public static class UnityPaletteParser
         Log($"Found {colorsNode.Children.Count} colors in this palette.");
 
         if (colorsNode.Children.Count <= 0)
+        {
+            Debug.LogError("Color Palette contains no colors!");
             return false;
+        }
 
         parsedData = new List<ColorData>();
 
@@ -130,7 +133,8 @@ public static class UnityPaletteParser
     {
         const string key = "selectedPalette:";
         var idx = text.IndexOf(key, StringComparison.Ordinal);
-        if (idx < 0) return null;
+        if (idx < 0) 
+            return null;
 
         var line = text.Substring(idx, Mathf.Min(text.Length - idx, 200)); // read enough chars
         var fileID = line

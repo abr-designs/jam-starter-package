@@ -74,7 +74,12 @@ namespace FixedColorPaletteTool
                     return new ColorData();
             }
             
-            return s_initializerSafeColors.FirstOrDefault(x => x.colorType == colorType);
+            var found = s_initializerSafeColors.FirstOrDefault(x => x.colorType == colorType);
+
+            if (found.colorType != colorType)
+                throw new MissingFieldException($"No color set to {colorType}");
+
+            return found;
         }
         
         private static ColorData TryParseManually(int colorIndex)
