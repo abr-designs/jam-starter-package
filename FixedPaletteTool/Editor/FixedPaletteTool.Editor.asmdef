@@ -1,0 +1,20 @@
+{
+    "name": "FixedPaletteTool.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d53c6629aef7b544db35d6729e3102d5",
+        "GUID:09efeed86ad53d143bde843967b9daad",
+        "GUID:e0a7d29f6751f3e479d83dc8ad7aa437"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
