@@ -1,0 +1,25 @@
+{
+    "name": "JamStarter.Editor.NuGet-Packages",
+    "rootNamespace": "",
+    "references": [
+        "NuGetForUnity",
+        "Jam-starter.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.github-glitchenzo.nugetforunity",
+            "expression": "4.5.0",
+            "define": "UNITY_NUGET"
+        }
+    ],
+    "noEngineReferences": false
+}
