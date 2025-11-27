@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `AddNuGetPackages.cs` as an automatic implementation of nuget packages
   - Automatically adds the `ZLinq` nuget package
 - Added `JamStarter.Editor.NuGet-Packages` assembly definition that will prevent pre-emptive compilation of Nuget code without the package being installed
+- Added _**Fixed Color Palette Tool**_
+  - Added `FixedPaletteSettingsProvider.cs` to display in Project Settings
+  - Added `FixedPaletteDrawer.uitoolkit.cs` & `FixedPaletteDrawer.imgui.cs` to display property in inspectors
+    - Added `ColorSelectDropdownWindow.TYPE.cs` Custom dropdown window to display as: List, Grid, Shades Grid
+  - Added Build Preprocessor to help ensure that the `FixedPaletteSettings` scriptable object is included as a preloaded asset
+  - Added `ColorPaletteImporter.cs` to allow flexible importing of palettes by using `IFixedColorPaletteImporter.cs`
+    - Added `HEXFixedColorPaletteImporter.cs` & `PNGFixedColorPaletteImporter.cs` as default importers
+  - Added `COLOR.cs` as enum to denot Primary, Secondary etc
+  - Added `COLOR_SELECT.cs` to allow denoting how colors are selected
+  - Added `ColorData.cs` as transportable color data
+  - Added `ColorScriptableObject.cs` as container for the Color Palette
+  - Added `FixedPaletteAttribute.cs` as main method of denoting in Monobehaviour that a user wants the color to be selectable
+  - Added `FixedPaletteSettings.cs` as main throughway to accessing `ColorScriptableObject.cs`
+    - Includes section to automatically include the generated `FixedPaletteSettings` as a pre-loaded assets in PlayerSettings
+  - Added `PaletteUtility.cs` as helper class to retrieve colors from the selected `ColorScriptableObject.cs`
+    - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
+  - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
+    - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
