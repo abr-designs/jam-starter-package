@@ -19,6 +19,7 @@ namespace JamStarter.Editor
             ("com.gitamend.unityutils", "https://github.com/adammyhre/Unity-Utils.git"),
             ("ayellowpaper.serialized-dictionary", "https://github.com/ayellowpaper/SerializedDictionary.git"),
             ("com.cysharp.unitask", "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"),
+            ("com.github-glitchenzo.nugetforunity", "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity")
         };
     
         [InitializeOnLoadMethod]

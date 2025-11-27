@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
   - Still operates using the `Update()` loop, but allows yielding
 - Added Playmode tests for `ScreenFader.cs`
+- Added UniTask to `AddPackages.cs` as a default included package
+- Added `AddNuGetPackages.cs` as an automatic implementation of nuget packages
+  - Automatically adds the `ZLinq` nuget package
+- Added `JamStarter.Editor.NuGet-Packages` assembly definition that will prevent pre-emptive compilation of Nuget code without the package being installed
 - Added _**Fixed Color Palette Tool**_
   - Added `FixedPaletteSettingsProvider.cs` to display in Project Settings
   - Added `FixedPaletteDrawer.uitoolkit.cs` & `FixedPaletteDrawer.imgui.cs` to display property in inspectors
@@ -32,7 +36,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
   - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
     - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
-- Added UniTask to `AddPackages.cs` as a default included package
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
@@ -55,6 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
 - Added optional parameter pitch to `SFXManager.PlaySound()`
 - Refactored `AddPackages.Packages` to merge the Package Ids & Package URLs into a single data field
+- Added nugetforunity package to `AddPackages.cs`
 
 ### Fixed
 - 
