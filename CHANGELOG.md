@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `FixedPaletteSettingsProvider.cs` to display in Project Settings
   - Added `FixedPaletteDrawer.uitoolkit.cs` & `FixedPaletteDrawer.imgui.cs` to display property in inspectors
     - Added `ColorSelectDropdownWindow.TYPE.cs` Custom dropdown window to display as: List, Grid, Shades Grid
-  - Added Build Preprocessor to include the Color Palettes in builds
+  - Added Build Preprocessor to help ensure that the `FixedPaletteSettings` scriptable object is included as a preloaded asset
   - Added `ColorPaletteImporter.cs` to allow flexible importing of palettes by using `IFixedColorPaletteImporter.cs`
     - Added `HEXFixedColorPaletteImporter.cs` & `PNGFixedColorPaletteImporter.cs` as default importers
   - Added `COLOR.cs` as enum to denot Primary, Secondary etc
@@ -27,7 +27,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `ColorScriptableObject.cs` as container for the Color Palette
   - Added `FixedPaletteAttribute.cs` as main method of denoting in Monobehaviour that a user wants the color to be selectable
   - Added `FixedPaletteSettings.cs` as main throughway to accessing `ColorScriptableObject.cs`
+    - Includes section to automatically include the generated `FixedPaletteSettings` as a pre-loaded assets in PlayerSettings
   - Added `PaletteUtility.cs` as helper class to retrieve colors from the selected `ColorScriptableObject.cs`
+    - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
+  - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
+    - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use

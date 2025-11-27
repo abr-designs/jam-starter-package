@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
 #endif
 
 namespace FixedColorPaletteTool
@@ -15,28 +17,21 @@ namespace FixedColorPaletteTool
         public ColorPaletteScriptableObject selectedPalette;
 
 #if !UNITY_EDITOR
-        public static FixedPaletteSettings Instance => Get();
+        public static FixedPaletteSettings Instance => s_instance;
         private static FixedPaletteSettings s_instance;
 
-        private static FixedPaletteSettings Get()
+        private void OnEnable()
         {
-            if (s_instance == null)
-                s_instance = Resources.Load<FixedPaletteSettings>(AssetName);
-            
-            return s_instance;
+            // This will be called when Unity instantiates the preloaded object
+            s_instance = this;
         }
-        
+
 #else
         public static FixedPaletteSettings Instance => GetOrCreate();
-
-
         public static SerializedObject GetSerializedObject() => new(GetOrCreate());
-        
         
         internal static FixedPaletteSettings GetOrCreate()
         {
-            
-            
             var settings = AssetDatabase.LoadAssetAtPath<FixedPaletteSettings>(AssetPath);
             if (settings != null) 
                 return settings;
@@ -48,6 +43,14 @@ namespace FixedColorPaletteTool
             settings.selectedPalette = palette;
             AssetDatabase.CreateAsset(settings, AssetPath);
             AssetDatabase.AddObjectToAsset(palette, AssetPath);
+            //Add new settings into preload assets for player runtime access
+            //-------------------------------------------------------------------//
+            var preloadedAssets = PlayerSettings.GetPreloadedAssets().ToList();
+            if(preloadedAssets.Any(x => x.GetType() == typeof(FixedPaletteSettings)))
+                throw new Exception();
+            preloadedAssets.Add(settings);
+            PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
+            //-------------------------------------------------------------------//
             AssetDatabase.SaveAssets();
             return settings;
         }
@@ -77,7 +80,6 @@ namespace FixedColorPaletteTool
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssetIfDirty(settings);
         }
-
 #endif
     }
 }
