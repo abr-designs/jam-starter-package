@@ -132,11 +132,19 @@ public static class UnityPaletteParser
         var idx = text.IndexOf(key, StringComparison.Ordinal);
         if (idx < 0) return null;
 
-        var line = text.Substring(idx, 200); // read enough chars
-        var start = line.IndexOf("fileID: ", StringComparison.Ordinal) + 8;
+        var line = text.Substring(idx, Mathf.Min(text.Length - idx, 200)); // read enough chars
+        var fileID = line
+            .Replace("selectedPalette: {","")
+            .Replace("fileID: ", "")
+            .Replace("{","")
+            .Replace("}","")
+            .Replace("\n","");
+        
+        
+        /*var start = line.IndexOf("fileID: ", StringComparison.Ordinal) + 8;
 
         var fileID = new string(line.Skip(start)
-            .TakeWhile(Char.IsDigit).ToArray());
+            .TakeWhile(Char.IsDigit).ToArray());*/
 
         return fileID;
     }
