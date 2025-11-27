@@ -63,6 +63,8 @@ namespace FixedColorPaletteTool
 
         private static List<ColorData> s_initializerSafeColors;
 
+        public static void ClearColors() => s_initializerSafeColors = null;
+
         private static ColorData TryParseManually(COLOR colorType)
         {
             const string AssetName = "FixedPaletteSettings";

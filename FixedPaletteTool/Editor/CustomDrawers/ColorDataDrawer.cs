@@ -97,6 +97,8 @@ namespace FixedColorPaletteTool.CustomDrawers
                                 property.enumValueIndex = index;
 
                             property.serializedObject.ApplyModifiedProperties();
+                            PaletteUtility.ClearColors();
+                            AssetDatabase.SaveAssets();
                         });
                 }
 
