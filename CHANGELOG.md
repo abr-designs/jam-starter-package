@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
   - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
     - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
+- Added UniTask to `AddPackages.cs` as a default included package
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
@@ -53,6 +54,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
 - Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
 - Added optional parameter pitch to `SFXManager.PlaySound()`
+- Refactored `AddPackages.Packages` to merge the Package Ids & Package URLs into a single data field
 
 ### Fixed
 - 
