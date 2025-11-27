@@ -79,7 +79,7 @@ namespace FixedColorPaletteTool
             var found = s_initializerSafeColors.FirstOrDefault(x => x.colorType == colorType);
 
             if (found.colorType != colorType)
-                throw new MissingFieldException($"No color set to {colorType}");
+                Debug.LogError($"No color set to {colorType}");
 
             return found;
         }
