@@ -36,6 +36,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
   - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
     - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
+- Added `Geodesics Movement Examples` into Samples
+  - Added shared assets such as Character with animations
+  - Added `CharacterAnimationController.cs` into Shared assets to allow character animations
+  - Added `/Sphere Examples/` sub-directory which contains the scene & `SphereMovementController.cs`
+  - Added `/Torus Examples/` sub-directory which contains the scene & `TorusMovementController.cs`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
