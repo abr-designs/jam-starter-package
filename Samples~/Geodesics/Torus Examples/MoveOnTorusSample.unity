@@ -278,7 +278,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &654723655
+--- !u!1 &1123995936
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -286,23 +286,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 654723659}
-  - component: {fileID: 654723658}
-  - component: {fileID: 654723657}
+  - component: {fileID: 1123995938}
+  - component: {fileID: 1123995941}
+  - component: {fileID: 1123995940}
+  - component: {fileID: 1123995939}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Torus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!23 &654723657
+--- !u!4 &1123995938
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123995936}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1649975669}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1123995939
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 654723655}
+  m_GameObject: {fileID: 1123995936}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -344,29 +360,31 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &654723658
+--- !u!33 &1123995940
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 654723655}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &654723659
-Transform:
+  m_GameObject: {fileID: 1123995936}
+  m_Mesh: {fileID: 4300000, guid: e031be45cd07f1f4eab146365dbdb6fb, type: 2}
+--- !u!114 &1123995941
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 654723655}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 1649975669}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 1123995936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df27a6d089144a19f5c4ee5f9414442, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Jam-starter.Runtime::Utilities.Geodesics.TorusMeshGenerator
+  majorRadius: 10
+  minorRadius: 4
+  majorSegments: 48
+  minorSegments: 24
+  mesh: {fileID: 4300000, guid: e031be45cd07f1f4eab146365dbdb6fb, type: 2}
 --- !u!1 &1150928033
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,8 +541,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1123995938}
   - {fileID: 1150928035}
-  - {fileID: 654723659}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1685896784
@@ -787,7 +805,7 @@ Transform:
   m_GameObject: {fileID: 919132149514758583}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 3.92, z: -10.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -960,6 +978,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0d2c8263c455894f8e1fdc6d87b1027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samples.Geodesics.Sphere.TorusMovementController
+  playerTransform: {fileID: 543450653247648525}
+  torus:
+    majorRadius: 10
+    minorRadius: 4
+    transform: {fileID: 1123995938}
+  moveSpeed: 5
+  cameraTransform: {fileID: 345536810}
+  playerVisualTransform: {fileID: 543450653247648525}
+  verticalOffset: 0
 --- !u!1 &968887109133878166
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,6 +1391,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0d2c8263c455894f8e1fdc6d87b1027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samples.Geodesics.Sphere.TorusMovementController
+  playerTransform: {fileID: 0}
+  torus:
+    majorRadius: 0
+    minorRadius: 0
+    transform: {fileID: 0}
+  moveSpeed: 0
+  cameraTransform: {fileID: 0}
+  playerVisualTransform: {fileID: 0}
+  verticalOffset: 0
 --- !u!4 &3695356596368064084
 Transform:
   m_ObjectHideFlags: 0
