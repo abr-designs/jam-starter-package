@@ -122,24 +122,8 @@ namespace Samples.Geodesics.Sphere
 
         private void InputProcessor()
         {
-            AxisInput(KeyCode.D, KeyCode.A, ref m_currentXInput);
-            AxisInput(KeyCode.W, KeyCode.S, ref m_currentYInput);
-            return;
-
-            void AxisInput(KeyCode positive, KeyCode negative, ref float value)
-            {
-                if (Input.GetKey(positive) || Input.GetKey(negative))
-                {
-                    if(Input.GetKeyDown(positive))
-                        value = 1f;
-                    if (Input.GetKeyDown(negative))
-                        value = -1f;
-                }
-                else
-                {
-                    value = 0f;
-                }
-            }
+            Input.AxisInput(KeyCode.D, KeyCode.A, ref m_currentXInput);
+            Input.AxisInput(KeyCode.W, KeyCode.S, ref m_currentYInput);
         }
 
         //============================================================================================================//
