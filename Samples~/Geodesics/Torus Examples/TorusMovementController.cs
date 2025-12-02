@@ -6,17 +6,21 @@ namespace Samples.Geodesics.Sphere
 {
     public class TorusMovementController : MonoBehaviour
     {
-        [SerializeField] private Transform playerTransform;
+        [SerializeField] 
+        private Transform playerTransform;
 
-        [Header("Torus")] [SerializeField] private Torus torus;
+        [Header("Torus")] 
+        [SerializeField] 
+        private Torus torus;
 
-        [Header("Movement")] [SerializeField] private float moveSpeed;
+        [Header("Movement")] 
+        [SerializeField] 
+        private float moveSpeed;
+        [SerializeField] 
+        private float turnSpeed;
 
-        [SerializeField] private Transform cameraTransform;
-
-        [SerializeField] private Transform playerVisualTransform;
-
-        [SerializeField] private float verticalOffset;
+        [SerializeField] 
+        private float verticalOffset;
 
         private float m_currentXInput;
         private float m_currentYInput;
@@ -44,10 +48,12 @@ namespace Samples.Geodesics.Sphere
 
             //FIXME This might need to be separated to keep consistent directions
             //------------------------------------------------//
-            Vector3 camForward = Vector3.ProjectOnPlane(cameraTransform.forward, lastUp);
-            Vector3 camRight = Vector3.ProjectOnPlane(cameraTransform.right, lastUp);
+            
+            Vector3 playerForward = Vector3.ProjectOnPlane(playerTransform.forward, lastUp);
+            //Vector3 playerRight = Vector3.ProjectOnPlane(playerTransform.right, lastUp);
 
-            Vector3 moveInput = (camRight * m_currentXInput + camForward * m_currentYInput).normalized;
+            Vector3 moveInput = (playerForward * m_currentYInput).normalized;
+
             //------------------------------------------------//
 
             Vector3 tangentU = TorusMaths.GetTorusTangent(torus, U, V, true);
@@ -56,7 +62,7 @@ namespace Samples.Geodesics.Sphere
             // Project camera-relative movement into torus tangent space
             Du = Vector3.Dot(moveInput, tangentU);
             Dv = Vector3.Dot(moveInput, tangentV);
-
+            
             float angleSpeed = moveSpeed * Time.deltaTime;
 
             // normalize speed by dividing by arc length radius
@@ -64,17 +70,20 @@ namespace Samples.Geodesics.Sphere
             V = (V + Dv * angleSpeed / scaleV + 2 * Mathf.PI) % (2 * Mathf.PI);
 
             Vector3 pos = TorusMaths.TorusUVToWorldPoint(torus, U, V);
-            Vector3 forward = TorusMaths.GetTorusTangent(torus, U, V, true); // du/dt
+            //Vector3 forward = TorusMaths.GetTorusTangent(torus, U, V, true); // du/dt
             Vector3 up = TorusMaths.GetTorusNormal(torus, U, V);
 
             playerTransform.position = pos;
-            playerTransform.rotation = Quaternion.LookRotation(forward, -up);
 
-            // If it ends up zero (e.g. looking straight down), default to forward
-            if (camForward.sqrMagnitude < 1e-5f)
-                camForward = TorusMaths.GetTorusTangent(torus, U, V, true); // fallback
+            // If the player's up is pointing opposite to the surface up, invert horizontal input.
+            float yawDegrees = m_currentXInput * turnSpeed * Time.deltaTime;
 
-            //playerMovementVisualizer.SetTarget(pos + (up * verticalOffset), Quaternion.LookRotation(camForward, -up));
+            // Apply yaw around the stable surfaceUp
+            Quaternion yaw = Quaternion.AngleAxis(yawDegrees, -up);
+
+            // Align player to surface, then apply yaw in surface space
+            Quaternion surfaceAlign = Quaternion.FromToRotation(playerTransform.up, -up);
+            playerTransform.rotation = surfaceAlign * yaw * playerTransform.rotation;
 
             lastUp = -up;
         }
