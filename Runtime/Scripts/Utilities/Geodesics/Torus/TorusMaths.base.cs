@@ -4,8 +4,6 @@ namespace Utilities.Geodesics
 {
     public static partial class TorusMaths
     {
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -32,6 +30,16 @@ namespace Utilities.Geodesics
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <param name="majorDirection"></param>
+        /// <returns></returns>
         public static Vector3 GetTorusTangent(Transform torusTransform, float R, float r,float u, float v, bool majorDirection)
         {
             // Tangent in u or v direction
@@ -66,6 +74,15 @@ namespace Utilities.Geodesics
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public static Vector3 GetTorusNormal(Transform torusTransform, float R, float r, float u, float v)
         {
             Vector3 tangentU = GetTorusTangent(torusTransform, R, r, u, v, true);
@@ -73,12 +90,29 @@ namespace Utilities.Geodesics
             return Vector3.Cross(tangentU, tangentV).normalized;
         }
        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="worldPos"></param>
+        /// <returns></returns>
         public static Vector3 ClosestPointOnTorus(Transform torusTransform, float R, float r, Vector3 worldPos)
         {
             WorldPointToTorusUV(torusTransform, R, r, worldPos, out float u, out float v);
             return TorusUVToWorldPoint(torusTransform, R, r, u, v);
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="worldPos"></param>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
         public static void WorldPointToTorusUV(Transform torusTransform, float R, float r, Vector3 worldPos, out float u, out float v)
         {
             // Step 1: Convert world position to local space (including scale)
@@ -135,6 +169,16 @@ namespace Utilities.Geodesics
             return t.position + t.rotation * scaled;        
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="worldDirection"></param>
+        /// <param name="worldPosition"></param>
+        /// <param name="du"></param>
+        /// <param name="dv"></param>
         public static void WorldDirectionToTorusDirection(Transform torusTransform, float R, float r, Vector3 worldDirection, Vector3 worldPosition, out float du, out float dv)
         {
             WorldPointToTorusUV(torusTransform, R, r, worldPosition, out var u, out var v);
@@ -188,6 +232,14 @@ namespace Utilities.Geodesics
             return distU * distU + distV * distV;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="uv1"></param>
+        /// <param name="uv2"></param>
+        /// <returns></returns>
         public static float Distance(float R, float r, Vector2 uv1, Vector2 uv2) => Mathf.Sqrt(DistanceSqr(R, r, uv1, uv2));
         
         public static Vector2 GetOppositeUV(Vector2 uv)
@@ -197,6 +249,14 @@ namespace Utilities.Geodesics
             return new Vector2(u2, v2);
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="torusTransform"></param>
+        /// <param name="R">Major Radius</param>
+        /// <param name="r">Minor Radius</param>
+        /// <param name="uv"></param>
+        /// <returns></returns>
         public static Vector2 GetOppositeWorldPoint(Transform torusTransform, float R, float r, Vector2 uv)
         {
             var oppositeUV = GetOppositeUV(uv);

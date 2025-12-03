@@ -56,7 +56,7 @@ namespace Samples.Geodesics.Sphere
             var speedWithMult = moveSpeed * m_currentYInput;
 
             // Move forward based on tangentDir
-            Vector3 newPos = SphereSurfaceMover.MoveAlongSphere(playerTransform.position, 
+            Vector3 newPos = SphereMaths.MoveAlongSphere(playerTransform.position, 
                 sphereTransform.position,
                 planetRadius, 
                 m_tangentDir, 

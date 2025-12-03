@@ -2,7 +2,7 @@
 
 namespace Utilities.Geodesics
 {
-    public static class SphereSurfaceMover
+    public static class SphereMaths
     {
         /// <summary>
         /// Static helper that computes a new position moved along the sphere surface.

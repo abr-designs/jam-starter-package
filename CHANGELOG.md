@@ -39,8 +39,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `Geodesics Movement Examples` into Samples
   - Added shared assets such as Character with animations
   - Added `CharacterAnimationController.cs` into Shared assets to allow character animations
+  - Added `Input.cs` into `/SharedAssets/` to allow unified input processing for the examples
   - Added `/Sphere Examples/` sub-directory which contains the scene & `SphereMovementController.cs`
   - Added `/Torus Examples/` sub-directory which contains the scene & `TorusMovementController.cs`
+- Added `/Utilities/Geodesics/` directory for specialized maths
+  - Added `SphereMaths.cs` as main script used to move an object along a surface of a sphere
+  - Added `Torus.cs` as data container to simplify required math calls
+  - Added partial class `TorusMaths.base.cs` as main location for all required math calculations to work with a torus
+  - Added partial class `TorusMaths.extensions.cs` as container for overloads that utilize `Torus.cs`
+  - Added `TorusMeshGenerator.cs` since Unity does not provide a way of generating a torus primitive
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
