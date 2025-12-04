@@ -1,5 +1,15 @@
 ﻿# Geodesics Utilities
+These utilities provide the math functions required to work with Geodesic maths & utilize them for different character 
+controllers.
+
 ## Sphere Maths
+
+> [!TIP]
+> If you wanted to see the sphere math in action, you can add the **_Geodesics Movement Examples_** sample, which includes
+> a character controller that uses the `SphereMaths`!
+
+The [`SphereMaths`](../../Runtime/Scripts/Utilities/Geodesics/SphereMaths.cs) class provides a single function for moving
+across the surface of a sphere.
 
 ## Torus Maths
 
