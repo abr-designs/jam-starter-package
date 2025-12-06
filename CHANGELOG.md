@@ -64,10 +64,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added nugetforunity package to `AddPackages.cs`
 - Added Checks for `JAM_INPUT_DELEGATOR` into 2D Character Controller Sample
   - Added `#define OLD_INPUT_SYSTEM` into `CharacterController2D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
-  - Added `ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
+  - Added `CharacterController2D.ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
   - Wrapped all calls to `GameInputDelegator.cs` in `CharacterController2D.cs` with `#if JAM_INPUT_DELEGATOR`
   - Wrapped all calls to `GameInputDelegator.cs` in `Character2DVisualizer.cs` with `#if JAM_INPUT_DELEGATOR`
   - Added `Character2DVisualizer.LateUpdate()` fallback if `!JAM_INPUT_DELEGATOR`
+- Added Checks for `JAM_INPUT_DELEGATOR` into 3D Character Controller Sample
+  - Added `#define OLD_INPUT_SYSTEM` into `CharacterController3D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
+  - Added `CharacterController3D.ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
 
 ### Fixed
 - 
