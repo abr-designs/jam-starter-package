@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
   - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
     - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
+- Added **_Editor_** class `ScriptingDefinitionHelper.cs` to check for specific classes, adding or removing scripting defines
+  - Added check for `GameInputDelegator.cs`, and if it exists it will add `JAM_INPUT_DELEGATOR`
+- Added `InputHelper.cs` for function to process axis inputs using the Old Input system `KeyCode`
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
@@ -59,6 +62,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added optional parameter pitch to `SFXManager.PlaySound()`
 - Refactored `AddPackages.Packages` to merge the Package Ids & Package URLs into a single data field
 - Added nugetforunity package to `AddPackages.cs`
+- Added Checks for `JAM_INPUT_DELEGATOR` into 2D Character Controller Sample
+  - Added `#define OLD_INPUT_SYSTEM` into `CharacterController2D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
+  - Added `ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
+  - Wrapped all calls to `GameInputDelegator.cs` in `CharacterController2D.cs` with `#if JAM_INPUT_DELEGATOR`
+  - Wrapped all calls to `GameInputDelegator.cs` in `Character2DVisualizer.cs` with `#if JAM_INPUT_DELEGATOR`
+  - Added `Character2DVisualizer.LateUpdate()` fallback if `!JAM_INPUT_DELEGATOR`
 
 ### Fixed
 - 

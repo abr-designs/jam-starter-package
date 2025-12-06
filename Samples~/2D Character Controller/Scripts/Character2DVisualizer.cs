@@ -10,7 +10,8 @@ namespace Samples.CharacterController2D.Scripts
 
         //Unity Functions
         //============================================================================================================//
-        
+
+#if JAM_INPUT_DELEGATOR
         private void OnEnable()
         {
             GameInputDelegator.OnMovementChanged += OnMovementChanged;
@@ -20,6 +21,8 @@ namespace Samples.CharacterController2D.Scripts
         {
             GameInputDelegator.OnMovementChanged -= OnMovementChanged;
         }
+
+        
         //============================================================================================================//
         
         private void OnMovementChanged(Vector2 movementInput)
@@ -29,5 +32,19 @@ namespace Samples.CharacterController2D.Scripts
             
             spriteRenderer.flipX = movementInput.x < 0;
         }
+#else
+
+        private void LateUpdate()
+        {
+            var inputX = 0f;
+            Utilities.InputHelper.AxisInput(KeyCode.D, KeyCode.A, ref inputX);
+            
+            if (inputX == 0f)
+                return;
+            
+            spriteRenderer.flipX = inputX < 0;
+        }
+
+#endif
     }
 }
