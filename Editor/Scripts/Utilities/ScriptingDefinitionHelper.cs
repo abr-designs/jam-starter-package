@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
@@ -6,7 +6,6 @@ using ZLinq;
 
 namespace JamStarter.Editor.Scripts.Utilities
 {
-    [InitializeOnLoad]
     internal static class ScriptingDefinitionHelper
     {
         private static readonly (string className, string scriptingDefinition)[] Definitions = 
@@ -14,6 +13,7 @@ namespace JamStarter.Editor.Scripts.Utilities
             ("GameInputDelegator", "JAM_INPUT_DELEGATOR")
         };
         //============================================================================================================//
+        
         /// <summary>
         /// Adds scripting definitions based on whether particular classes exist.
         /// </summary>
@@ -21,36 +21,25 @@ namespace JamStarter.Editor.Scripts.Utilities
         /// For the <c>GameInputDelegator</c> we may want to know if this exists so input handling in
         /// the included samples needs to be adjusted <i>(New vs Old input systems)</i>
         /// </example>
-        static ScriptingDefinitionHelper()
+        public class ScriptDeletionHandler : AssetPostprocessor
         {
-            foreach (var (className, scriptingDefinition) in Definitions)
+            private static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
             {
-                if (ClassExists(className))
-                    AddDefineIfMissing(scriptingDefinition);
-                else
-                    TryRemoveDefine(scriptingDefinition);
-            }
-        }
-        
-        private static bool ClassExists(string fullTypeName)
-        {
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var definedType in asm.DefinedTypes)
+                foreach (var (className, scriptingDefinition) in Definitions)
                 {
-                    if (!definedType.IsClass)
-                        continue;
-
-                    if (!definedType.Name.Contains(fullTypeName, StringComparison.OrdinalIgnoreCase))
-                        continue;
-                    
-                    return true;
+                    if (imported.Any(p => p.EndsWith($"{className}.cs")))
+                    {
+                        AddDefineIfMissing(scriptingDefinition);
+                    }
+                    else if (deleted.Any(p => p.EndsWith($"{className}.cs")))
+                    {
+                        TryRemoveDefine(scriptingDefinition);
+                    }
                 }
+
             }
-            return false;
         }
        
-        
         private static void AddDefineIfMissing(string scriptingDefinition)
         {
             var activeBuildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
