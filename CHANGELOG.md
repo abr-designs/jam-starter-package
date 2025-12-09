@@ -44,7 +44,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `Geodesics Movement Examples` into Samples
   - Added shared assets such as Character with animations
   - Added `CharacterAnimationController.cs` into Shared assets to allow character animations
-  - Added `Input.cs` into `/SharedAssets/` to allow unified input processing for the examples
   - Added `/Sphere Examples/` sub-directory which contains the scene & `SphereMovementController.cs`
   - Added `/Torus Examples/` sub-directory which contains the scene & `TorusMovementController.cs`
 - Added `/Utilities/Geodesics/` directory for specialized maths
@@ -91,6 +90,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Checks for `JAM_INPUT_DELEGATOR` into 3D Character Controller Sample
   - Added `#define OLD_INPUT_SYSTEM` into `CharacterController3D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
   - Added `CharacterController3D.ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
+- Changed `Geodesics Movement Examples` to use `InputHelper.cs` to process inputs
 
 ### Fixed
 - 
