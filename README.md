@@ -33,6 +33,7 @@ projects & Game jams.
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
 - ### [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - ### [Materials](Documentation~/Samples/samples-materials.md)
+- ### [Thumbnail Studio](Documentation~/Samples/thumbnail-studio.md)
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features

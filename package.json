@@ -81,6 +81,11 @@
       "displayName": "Trajectory",
       "description": "Example of how to utilize the trajectory visual system.",
       "path": "Samples~/Trajectory"
+    },
+    {
+      "displayName": "Thumbnail Studio",
+      "description": "Tool/Sample that enables you to create thumbnails of a collection of prefabs automatically.",
+      "path": "Samples~/Thumbnail Studio"
     }
   ]
 }

@@ -36,6 +36,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
   - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
     - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
+- Added **_Thumbnail Studio_** sample
+  - Added `Photo Studio Sample Scene` which uses a camera stack to add a background
+  - Added `CameraScreenshotTool.cs` as main utility script to convert camera image into a texture saved to the project
+  - Added `ScreenshotUtility.cs` as tool to select which prefabs will be screenshotted & where in the scene
+  - Added `floor-small-square.fbx & `block-grass-overhang-large.fbx` as scene objects, as well as their associated materials
+  - Added `Kenney Mini Character 1` as example collection included with the sample
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
