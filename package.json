@@ -83,6 +83,11 @@
       "path": "Samples~/Trajectory"
     },
     {
+      "displayName": "Geodesics Movement Examples",
+      "description": "Movement examples using Geodesics maths!<br><u>Supports:</u><br>- Sphere Movement<br>- Torus Movement",
+      "path": "Samples~/Geodesics"
+    },
+    {
       "displayName": "Thumbnail Studio",
       "description": "Tool/Sample that enables you to create thumbnails of a collection of prefabs automatically.",
       "path": "Samples~/Thumbnail Studio"
