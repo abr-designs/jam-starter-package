@@ -41,6 +41,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `InputHelper.cs` for function to process axis inputs using the Old Input system `KeyCode`
 - Added `AddPrefabIfExists.cs` as utility class that checks for a GUID within the Asset Database, adding it into the scene if it exists
   - Added `--- GAME INPUT PROMISE ---.prefab` as container for the `GameInputDelegator` prefab GUID that will be added into the 2D & 3D Character controller sample scenes
+- Added `Geodesics Movement Examples` into Samples
+  - Added shared assets such as Character with animations
+  - Added `CharacterAnimationController.cs` into Shared assets to allow character animations
+  - Added `Input.cs` into `/SharedAssets/` to allow unified input processing for the examples
+  - Added `/Sphere Examples/` sub-directory which contains the scene & `SphereMovementController.cs`
+  - Added `/Torus Examples/` sub-directory which contains the scene & `TorusMovementController.cs`
+- Added `/Utilities/Geodesics/` directory for specialized maths
+  - Added `SphereMaths.cs` as main script used to move an object along a surface of a sphere
+  - Added `Torus.cs` as data container to simplify required math calls
+  - Added partial class `TorusMaths.base.cs` as main location for all required math calculations to work with a torus
+  - Added partial class `TorusMaths.extensions.cs` as container for overloads that utilize `Torus.cs`
+  - Added `TorusMeshGenerator.cs` since Unity does not provide a way of generating a torus primitive
+- Added **_Thumbnail Studio_** sample
+  - Added `Photo Studio Sample Scene` which uses a camera stack to add a background
+  - Added `CameraScreenshotTool.cs` as main utility script to convert camera image into a texture saved to the project
+  - Added `ScreenshotUtility.cs` as tool to select which prefabs will be screenshotted & where in the scene
+  - Added `floor-small-square.fbx & `block-grass-overhang-large.fbx` as scene objects, as well as their associated materials
+  - Added `Kenney Mini Character 1` as example collection included with the sample
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
