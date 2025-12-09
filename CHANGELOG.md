@@ -39,6 +39,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added **_Editor_** class `ScriptingDefinitionHelper.cs` to check for specific classes, adding or removing scripting defines
   - Added check for `GameInputDelegator.cs`, and if it exists it will add `JAM_INPUT_DELEGATOR`
 - Added `InputHelper.cs` for function to process axis inputs using the Old Input system `KeyCode`
+- Added `AddPrefabIfExists.cs` as utility class that checks for a GUID within the Asset Database, adding it into the scene if it exists
+  - Added `--- GAME INPUT PROMISE ---.prefab` as container for the `GameInputDelegator` prefab GUID that will be added into the 2D & 3D Character controller sample scenes
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
