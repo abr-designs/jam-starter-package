@@ -48,6 +48,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added partial class `TorusMaths.base.cs` as main location for all required math calculations to work with a torus
   - Added partial class `TorusMaths.extensions.cs` as container for overloads that utilize `Torus.cs`
   - Added `TorusMeshGenerator.cs` since Unity does not provide a way of generating a torus primitive
+- Added **_Thumbnail Studio_** sample
+  - Added `Photo Studio Sample Scene` which uses a camera stack to add a background
+  - Added `CameraScreenshotTool.cs` as main utility script to convert camera image into a texture saved to the project
+  - Added `ScreenshotUtility.cs` as tool to select which prefabs will be screenshotted & where in the scene
+  - Added `floor-small-square.fbx & `block-grass-overhang-large.fbx` as scene objects, as well as their associated materials
+  - Added `Kenney Mini Character 1` as example collection included with the sample
 
 ### Changed
 - Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
