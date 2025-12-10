@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Utilities;
 using Utilities.Geodesics;
 
 namespace Samples.Geodesics.Sphere
@@ -92,8 +93,8 @@ namespace Samples.Geodesics.Sphere
 
         private void InputProcessor()
         {
-            Input.AxisInput(KeyCode.D, KeyCode.A, ref m_currentXInput);
-            Input.AxisInput(KeyCode.W, KeyCode.S, ref m_currentYInput);
+            InputHelper.AxisInput(KeyCode.D, KeyCode.A, ref m_currentXInput);
+            InputHelper.AxisInput(KeyCode.W, KeyCode.S, ref m_currentYInput);
         }
     }
 }

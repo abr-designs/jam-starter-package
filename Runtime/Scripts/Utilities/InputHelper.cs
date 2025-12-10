@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace Samples.Geodesics.Sphere
+namespace Utilities
 {
-    public static class Input
+    public static class InputHelper
     {
         public static void AxisInput(KeyCode positive, KeyCode negative, ref float value)
         {
@@ -19,4 +19,5 @@ namespace Samples.Geodesics.Sphere
             }
         }
     }
+    
 }

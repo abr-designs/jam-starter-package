@@ -1,5 +1,11 @@
+#if !JAM_INPUT_DELEGATOR
+#define OLD_INPUT_SYSTEM
+#endif
+
 using System;
+using System.Diagnostics;
 using UnityEngine;
+using Utilities;
 
 namespace Samples.CharacterController3D.Scripts
 {
@@ -56,11 +62,13 @@ namespace Samples.CharacterController3D.Scripts
 
         //============================================================================================================//
 
+#if JAM_INPUT_DELEGATOR
         private void OnEnable()
         {
             GameInput.GameInputDelegator.OnMovementChanged += OnMovementChanged;
             GameInput.GameInputDelegator.OnJumpPressed += OnJumpPressed;
         }
+#endif
 
         private void Start()
         {
@@ -72,6 +80,7 @@ namespace Samples.CharacterController3D.Scripts
 
         private void Update()
         {
+            ProcessInputs();
             CountTimers();
             JumpInputChecks();
             
@@ -89,11 +98,13 @@ namespace Samples.CharacterController3D.Scripts
                     : characterMovementData.AirAcceleration);
         }
 
+#if JAM_INPUT_DELEGATOR
         private void OnDisable()
         {
             GameInput.GameInputDelegator.OnMovementChanged -= OnMovementChanged;
             GameInput.GameInputDelegator.OnJumpPressed -= OnJumpPressed;
         }
+#endif
 
         //Locomotion Functions
         //============================================================================================================//
@@ -351,7 +362,8 @@ namespace Samples.CharacterController3D.Scripts
         
         //Callbacks
         //============================================================================================================//
-        
+
+#if JAM_INPUT_DELEGATOR
         private void OnMovementChanged(Vector2 movementValue)
         {
             m_movementInput = movementValue;
@@ -360,6 +372,16 @@ namespace Samples.CharacterController3D.Scripts
         private void OnJumpPressed(bool pressed)
         {
             m_isJumpPressed = pressed;
+        }
+#endif
+
+        [Conditional("OLD_INPUT_SYSTEM")]
+        private void ProcessInputs()
+        {
+            InputHelper.AxisInput(KeyCode.W, KeyCode.S, ref m_movementInput.y);
+            InputHelper.AxisInput(KeyCode.D, KeyCode.A, ref m_movementInput.x);
+
+            m_isJumpPressed = Input.GetKey(KeyCode.Space);
         }
         
         //============================================================================================================//

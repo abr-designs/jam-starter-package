@@ -1,7 +1,14 @@
+#if !JAM_INPUT_DELEGATOR
+#define OLD_INPUT_SYSTEM
+#endif
+
+
 using System;
-using GameInput;
+using System.Diagnostics;
 using UnityEngine;
+using Utilities;
 using Utilities.Debugging;
+using Debug = UnityEngine.Debug;
 
 namespace Samples.CharacterController2D.Scripts
 {
@@ -90,11 +97,13 @@ namespace Samples.CharacterController2D.Scripts
             m_isGrounded = false;
         }
 
+#if JAM_INPUT_DELEGATOR
         private void OnEnable()
         {
-            GameInputDelegator.OnMovementChanged += OnMovementChanged;
-            GameInputDelegator.OnJumpPressed += OnJumpPressed;
+            GameInput.GameInputDelegator.OnMovementChanged += OnMovementChanged;
+            GameInput.GameInputDelegator.OnJumpPressed += OnJumpPressed;
         }
+#endif
 
         private void Start()
         {
@@ -104,6 +113,8 @@ namespace Samples.CharacterController2D.Scripts
         // Update is called once per frame
         private void Update()
         {
+            ProcessInputs();
+            
             CountTimers();
             JumpInputChecks();
 
@@ -134,11 +145,13 @@ namespace Samples.CharacterController2D.Scripts
 
         }
 
+#if JAM_INPUT_DELEGATOR
         private void OnDisable()
         {
-            GameInputDelegator.OnMovementChanged -= OnMovementChanged;
-            GameInputDelegator.OnJumpPressed -= OnJumpPressed;
+            GameInput.GameInputDelegator.OnMovementChanged -= OnMovementChanged;
+            GameInput.GameInputDelegator.OnJumpPressed -= OnJumpPressed;
         }
+#endif
 
         #endregion //Unity Functions
 
@@ -540,6 +553,7 @@ namespace Samples.CharacterController2D.Scripts
 
         #region Input Handlers
 
+#if JAM_INPUT_DELEGATOR
         private void OnMovementChanged(Vector2 moveInput)
         {
             m_moveInput = moveInput;
@@ -553,6 +567,21 @@ namespace Samples.CharacterController2D.Scripts
         private void OnRunPressed(bool pressed)
         {
             m_isRunPressed = pressed;
+        }
+#endif
+        
+        /// <summary>
+        /// If the InputDelegator has not been added into the project, this will be used instead. Otherwise, this function
+        /// will be excluded from the compile.
+        /// </summary>
+        [Conditional("OLD_INPUT_SYSTEM")]
+        private void ProcessInputs()
+        {
+            InputHelper.AxisInput(KeyCode.W, KeyCode.S, ref m_moveInput.y);
+            InputHelper.AxisInput(KeyCode.D, KeyCode.A, ref m_moveInput.x);
+
+            m_isJumpPressed = Input.GetKey(KeyCode.Space);
+            m_isRunPressed = Input.GetKey(KeyCode.LeftShift);
         }
 
         #endregion
