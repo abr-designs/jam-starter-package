@@ -1,7 +1,5 @@
 ﻿## Animators
 ### Ping Pong
-> _**NOTE** `Rotation` & `Position` target World Space_
-
 ![example](../Images/pingpong_example.gif)
 
 This animator will Ping-Pong the follow transform values if enabled:
@@ -11,8 +9,7 @@ This animator will Ping-Pong the follow transform values if enabled:
 
 Set the speed _( > 0)_ & the animator curve. This will target the Transform that it's attached to and will run automatically.
 ### Simple Spin
-This animator will rotate the specified degrees per frame * `Time.deltaTime`. It targets the attached Transforms world
-rotation value. Works for both 2D & 3D.
+This animator will rotate the specified degrees per frame * `Time.deltaTime`. Works for both 2D & 3D.
 
 ![example](../Images/simple-spin_example.gif)
 

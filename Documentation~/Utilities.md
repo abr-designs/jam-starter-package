@@ -3,6 +3,7 @@
 - ### [Animators](Utilities/utilities-animators.md)
 - ### [Wait-For Animations](Utilities/utilities-wait-animation.md)
 - ### [Physics](Utilities/utilities-physics.md)
+- ### [Geodesics](Utilities/utilities-geodesics.md)
 - ### [Extensions](Utilities/utilities-extensions.md)
 - ### [Debugging - Draw.cs](Utilities/utilities-draw.md)
 

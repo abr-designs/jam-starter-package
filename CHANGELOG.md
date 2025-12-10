@@ -5,8 +5,97 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.7f1] - 2025-10-18
 
+## [0.0.8] - December 10, 2025
+
+### Added
+- Added `SPACE.cs` enum, that is used for `PingPongAnimator.cs` & `SimpleSpin.cs` to allow space specific assignments
+- Added `TransformExtensions.cs` to provide Setting `position` & `rotation` functions that use `enum SPACE` as a parameter
+- Added `TweenToCoroutine()` & `TweenScaleToCoroutine()` variant of the `TweenTo()` library
+  - Still operates using the `Update()` loop, but allows yielding
+- Added Playmode tests for `ScreenFader.cs`
+- Added UniTask to `AddPackages.cs` as a default included package
+- Added `AddNuGetPackages.cs` as an automatic implementation of nuget packages
+  - Automatically adds the `ZLinq` nuget package
+- Added `JamStarter.Editor.NuGet-Packages` assembly definition that will prevent pre-emptive compilation of Nuget code without the package being installed
+- Added _**Fixed Color Palette Tool**_
+  - Added `FixedPaletteSettingsProvider.cs` to display in Project Settings
+  - Added `FixedPaletteDrawer.uitoolkit.cs` & `FixedPaletteDrawer.imgui.cs` to display property in inspectors
+    - Added `ColorSelectDropdownWindow.TYPE.cs` Custom dropdown window to display as: List, Grid, Shades Grid
+  - Added Build Preprocessor to help ensure that the `FixedPaletteSettings` scriptable object is included as a preloaded asset
+  - Added `ColorPaletteImporter.cs` to allow flexible importing of palettes by using `IFixedColorPaletteImporter.cs`
+    - Added `HEXFixedColorPaletteImporter.cs` & `PNGFixedColorPaletteImporter.cs` as default importers
+  - Added `COLOR.cs` as enum to denot Primary, Secondary etc
+  - Added `COLOR_SELECT.cs` to allow denoting how colors are selected
+  - Added `ColorData.cs` as transportable color data
+  - Added `ColorScriptableObject.cs` as container for the Color Palette
+  - Added `FixedPaletteAttribute.cs` as main method of denoting in Monobehaviour that a user wants the color to be selectable
+  - Added `FixedPaletteSettings.cs` as main throughway to accessing `ColorScriptableObject.cs`
+    - Includes section to automatically include the generated `FixedPaletteSettings` as a pre-loaded assets in PlayerSettings
+  - Added `PaletteUtility.cs` as helper class to retrieve colors from the selected `ColorScriptableObject.cs`
+    - This includes `Editor Only` code that manually parses `FixedPaletteSettings` to obtain color values during the assembly compilation step
+  - Added `UnityPaletteParser.cs` to parse & cache the `FixedPaletteSettings.asset` `yaml` file
+    - This includes `YamlDotNet.dll`, which is used in-editor only to enable `UnityPaletteParser.cs`
+- Added **_Editor_** class `ScriptingDefinitionHelper.cs` to check for specific classes, adding or removing scripting defines
+  - Added check for `GameInputDelegator.cs`, and if it exists it will add `JAM_INPUT_DELEGATOR`
+- Added `InputHelper.cs` for function to process axis inputs using the Old Input system `KeyCode`
+- Added `AddPrefabIfExists.cs` as utility class that checks for a GUID within the Asset Database, adding it into the scene if it exists
+  - Added `--- GAME INPUT PROMISE ---.prefab` as container for the `GameInputDelegator` prefab GUID that will be added into the 2D & 3D Character controller sample scenes
+- Added `Geodesics Movement Examples` into Samples
+  - Added shared assets such as Character with animations
+  - Added `CharacterAnimationController.cs` into Shared assets to allow character animations
+  - Added `/Sphere Examples/` sub-directory which contains the scene & `SphereMovementController.cs`
+  - Added `/Torus Examples/` sub-directory which contains the scene & `TorusMovementController.cs`
+- Added `/Utilities/Geodesics/` directory for specialized maths
+  - Added `SphereMaths.cs` as main script used to move an object along a surface of a sphere
+  - Added `Torus.cs` as data container to simplify required math calls
+  - Added partial class `TorusMaths.base.cs` as main location for all required math calculations to work with a torus
+  - Added partial class `TorusMaths.extensions.cs` as container for overloads that utilize `Torus.cs`
+  - Added `TorusMeshGenerator.cs` since Unity does not provide a way of generating a torus primitive
+- Added **_Thumbnail Studio_** sample
+  - Added `Photo Studio Sample Scene` which uses a camera stack to add a background
+  - Added `CameraScreenshotTool.cs` as main utility script to convert camera image into a texture saved to the project
+  - Added `ScreenshotUtility.cs` as tool to select which prefabs will be screenshotted & where in the scene
+  - Added `floor-small-square.fbx & `block-grass-overhang-large.fbx` as scene objects, as well as their associated materials
+  - Added `Kenney Mini Character 1` as example collection included with the sample
+
+### Changed
+- Updated `PingPongAnimator.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
+  - Added `Assert` to `Start()` to help catch potential issues early
+- Updated `SimpleSpin.cs` to utilize the `TransformExtension.cs` & `enum SPACE` to provide more flexibility on use
+- Updated `TweenData.SetData()` to use a [`enum SPACE`](../../Runtime/Scripts/Utilities/Enums/SPACE.cs) instead of a `bool` to set how it transforms
+- Added `enum TweenController.UPDATE_TYPE` to allow sorting of the `TweenData`
+- Added `TweenData.AsCoroutine()` to allow yielding as Coroutine
+  - Waits until `Active == false` then executes the callback if there was one set
+- Added `TweenData.AsAsncTask()` for future implementation of `async`
+- Updated `TweenData.SetTargetPosition()`, `TweenData.SetTargetRotation()`, `TweenData.SetTargetScale()` to return `TweenData`, to better allow chaining
+- Updated `TweenTo()` tests to use Coroutine & remove deprecated calls
+- Added `defaultFadeTime` to `ScreenFader.cs` to allow setting value in the inspector, with a starting default of `0.5f`
+- Added overloads for `ScreenFader.cs` `FadeIn()`, `FadeOut()`, `FadeInOut()` without `float time` parameter to fallback to value set in inspector
+- Added Automatic Singleton generation for `ScreenFader.cs` which creates the scene Hierarchy
+  - No longer inheriting from `HiddenSingleton<>` in favor of managing locally for lifecycle
+- Added Pitch to `SDXExtensions.cs`
+- Changed `SFXManager.TryGet3DAudioSource()` to `TryGetAudioSourceInstance()`
+- Added optional spatialBlend parameter to `TryGetAudioSourceInstance()`
+- Added `SFXManager._PlaySoundWithPitch()` to create 2D AudioSource` instances to allow pitch adjustment
+- Added optional parameter pitch to `SFXManager.PlaySound()`
+- Refactored `AddPackages.Packages` to merge the Package Ids & Package URLs into a single data field
+- Added nugetforunity package to `AddPackages.cs`
+- Added Checks for `JAM_INPUT_DELEGATOR` into 2D Character Controller Sample
+  - Added `#define OLD_INPUT_SYSTEM` into `CharacterController2D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
+  - Added `CharacterController2D.ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
+  - Wrapped all calls to `GameInputDelegator.cs` in `CharacterController2D.cs` with `#if JAM_INPUT_DELEGATOR`
+  - Wrapped all calls to `GameInputDelegator.cs` in `Character2DVisualizer.cs` with `#if JAM_INPUT_DELEGATOR`
+  - Added `Character2DVisualizer.LateUpdate()` fallback if `!JAM_INPUT_DELEGATOR`
+- Added Checks for `JAM_INPUT_DELEGATOR` into 3D Character Controller Sample
+  - Added `#define OLD_INPUT_SYSTEM` into `CharacterController3D.cs` to allow for `[Conditional]` on new `ProcessInputs()` function
+  - Added `CharacterController3D.ProcessInputs()` as old input system fallback incase `GameInputDelegator.cs` doesn't exist
+- Changed `Geodesics Movement Examples` to use `InputHelper.cs` to process inputs
+
+### Fixed
+- 
+
+## [0.0.7f1] - 2025-10-18
 ### Fixed
 - Resolved crash caused by Testframework Assemblies missing a constraint
 

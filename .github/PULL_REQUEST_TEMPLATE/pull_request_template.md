@@ -2,6 +2,7 @@
 
 ## Issue
 <!-- Examples
+- Closes #26
 - https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#task-lists
 - #26
 - https://github.com/abr-designs/jam-starter-package/issues/26
@@ -19,6 +20,7 @@
 ## Type of Change
 - [ ] Bug Fix
 - [ ] New Feature
+- [ ] New Sample
 - [ ] Breaking Change
 
 ## Checklist
@@ -27,3 +29,4 @@
 - [ ] `CHANGELOG.md` was updated
 - [ ] All Tests Pass
 - [ ] Changes do not break
+- [ ] Builds Successfully

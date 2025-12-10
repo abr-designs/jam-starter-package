@@ -1,15 +1,18 @@
 ﻿# Transform Tweening
 Using extension methods, there are now some new Tween functions that allow you to move the Transform via a simple function
 
-By calling `Transform.TweenTo()` _(or `TweenToLocal()`, or `TweenScaleTo()`)_ you are able to animate an object while 
+By calling `Transform.TweenTo()` _(or `TweenScaleTo()`)_ you are able to animate an object while 
 remaining hands off! When you call TweenTo, a `TweenController` will be created in the Scene which will be the logic centre
 for all the Tweening.
 
 ### Features
-- You are able to target Local or World Positions & Rotations!
+- You are able to target Local or World Positions & Rotations using [`SPACE.WORLD`](../../Runtime/Scripts/Utilities/Enums/SPACE.cs) or [`SPACE.LOCAL`](../../Runtime/Scripts/Utilities/Enums/SPACE.cs)!
 - Performant functionality, that pools backend tweening data to remove Memory allocations!
   - This includes if you destroy a `GameObject` that is currently Tweening!
   - Uses the `Update()` Unity Event, without using Coroutines
+- Call a Coroutine variant using `TweenToCoroutine()`
+  - This still uses the `Update()` loop update, but allows waiting when called from a coroutine
+  - The added `callback` will invoke once the Coroutine is completed, to ensure execution order expectation
 
 ### Stacking Tweens
 - If you call to tween a `Transform` Position & Rotation, each will be treated as separate tweens

@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.7f1` - Oct 18, 2025
+### `v0.0.8` - December 10, 2025
 ### Supports Unity 6000.0
 
 ## Samples
@@ -33,9 +33,11 @@ projects & Game jams.
 - ### [Cinematics - WIP](Documentation~/Samples/cinematics.md)
 - ### [MainMenuUI.cs](Samples~/MainMenu/MainMenuUI.cs)
 - ### [Materials](Documentation~/Samples/samples-materials.md)
+- ### [Thumbnail Studio](Documentation~/Samples/thumbnail-studio.md)
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features
+- ### [Fixed Palette Tool](FixedPaletteTool/Documentation~/FixedPaletteTool.md)
 - ### [Level Loading](Documentation~/Levels.md)
 - ### [Interfaces](Documentation~/Interfaces.md)
 - ### [Utilities](Documentation~/Utilities.md)
@@ -62,8 +64,12 @@ projects & Game jams.
 | [Newtonsoft JSON](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.2/manual/index.html) | 3.2.1   |
 
 #### Custom Packages
-> _See [AddPackages.cs](Editor/AddPackages.cs)_
+> _See [`AddPackages.cs`](Editor/Packages/AddPackages.cs)_
 - [Naughty Attributes](https://github.com/dbrizov/NaughtyAttributes)
 - [Unity Utils](https://github.com/ayellowpaper/SerializedDictionary)
 - [Cast Visualizer](https://www.bgtools.de/page/castvisualizer-manual/)
 - [Timescale Toolbar](https://assetstore.unity.com/packages/tools/utilities/timescale-toolbar-291564?srsltid=AfmBOorUkK2rYmOyD1nEe3st6saUWgPJvKqNkvB6vEWthLqgC344A70Y)
+
+#### Custom NuGet Packages
+> _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
+- [ZLinq](https://github.com/Cysharp/ZLinq)

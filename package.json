@@ -1,7 +1,7 @@
 {
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "unity": "6000.0",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
@@ -12,9 +12,10 @@
     "type": "git"
   },
   "author": {
-    "name": "ABR Designs",
+    "name": "<a href=\"https://github.com/abr-designs\"> ABR Designs</a> | <a href=\"https://github.com/tyzor\">Tyzor</a>",
     "url": "https://www.abr-designs.ca/"
   },
+  "documentationUrl": "https://abr-designs.github.io/jam-starter-package/",
   "dependencies": {
     "com.unity.feature.2d": "2.0.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
@@ -81,6 +82,16 @@
       "displayName": "Trajectory",
       "description": "Example of how to utilize the trajectory visual system.",
       "path": "Samples~/Trajectory"
+    },
+    {
+      "displayName": "Geodesics Movement Examples",
+      "description": "Movement examples using Geodesics maths!<br><u>Supports:</u><br>- Sphere Movement<br>- Torus Movement",
+      "path": "Samples~/Geodesics"
+    },
+    {
+      "displayName": "Thumbnail Studio",
+      "description": "Tool/Sample that enables you to create thumbnails of a collection of prefabs automatically.",
+      "path": "Samples~/Thumbnail Studio"
     }
   ]
 }
