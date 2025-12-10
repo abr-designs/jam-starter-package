@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [0.0.8-preview] - DATE
+## [0.0.8] - December 10, 2025
 
 ### Added
 - Added `SPACE.cs` enum, that is used for `PingPongAnimator.cs` & `SimpleSpin.cs` to allow space specific assignments
