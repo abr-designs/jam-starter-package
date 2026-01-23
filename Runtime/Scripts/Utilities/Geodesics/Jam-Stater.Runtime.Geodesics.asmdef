@@ -1,26 +1,24 @@
 {
-    "name": "JamStarter.Editor.NuGet-Packages",
+    "name": "Jam-Stater.Runtime.Geodesics",
     "rootNamespace": "",
     "references": [
-        "NuGetForUnity",
-        "Jam-starter.Editor"
+        "GUID:e0a7d29f6751f3e479d83dc8ad7aa437",
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "UNITY_NUGET"
+        "NAUGHTY"
     ],
     "versionDefines": [
         {
-            "name": "com.github-glitchenzo.nugetforunity",
-            "expression": "4.5.0",
-            "define": "UNITY_NUGET"
+            "name": "com.dbrizov.naughtyattributes",
+            "expression": "2",
+            "define": "NAUGHTY"
         }
     ],
     "noEngineReferences": false

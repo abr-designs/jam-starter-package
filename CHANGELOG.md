@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.8f1] - January 23, 2026
+
+### Fixed
+- Added `Jam-Stater.Runtime.Geodesics.asmdef` to allow awaiting for NaughtyAttributes to be included preventing compilation issue
+- Removed #if UNITY_NUGET in favour of using an assembly definition defineConstraints
+- Removed the zLinq dependency within `ScriptingDefinitionHelper.cs` causing compilation error
 
 ## [0.0.8] - December 10, 2025
 
