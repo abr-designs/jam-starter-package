@@ -20,7 +20,7 @@ namespace Levels
         private int _currentLevelIndex = -1;
         private GameObject _currentLevelGameObject;
 
-        public IReadOnlyList<LevelDataDefinition> Levels => levels;
+        public static IReadOnlyList<LevelDataDefinition> Levels => Instance?.levels;
         [SerializeField]
         private LevelDataDefinition[] levels;
 
