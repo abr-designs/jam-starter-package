@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.9-preview] - DATE
 
 ### Added
-- a
+- Implemented Unit Tests for `LevelLoader.cs` in `LevelLoaderTests.cs`
+  - Added check for Duplicate LevelLoader objects
+  - Added check for duplicate loaded levels
+  - Added check for correct level load flows
 
 ### Changed
 - Updated `LevelLoader.cs` to improve its usability
