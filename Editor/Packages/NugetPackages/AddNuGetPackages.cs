@@ -1,6 +1,3 @@
-#if UNITY_NUGET
-
-
 using System;
 using System.Linq;
 using System.Reflection;
@@ -156,4 +153,3 @@ namespace JamStarter.Editor
         }
     }
 }
-#endif

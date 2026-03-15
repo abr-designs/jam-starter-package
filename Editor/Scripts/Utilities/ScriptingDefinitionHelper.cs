@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
-using ZLinq;
 
 namespace JamStarter.Editor.Scripts.Utilities
 {
@@ -46,7 +45,7 @@ namespace JamStarter.Editor.Scripts.Utilities
             var target = NamedBuildTarget.FromBuildTargetGroup(activeBuildTargetGroup);
             PlayerSettings.GetScriptingDefineSymbols(target, out var defines);
 
-            var values = defines.AsValueEnumerable().ToList();
+            var values = defines.ToList();
             var hasDefinition = values.Contains(scriptingDefinition);
 
             if (hasDefinition)
@@ -65,7 +64,7 @@ namespace JamStarter.Editor.Scripts.Utilities
             var target = NamedBuildTarget.FromBuildTargetGroup(activeBuildTargetGroup);
             PlayerSettings.GetScriptingDefineSymbols(target, out var defines);
 
-            var values = defines.AsValueEnumerable().ToList();
+            var values = defines.ToList();
             var hasDefinition = values.Contains(scriptingDefinition);
 
             if (!hasDefinition)
