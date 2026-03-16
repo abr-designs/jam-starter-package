@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
+- Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
 
 ### Changed
 - Added functionality to `WaitForAnimationBase.cs` to be called from Unity Events
