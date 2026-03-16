@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - a
 
 ### Changed
-- a
+- Updated `LevelLoader.cs` to improve its usability
+  - Added `public IReadOnlyList` of levels
+  - Added editor only debugging to load specific levels
+  - Adjusted `LoadFirstLevel()` to load the debug index when in editor, and the user has enabled debugging
+  - Added `LoadLevelAtIndex()` to simplify external access to loading levels
 
 ### Fixed
 - a
