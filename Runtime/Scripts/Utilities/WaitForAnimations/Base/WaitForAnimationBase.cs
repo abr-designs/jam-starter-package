@@ -23,6 +23,7 @@ namespace Utilities.WaitForAnimations.Base
         protected class AnimationData
         {
             public TR transform;
+            public SPACE transformSpace = SPACE.WORLD;
             public T start;
             public T end;
         }

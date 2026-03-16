@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.9-preview] - DATE
 
 ### Added
-- a
+- Added `SPACE.cs` enum to allow selection between World & Local spaces
 
 ### Changed
-- a
+- Added functionality to `WaitForAnimationBase.cs` to be called from Unity Events
+  - Added `WaitForAnimationBase.Animate()` to be easily called from Unity Events
+  - Added `defaultAnimationTime` to allow `Animate()` to use when calling
+  - Added `m_lastAnimationDirection` to allow `Animate()` to ping-pong between positions when calling `Animate()`
+- Added Transform Space selection for WaitForAnimations
+  - Added SPACE field into `WaitForAnimationBase.AnimationData` class
+  - Added SPACE switch into `WaitForMoveAnimations.SetValue()`
 
 ### Fixed
 - a
