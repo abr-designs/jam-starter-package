@@ -8,10 +8,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.9-preview] - DATE
 
 ### Added
+- Implemented Unit Tests for `LevelLoader.cs` in `LevelLoaderTests.cs`
+  - Added check for Duplicate LevelLoader objects
+  - Added check for duplicate loaded levels
+  - Added check for correct level load flows
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
 - Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
 
 ### Changed
+- Updated `LevelLoader.cs` to improve its usability
+  - Added `public IReadOnlyList` of levels
+  - Added editor only debugging to load specific levels
+  - Adjusted `LoadFirstLevel()` to load the debug index when in editor, and the user has enabled debugging
+  - Added `LoadLevelAtIndex()` to simplify external access to loading levels
 - Added functionality to `WaitForAnimationBase.cs` to be called from Unity Events
   - Added `WaitForAnimationBase.Animate()` to be easily called from Unity Events
   - Added `defaultAnimationTime` to allow `Animate()` to use when calling
