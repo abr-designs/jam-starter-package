@@ -7,6 +7,10 @@ namespace Utilities.WaitForAnimations.Base
 {
     public abstract class WaitForAnimationBase : MonoBehaviour, IWaitForAnimation
     {
+        /// <summary>
+        /// This function can be called from UnityEvents easily to animate
+        /// </summary>
+        public abstract void Animate();
         //FIXME Only do the animation if we're not already at then intended destination OR Start!!
         public abstract Coroutine DoAnimation(float time, ANIM_DIR animDir);
     }
@@ -19,12 +23,13 @@ namespace Utilities.WaitForAnimations.Base
         protected class AnimationData
         {
             public TR transform;
+            public SPACE transformSpace = SPACE.WORLD;
             public T start;
             public T end;
         }
         
         //============================================================================================================//
-        
+
         [SerializeField, Range(0f,1f)]
         protected float startingValue;
         
@@ -33,6 +38,10 @@ namespace Utilities.WaitForAnimations.Base
         
         [SerializeField, Space(10f)]
         protected AnimationData[] objectsToAnimate;
+
+        [SerializeField, Min(0f), Header("Simple-Call Fields")]
+        private float defaultAnimationTime;
+        private ANIM_DIR m_lastAnimationDirection;
 
         //Unity Functions
         //============================================================================================================//
@@ -57,8 +66,19 @@ namespace Utilities.WaitForAnimations.Base
 
         //============================================================================================================//
         
+        public override void Animate()
+        {
+            var dir = m_lastAnimationDirection == ANIM_DIR.START_TO_END ? ANIM_DIR.END_TO_START : ANIM_DIR.START_TO_END;
+            
+            DoAnimation(defaultAnimationTime, dir);
+        }
+
+        //================================================================================================================//
+        
         protected IEnumerator DoAnimationCoroutine(float time, ANIM_DIR animDir)
         {
+            m_lastAnimationDirection = animDir;
+            
             for (int i = 0; i < objectsToAnimate.Length; i++)
             {
                 var moveData = objectsToAnimate[i];
