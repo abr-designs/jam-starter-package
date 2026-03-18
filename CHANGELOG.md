@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added check for duplicate loaded levels
   - Added check for correct level load flows
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
+- Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
 
 ### Changed
 - Updated `LevelLoader.cs` to improve its usability
