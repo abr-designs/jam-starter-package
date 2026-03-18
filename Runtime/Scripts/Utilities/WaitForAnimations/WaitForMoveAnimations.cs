@@ -24,7 +24,16 @@ namespace Utilities.WaitForAnimations
 
         protected override void SetValue(AnimationData data, Vector3 value)
         {
-            data.transform.position = value;
+            switch (data.transformSpace)
+            {
+                case SPACE.WORLD:
+                    data.transform.position = value;
+                    break;
+                case SPACE.LOCAL:
+                    data.transform.localPosition = value;
+                    break;
+            }
+            
         }
 
         //============================================================================================================//
