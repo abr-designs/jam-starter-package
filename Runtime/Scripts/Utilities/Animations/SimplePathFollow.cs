@@ -1,164 +1,260 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+
+[assembly: InternalsVisibleTo("Jam-starter.Editor")]
 
 namespace Utilities.Animations
 {
     public class SimplePathFollow : MonoBehaviour
     {
         //FIXME Does Bezier even make sense for this? It feels that having extra handles is just annoying
-        private enum MOTION
+        internal enum MOTION
         {
             LINEAR,
-            CATMULLROM,
-            HERMITE
+            SMOOTH
         }
 
         [SerializeField]
-        private bool looping;
+        internal bool looping;
 
         [SerializeField]
-        private MOTION motion;
+        internal MOTION motion;
 
         [SerializeField]
         //This could be in reverse, so no Min() required
         private float speed;
 
         [SerializeField]
-        private List<Transform> pathPoints;
+        internal List<Vector3> pathPoints;
+        
+        [SerializeField, Min(3), ShowIf(nameof(SimplePathFollow.motion), MOTION.LINEAR)]
+        internal int catmullResolution = 12;
+        
+        [SerializeField]
+        private Transform targetMoveTransform;
+
+        // Arc-length table: maps sample index → cumulative world distance
+        private float[] m_arcLengthTable;
+        private float m_totalLength;
+        private float m_distanceTravelled;
+        private bool m_pingPongForward = true;
+
+        //UnityFunctions
+        //================================================================================================================//
 
         private void Start()
         {
             Assert.IsNotNull(pathPoints);
             Assert.IsTrue(pathPoints.Count >= 2);
+            
+            BakeArcLengthTable();
+        }
+        
+        private void Update()
+        {
+            if (targetMoveTransform == null) 
+                return;
+            if (m_totalLength <= 0f) 
+                return;
+
+            float delta = speed * Time.deltaTime;
+
+            if (looping)
+            {
+                m_distanceTravelled = (m_distanceTravelled + delta) % m_totalLength;
+                
+                if (m_distanceTravelled < 0f) 
+                    m_distanceTravelled += m_totalLength;
+            }
+            else
+            {
+                m_distanceTravelled += m_pingPongForward ? delta : -delta;
+
+                if (m_distanceTravelled >= m_totalLength)
+                {
+                    m_distanceTravelled = m_totalLength;
+                    m_pingPongForward = false;
+                }
+                else if (m_distanceTravelled <= 0f)
+                {
+                    m_distanceTravelled = 0f;
+                    m_pingPongForward = true;
+                }
+            }
+
+            targetMoveTransform.position = SamplePath(m_distanceTravelled);
+        }
+        
+        // Arc-length Baking
+        //================================================================================================================//
+
+        private void BakeArcLengthTable()
+        {
+            int totalSamples = motion == MOTION.LINEAR
+                ? pathPoints.Count + (looping ? 1 : 0)
+                : looping
+                    ? pathPoints.Count * catmullResolution + 1
+                    : (pathPoints.Count - 1) * catmullResolution + 1;
+
+            m_arcLengthTable = new float[totalSamples];
+            m_arcLengthTable[0] = 0f;
+
+            Vector3 previous = SamplePathByIndex(0, totalSamples);
+
+            for (int i = 1; i < totalSamples; i++)
+            {
+                Vector3 current = SamplePathByIndex(i, totalSamples);
+                m_arcLengthTable[i] = m_arcLengthTable[i - 1] + Vector3.Distance(previous, current);
+                previous = current;
+            }
+
+            m_totalLength = m_arcLengthTable[totalSamples - 1];
+        }
+
+        // Returns a world-space point at sample index i out of totalSamples
+        private Vector3 SamplePathByIndex(int i, int totalSamples)
+        {
+            if (motion == MOTION.LINEAR)
+            {
+                if (!looping)
+                    return transform.TransformPoint(pathPoints[Mathf.Clamp(i, 0, pathPoints.Count - 1)]);
+
+                int idx = i % pathPoints.Count;
+                return transform.TransformPoint(pathPoints[idx]);
+            }
+
+            // SMOOTH (Catmull-Rom)
+            // For the looping closing sample, explicitly return point[0] to guarantee no float precision gap
+            if (looping && i == totalSamples - 1)
+                return transform.TransformPoint(pathPoints[0]);
+
+            int segCount = looping ? pathPoints.Count : pathPoints.Count - 1;
+
+            float globalT = (float)i / (totalSamples - 1);
+            float scaledT = globalT * segCount;
+            int seg = Mathf.FloorToInt(scaledT);
+            float localT = scaledT - seg;
+
+            // When globalT == 1.0 (closing sample), seg == segCount; wrap it back
+            if (looping)
+                seg %= pathPoints.Count;
+            else
+                seg = Mathf.Clamp(seg, 0, pathPoints.Count - 2);
+
+            Vector3 p0 = GetCatmullPoint(seg - 1);
+            Vector3 p1 = GetCatmullPoint(seg);
+            Vector3 p2 = GetCatmullPoint(seg + 1);
+            Vector3 p3 = GetCatmullPoint(seg + 2);
+
+            return LerpFunctions.CatmullRom(localT, p0, p1, p2, p3);
+        }
+
+        // Returns a world-space point at a given cumulative arc distance
+        private Vector3 SamplePath(float distance)
+        {
+            if (m_arcLengthTable == null) 
+                return transform.TransformPoint(pathPoints[0]);
+
+            distance = Mathf.Clamp(distance, 0f, m_totalLength);
+
+            int totalSamples = m_arcLengthTable.Length;
+
+            // Binary search for the two surrounding samples
+            int lo = 0, hi = totalSamples - 1;
+            while (lo < hi - 1)
+            {
+                int mid = (lo + hi) / 2;
+                if (m_arcLengthTable[mid] < distance) lo = mid;
+                else hi = mid;
+            }
+
+            float segStart = m_arcLengthTable[lo];
+            float segEnd = m_arcLengthTable[hi];
+            float segLength = segEnd - segStart;
+
+            float localT = segLength > 0f ? (distance - segStart) / segLength : 0f;
+
+            Vector3 a = SamplePathByIndex(lo, totalSamples);
+            Vector3 b = SamplePathByIndex(hi, totalSamples);
+            return Vector3.Lerp(a, b, localT);
         }
 
         //Curve Functions
         //================================================================================================================//
 
-        private Vector3 GetCatmullPoint(int index)
+        #region Curve Functions
+
+        internal Vector3 GetCatmullPoint(int index)
         {
             if (looping)
             {
                 int wrappedIndex = (index % pathPoints.Count + pathPoints.Count) % pathPoints.Count;
-                return pathPoints[wrappedIndex].position;
+                return transform.TransformPoint(pathPoints[wrappedIndex]);
             }
 
             if (index < 0)
             {
-                Vector3 first = pathPoints[0].position;
-                Vector3 second = pathPoints[1].position;
+                Vector3 first = transform.TransformPoint(pathPoints[0]);
+                Vector3 second = transform.TransformPoint(pathPoints[1]);
                 return first + (first - second);
             }
 
             if (index >= pathPoints.Count)
             {
-                Vector3 last = pathPoints[^1].position;
-                Vector3 beforeLast = pathPoints[^2].position;
+                Vector3 last = transform.TransformPoint(pathPoints[^1]);
+                Vector3 beforeLast = transform.TransformPoint(pathPoints[^2]);
                 return last + (last - beforeLast);
             }
 
-            return pathPoints[index].position;
+            return transform.TransformPoint(pathPoints[index]);
         }
 
-        private static Vector3 GetCatmullRomPosition(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
-        {
-            float t2 = t * t;
-            float t3 = t2 * t;
-
-            return 0.5f * (
-                (2f * p1) +
-                (-p0 + p2) * t +
-                (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
-                (-p0 + 3f * p1 - 3f * p2 + p3) * t3
-            );
-        }
+        #endregion //Curve Functions
 
         //Unity Editor Functions
         //================================================================================================================//
 #if UNITY_EDITOR
-
-        [SerializeField]
-        private int catmullResolution = 12;
         
-        [Button]
-        private void AddPoint()
+        internal void AddPoint()
         {
+            const float DEFAULT_DISTANCE = 1f;
             if(pathPoints == null)
-                pathPoints = new List<Transform>();
+                pathPoints = new List<Vector3>();
+
+            Vector3 position;
+
+            switch (pathPoints.Count)
+            {
+                case >= 2:
+                {
+                    var previousPointA = transform.TransformPoint(pathPoints[^2]);
+                    var previousPointB = transform.TransformPoint(pathPoints[^1]);
+               
+                    var tangent = previousPointB - previousPointA;
+                
+                    position = previousPointB + tangent.normalized * DEFAULT_DISTANCE;
+                    break;
+                }
+                case 1:
+                    position = transform.TransformPoint(pathPoints[^1]) + transform.forward.normalized * DEFAULT_DISTANCE;
+                    break;
+                default:
+                    position = transform.position;
+                    break;
+            }
             
-            var pointObject = new GameObject($"PathPoint[{pathPoints.Count}]");
-            pointObject.transform.SetParent(gameObject.transform, false);
-            pathPoints.Add(pointObject.transform);
+            pathPoints.Add(position);
             
             //If the points changed, we need to make sure we properly update the inspector
             EditorUtility.SetDirty(gameObject);
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            if (pathPoints?.Count < 2)
-                return;
-            
-            Gizmos.color = Color.yellow;
-            
-            switch (motion)
-            {
-                case MOTION.LINEAR:
-                    DrawLinearPath();
-                    break;
-                case MOTION.CATMULLROM:
-                    DrawCatmullPath();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
-            Gizmos.color = Color.white;
-            for (int i = 0; i < pathPoints.Count; i++)
-            {
-                var point = pathPoints[i];
-                Gizmos.DrawSphere(point.position, 0.1f);
-            }
-        }
-
-        private void DrawLinearPath()
-        {
-            for (int i = 1; i < pathPoints.Count; i++)
-            {
-                Gizmos.DrawLine(pathPoints[i-1].position, pathPoints[i].position);
-            }
-            
-            if(looping)
-                Gizmos.DrawLine(pathPoints[^1].position, pathPoints[0].position);
-        }
         
-        private void DrawCatmullPath()
-        {
-            int segmentCount = looping ? pathPoints.Count : pathPoints.Count - 1;
-
-            for (int i = 0; i < segmentCount; i++)
-            {
-                Vector3 p0 = GetCatmullPoint(i - 1);
-                Vector3 p1 = GetCatmullPoint(i);
-                Vector3 p2 = GetCatmullPoint(i + 1);
-                Vector3 p3 = GetCatmullPoint(i + 2);
-
-                Vector3 previousPoint = p1;
-
-                for (int step = 1; step <= catmullResolution; step++)
-                {
-                    float t = step / (float)catmullResolution;
-                    Vector3 currentPoint = GetCatmullRomPosition(t, p0, p1, p2, p3);
-                    Gizmos.DrawLine(previousPoint, currentPoint);
-                    previousPoint = currentPoint;
-                }
-            }
-            
-        }
 #endif
         //================================================================================================================//
     }
