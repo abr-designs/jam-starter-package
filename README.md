@@ -41,6 +41,7 @@ projects & Game jams.
 - ### [Level Loading](Documentation~/Levels.md)
 - ### [Interfaces](Documentation~/Interfaces.md)
 - ### [Utilities](Documentation~/Utilities.md)
+  - #### [Simple Path Follow](Documentation~/Utilities/utilities-simple-path-follow.md)
   - #### [Animators](Documentation~/Utilities/utilities-animators.md)
   - #### [Wait-For Animations](Documentation~/Utilities/utilities-wait-animation.md)
   - #### [Physics](Documentation~/Utilities/utilities-physics.md)
