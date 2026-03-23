@@ -1,4 +1,8 @@
-﻿# Simple Path Follow
+﻿---
+title: Simple Path Follow
+---
+
+# Simple Path Follow
 The SimplePathFollow component is a utility script that allows you to connect Transforms, to animate an object along a path.
 
 ![path-smooth-animation.gif](../Images/path-smooth-animation.gif)
