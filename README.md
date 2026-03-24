@@ -37,7 +37,7 @@ projects & Game jams.
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features
-- ### [Fixed Palette Tool](FixedPaletteTool/Documentation~/FixedPaletteTool.md)
+- ### [Fixed Palette Tool](Documentation~/FixedPaletteTool/FixedPaletteTool.md)
 - ### [Level Loading](Documentation~/Levels.md)
 - ### [Interfaces](Documentation~/Interfaces.md)
 - ### [Utilities](Documentation~/Utilities.md)

@@ -1,9 +1,8 @@
 {
   "scripts": {
-    "process-docs": "shx rm -rf ./site && npm run copy-docs && npm run copy-webgl && npm run copy-palette && node .vitepress/prebuild.js",
+    "process-docs": "shx rm -rf ./site && npm run copy-docs && npm run copy-webgl && node .vitepress/prebuild.js",
     "copy-docs": "shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md",
     "copy-webgl": "shx cp ../WebGLTemplates~/README.md ./site/WebGL.md",
-    "copy-palette": "shx cp -r ../FixedPaletteTool/Documentation~/* ./site",
     "copy-assets": "shx mkdir -p ./site/public && shx cp -r ./site/Images ./site/public",
     "predocs:dev": "npm run process-docs",
     "docs:dev": "vitepress dev",
