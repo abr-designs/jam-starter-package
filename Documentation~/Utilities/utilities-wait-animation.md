@@ -1,4 +1,7 @@
-﻿# WaitForAnimations
+﻿---
+title: Wait For Animations
+---
+# WaitForAnimations
 
 These scripts are designed to allow editor/inspector focused animations that can be used within coroutines, giving you
 the ability to wait for sections, and to target groups of objects.

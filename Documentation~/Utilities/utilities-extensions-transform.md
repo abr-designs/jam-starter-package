@@ -1,4 +1,7 @@
-﻿# Transform Tweening
+﻿---
+title: Transform Tweening
+---
+# Transform Tweening
 Using extension methods, there are now some new Tween functions that allow you to move the Transform via a simple function
 
 By calling `Transform.TweenTo()` _(or `TweenScaleTo()`)_ you are able to animate an object while 
@@ -26,16 +29,16 @@ use `LINEAR` but below are the current options.
 ### Linear
 This is a basic `Mathf.Lerp()`
 
-![linear-curve.gif](../Images/linear-curve.gif)
+![linear-curve.gif](../Images/Utilities/linear-curve.gif)
 ### Ease In
 This uses the [`LerpFunctions.Coserp()`](../../Runtime/Scripts/Utilities/LerpFunctions.cs)
 
-![ease-in-curve.gif](../Images/ease-in-curve.gif)
+![ease-in-curve.gif](../Images/Utilities/ease-in-curve.gif)
 ### Ease Out
 This uses the [`LerpFunctions.Sinerp()`](../../Runtime/Scripts/Utilities/LerpFunctions.cs)
 
-![ease-out-curve.gif](../Images/ease-out-curve.gif)
+![ease-out-curve.gif](../Images/Utilities/ease-out-curve.gif)
 ### Ease In Out
 This uses the [`LerpFunctions.Hermite()`](../../Runtime/Scripts/Utilities/LerpFunctions.cs)
 
-![ease-in-out-curve.gif](../Images/ease-in-out-curve.gif)
+![ease-in-out-curve.gif](../Images/Utilities/ease-in-out-curve.gif)
