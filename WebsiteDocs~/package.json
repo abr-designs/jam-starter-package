@@ -2,7 +2,6 @@
   "scripts": {
     "process-docs": "shx rm -rf ./site && npm run copy-docs && node .vitepress/prebuild.js",
     "copy-docs": "shx cp -r ../Documentation~ ./site && shx cp *.md ./site && shx cp ../README.md ./site/home.md",
-    "copy-assets": "shx mkdir -p ./site/public && shx cp -r ./site/Images ./site/public",
     "predocs:dev": "npm run process-docs",
     "docs:dev": "vitepress dev",
     "predocs:build": "npm run process-docs",
@@ -21,6 +20,7 @@
     "vitepress": "^1.5.0"
   },
   "dependencies": {
-    "glob": "^11.0.0"
+    "glob": "^11.0.0",
+    "gray-matter": "^4.0.3"
   }
 }

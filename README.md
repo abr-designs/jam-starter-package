@@ -49,7 +49,7 @@ projects & Game jams.
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
   - #### [Singletons](Documentation~/Utilities/utilities-singletons.md)
-- ### [WebGL Templates](WebGLTemplates~/README.md)
+- ### [WebGL Templates](Documentation~/WebGLTemplates/README.md)
 
 ---
 
