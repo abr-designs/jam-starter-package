@@ -31,9 +31,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added SPACE switch into `WaitForMoveAnimations.SetValue()`
 - Updated documentation to meet new decided standards
   - `FixedPaletteTool` documentation was moved into the `/Documentation~/` directory
+  - `WebGLTemplates` documentation was moved into the `/Documentation~/` directory
   - All images we sub categorized & placed within the `/Images/` directory
   - All documents image links were updated to reflect the new directory structure
   - All documents now include the yaml title tag
+  - Updated `/WebsiteDocs/package.json` to remove the now obsolete commands for moving directories
 
 ### Fixed
 - a
