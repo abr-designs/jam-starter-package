@@ -30,7 +30,7 @@ namespace Utilities.Animations
         private float speed;
 
         [SerializeField]
-        internal List<Vector3> pathPoints;
+        internal List<Vector3> pathPoints = new();
         
         [SerializeField, Min(3), ShowIf(nameof(SimplePathFollow.motion), MOTION.LINEAR)]
         internal int catmullResolution = 12;

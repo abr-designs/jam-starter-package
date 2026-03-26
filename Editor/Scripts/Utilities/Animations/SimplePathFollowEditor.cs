@@ -13,7 +13,6 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         private SerializedProperty m_pathPointsProp;
         
         private int m_selectedIndex = -1;
-        private SerializedProperty m_currentPoint;
 
         private void OnEnable()
         {
@@ -38,16 +37,20 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             if (m_pathPointsProp == null || !m_pathPointsProp.isArray) 
                 return;
-
-            for (int i = 0; i < m_pathPointsProp.arraySize; i++)
+            
+            var pathPoints = m_simplePathFollow.pathPoints;
+            
+            for (var i = pathPoints.Count - 1; i >= 0; i--)
             {
                 if(i == m_selectedIndex)
                     continue;
+
+                //Exit early if the counts no longer match
+                if (m_pathPointsProp.arraySize != pathPoints.Count)
+                    return;
                 
                 var element = m_pathPointsProp.GetArrayElementAtIndex(i);
                 Vector3 point = m_simplePathFollow.transform.TransformPoint(element.vector3Value);
-                
-                //var handleSize = HandleUtility.GetHandleSize(point) * 0.2f;
                 
                 Handles.color = Color.red;
                 if (Handles.Button(point, Quaternion.identity, 0.5f, 0.5f * 1.5f, Handles.SphereHandleCap))
@@ -58,21 +61,34 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 DrawLabel(point, $"Element {i}");
             }
 
+            //Checks to ensure that the element selected is still alive & available
+            //----------------------------------------------------------//
+            serializedObject.Update();
+            
             if (m_selectedIndex == -1)
                 return;
-            if (m_currentPoint == null)
+            if (m_selectedIndex >= m_pathPointsProp.arraySize)
             {
                 m_selectedIndex = -1;
                 return;
             }
-                
+
+            var currentPoint = m_pathPointsProp.GetArrayElementAtIndex(m_selectedIndex);
+
+            if (currentPoint == null)
+            {
+                m_selectedIndex = -1;
+                return;
+            }
+            //----------------------------------------------------------//
+
             EditorGUI.BeginChangeCheck();
-            var currentPointPosition = m_simplePathFollow.transform.TransformPoint(m_currentPoint.vector3Value);
+            var currentPointPosition = m_simplePathFollow.transform.TransformPoint(currentPoint.vector3Value);
             var newPos = Handles.PositionHandle(currentPointPosition, Quaternion.identity);
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.Update();
-                m_currentPoint.vector3Value = m_simplePathFollow.transform.InverseTransformPoint(newPos);
+                currentPoint.vector3Value = m_simplePathFollow.transform.InverseTransformPoint(newPos);
 
                 serializedObject.ApplyModifiedProperties();
             }
@@ -81,7 +97,6 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         private void SelectPoint(int index)
         {
             m_selectedIndex = index;
-            m_currentPoint = m_pathPointsProp.GetArrayElementAtIndex(m_selectedIndex);
         }
 
         private static void DrawLabel(Vector3 position, string text)
