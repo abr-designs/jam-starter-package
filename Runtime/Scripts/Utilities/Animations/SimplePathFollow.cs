@@ -222,33 +222,33 @@ namespace Utilities.Animations
         
         internal void AddPoint()
         {
-            const float DEFAULT_DISTANCE = 1f;
+            const float DEFAULT_DISTANCE = 2f;
             if(pathPoints == null)
                 pathPoints = new List<Vector3>();
 
-            Vector3 position;
+            Vector3 localPosition;
 
             switch (pathPoints.Count)
             {
                 case >= 2:
                 {
-                    var previousPointA = transform.TransformPoint(pathPoints[^2]);
-                    var previousPointB = transform.TransformPoint(pathPoints[^1]);
+                    var previousPointA = pathPoints[^2];
+                    var previousPointB = pathPoints[^1];
                
                     var tangent = previousPointB - previousPointA;
                 
-                    position = previousPointB + tangent.normalized * DEFAULT_DISTANCE;
+                    localPosition = previousPointB + tangent.normalized * tangent.magnitude;
                     break;
                 }
                 case 1:
-                    position = transform.TransformPoint(pathPoints[^1]) + transform.forward.normalized * DEFAULT_DISTANCE;
+                    localPosition = pathPoints[^1] + transform.forward.normalized * DEFAULT_DISTANCE;
                     break;
                 default:
-                    position = transform.position;
+                    localPosition = Vector3.zero;
                     break;
             }
             
-            pathPoints.Add(position);
+            pathPoints.Add(localPosition);
             
             //If the points changed, we need to make sure we properly update the inspector
             EditorUtility.SetDirty(gameObject);
