@@ -61,10 +61,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 DrawLabel(point, $"Element {i}");
             }
 
+            
             //Checks to ensure that the element selected is still alive & available
             //----------------------------------------------------------//
-            serializedObject.Update();
-            
             if (m_selectedIndex == -1)
                 return;
             if (m_selectedIndex >= m_pathPointsProp.arraySize)
@@ -72,6 +71,10 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 m_selectedIndex = -1;
                 return;
             }
+            
+            DrawWindow();
+            
+            serializedObject.Update();
 
             var currentPoint = m_pathPointsProp.GetArrayElementAtIndex(m_selectedIndex);
 
@@ -80,10 +83,15 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 m_selectedIndex = -1;
                 return;
             }
-            //----------------------------------------------------------//
 
+            //----------------------------------------------------------//
+            
             EditorGUI.BeginChangeCheck();
             var currentPointPosition = m_simplePathFollow.transform.TransformPoint(currentPoint.vector3Value);
+
+            Handles.color = Color.white;
+            Handles.SphereHandleCap(0, currentPointPosition, Quaternion.identity, 0.5f, EventType.Repaint);
+
             var newPos = Handles.PositionHandle(currentPointPosition, Quaternion.identity);
             if (EditorGUI.EndChangeCheck())
             {
@@ -132,6 +140,95 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             GUI.Label(rect, text, style);
 
             Handles.EndGUI();
+        }
+
+        //Drawing Floating Window
+        //================================================================================================================//
+
+        private void DrawWindow()
+        {
+            if (m_simplePathFollow.pathPoints.Count < 2)
+                return;
+            
+            var point = m_simplePathFollow.transform.TransformPoint(m_simplePathFollow.pathPoints[m_selectedIndex]);
+            Vector2 guiPos = HandleUtility.WorldToGUIPoint(point);
+            var width = m_selectedIndex == m_simplePathFollow.pathPoints.Count - 1 ? 60 : 30;
+
+            Handles.BeginGUI();
+
+            GUILayout.BeginArea(new Rect(guiPos.x + 15, guiPos.y- 20, width, 30)/*, GUI.skin.window*/);
+
+            GUILayout.BeginHorizontal();
+            
+            var removeIcon = EditorGUIUtility.IconContent("TreeEditor.Trash"/*"Toolbar Minus"*/);
+            removeIcon.tooltip = "Delete Path Point";
+
+            if (m_selectedIndex == m_simplePathFollow.pathPoints.Count - 1)
+            {
+                var addIcon = EditorGUIUtility.IconContent("Toolbar Plus");
+                
+                if (GUILayout.Button(addIcon))
+                    AddPoint(m_simplePathFollow, m_selectedIndex + 1);
+            }
+            
+            /*if (GUILayout.Button("Insert Before"))
+                AddPoint(m_simplePathFollow, m_selectedIndex);*/
+
+            Color oldColor = GUI.color;
+
+            GUI.color = new Color(0.8588f, 0.2431f, 0.1137f);
+            if (GUILayout.Button(removeIcon))
+                DeletePoint(m_simplePathFollow, m_selectedIndex);
+            GUI.color = oldColor;
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
+
+            Handles.EndGUI();
+        }
+        
+        private void AddPoint(SimplePathFollow path, int index)
+        {
+            Undo.RecordObject(path, "Add Path Point");
+
+            Vector3 newPoint;
+            // Parent it
+            // Position it (simple example)
+            if (path.pathPoints.Count >= 2)
+            {
+                
+                var previousPointA = path.pathPoints[^2];
+                var previousPointB = path.pathPoints[^1];
+               
+                var tangent = previousPointB - previousPointA;
+                
+                newPoint = previousPointB + tangent.normalized * tangent.magnitude;
+                
+                //newPoint = path.pathPoints[prevIndex] + path.transform.forward;
+            }
+            else
+            {
+                newPoint = path.transform.position;
+            }
+
+            path.pathPoints.Insert(index, newPoint);
+            SelectPoint(index);
+            EditorUtility.SetDirty(path);
+        }
+        
+        private void DeletePoint(SimplePathFollow path, int index)
+        {
+            if (path.pathPoints.Count <= 1) 
+                return;
+
+            Undo.RecordObject(path, "Delete Path Point");
+
+            path.pathPoints.RemoveAt(index);
+
+            m_selectedIndex = Mathf.Clamp(m_selectedIndex - 1, 0, path.pathPoints.Count - 1);
+
+            EditorUtility.SetDirty(path);
         }
 
         //================================================================================================================//
