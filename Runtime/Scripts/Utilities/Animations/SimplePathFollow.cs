@@ -28,6 +28,10 @@ namespace Utilities.Animations
         [SerializeField]
         //This could be in reverse, so no Min() required
         private float speed;
+        
+        [SerializeField]
+        //This could be in reverse, so no Min() required
+        private bool faceDirection;
 
         [SerializeField]
         internal List<Vector3> pathPoints = new();
@@ -87,7 +91,10 @@ namespace Utilities.Animations
                 }
             }
 
-            targetMoveTransform.position = SamplePath(m_distanceTravelled);
+            targetMoveTransform.position = SamplePath(m_distanceTravelled, out var tangent);
+
+            if (faceDirection)
+                targetMoveTransform.forward = tangent;
         }
         
         // Arc-length Baking
@@ -155,8 +162,10 @@ namespace Utilities.Animations
         }
 
         // Returns a world-space point at a given cumulative arc distance
-        private Vector3 SamplePath(float distance)
+        private Vector3 SamplePath(float distance, out Vector3 tangent)
         {
+            tangent = Vector3.zero;
+            
             if (m_arcLengthTable == null) 
                 return transform.TransformPoint(pathPoints[0]);
 
@@ -169,8 +178,10 @@ namespace Utilities.Animations
             while (lo < hi - 1)
             {
                 int mid = (lo + hi) / 2;
-                if (m_arcLengthTable[mid] < distance) lo = mid;
-                else hi = mid;
+                if (m_arcLengthTable[mid] < distance) 
+                    lo = mid;
+                else 
+                    hi = mid;
             }
 
             float segStart = m_arcLengthTable[lo];
@@ -181,6 +192,9 @@ namespace Utilities.Animations
 
             Vector3 a = SamplePathByIndex(lo, totalSamples);
             Vector3 b = SamplePathByIndex(hi, totalSamples);
+            
+            tangent = ((b - a) * speed).normalized;
+            
             return Vector3.Lerp(a, b, localT);
         }
 
