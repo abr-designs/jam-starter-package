@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Utilities;
@@ -309,6 +310,13 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             var bestPoint = Vector3.zero;
             var bestSegmentIndex = -1;
 
+            //We don't want to add points when attempting to select a path point
+            if (IsMouseCloseToPathPoint(
+                    m_simplePathFollow.transform, 
+                    m_simplePathFollow.pathPoints,
+                    Event.current.mousePosition))
+                return;
+
             var segmentCount = BuildSegmentsNonAlloc(m_segments);
 
             if (segmentCount == 0)
@@ -453,10 +461,6 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             
             var a = HandleUtility.WorldToGUIPoint(worldPointA);
             var b = HandleUtility.WorldToGUIPoint(worldPointB);
-            
-            //If the mouse is close to either point, we want their selection to take priority
-            if(Vector2.Distance(mousePos, a) < 20f || Vector2.Distance(mousePos, b) < 20f)
-                return float.MaxValue;
 
             var ab = b - a;
             var lengthSqr = ab.sqrMagnitude;
@@ -471,6 +475,21 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             closestWorldPoint = Vector3.Lerp(worldPointA, worldPointB, t);
             
             return Vector2.Distance(mousePos, closest2D);
+        }
+
+        private static bool IsMouseCloseToPathPoint(Transform transform, IEnumerable<Vector3> pathPoints, Vector3 mousePos)
+        {
+            foreach (var pathPoint in pathPoints)
+            {
+                var worldPoint = transform.TransformPoint(pathPoint);
+                var guiPoint = HandleUtility.WorldToGUIPoint(worldPoint);
+                
+                if (Vector2.Distance(mousePos, guiPoint) < 20f)
+                    return true;
+                
+            }
+
+            return false;
         }
 
         #endregion //Testing Point Add Preview

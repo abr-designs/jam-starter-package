@@ -60,6 +60,9 @@ namespace Utilities.Animations
             Assert.IsTrue(pathPoints.Count >= 2);
             
             BakeArcLengthTable();
+            
+            if(speed  < 0)
+                m_pingPongForward = false;
         }
         
         private void Update()
@@ -85,12 +88,12 @@ namespace Utilities.Animations
                 if (m_distanceTravelled >= m_totalLength)
                 {
                     m_distanceTravelled = m_totalLength;
-                    m_pingPongForward = false;
+                    m_pingPongForward = !m_pingPongForward;
                 }
                 else if (m_distanceTravelled <= 0f)
                 {
                     m_distanceTravelled = 0f;
-                    m_pingPongForward = true;
+                    m_pingPongForward = !m_pingPongForward;
                 }
             }
 
@@ -142,6 +145,9 @@ namespace Utilities.Animations
             // For the looping closing sample, explicitly return point[0] to guarantee no float precision gap
             if (looping && i == totalSamples - 1)
                 return transform.TransformPoint(pathPoints[0]);
+
+            if (!looping && i == totalSamples - 1)
+                return transform.TransformPoint(pathPoints[^1]);
 
             int segCount = looping ? pathPoints.Count : pathPoints.Count - 1;
 
