@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using NaughtyAttributes;
 using UnityEditor;
@@ -34,7 +33,11 @@ namespace Utilities.Animations
         private bool faceDirection;
 
         [SerializeField]
-        internal List<Vector3> pathPoints = new();
+        internal List<Vector3> pathPoints = new()
+        {
+            Vector3.zero,
+            Vector3.forward,
+        };
         
         [SerializeField, Min(3), ShowIf(nameof(SimplePathFollow.motion), MOTION.LINEAR)]
         internal int catmullResolution = 12;
