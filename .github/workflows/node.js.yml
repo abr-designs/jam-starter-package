@@ -4,7 +4,9 @@ name: Generate Documentation Website with Vitepress
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main']
+    branches: 
+      - 'main'
+      - 'develop/v*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -29,15 +31,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Main
         uses: actions/checkout@v4 
         with:
+            ref: main
+            path: main-repo
             lfs: true
-      - name: LFS Pull
-        run: git lfs pull
 
-      - name: LFS Debug
-        run: git lfs ls-files
+      # - name: LFS Pull
+      #   run: git lfs pull
+
+      # - name: LFS Debug
+      #   run: git lfs ls-files
 
       # - name: List Files and Sizes - Image Debug
       #   run: |
@@ -45,28 +50,67 @@ jobs:
       #     echo "Listing all files and their sizes:"
       #     find . -type f -exec du -h {} + | sort -rh
 
+      - name: Get Latest Dev Branch Name
+        run: |
+          # Find the latest branch matching develop/v*
+          # sort -V handles version numbers like v0.0.10 correctly (higher than v0.0.2)
+          LATEST_DEV=$(git ls-remote --heads origin 'refs/heads/develop/v*' | cut -d/ -f3- | sort -V | tail -n1)
+          
+          # Fallback to main if no dev branch is found
+          if [ -z "$LATEST_DEV" ]; then LATEST_DEV="main"; fi
+          
+          echo "LATEST_DEV_BRANCH=$LATEST_DEV" >> $GITHUB_ENV
+
+      - name: Checkout Dev Branch
+        uses: actions/checkout@v4
+        with:
+            ref: ${{ env.LATEST_DEV_BRANCH }}
+            path: dev-repo
+            lfs: true
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           cache-dependency-path: WebsiteDocs~/package-lock.json
           node-version: 20
           cache: 'npm'
-      - name: Set base URL for VitePress build
-        run: |
-          REPO_NAME=$(basename $(git rev-parse --show-toplevel))
-          echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
-      - name: Install dependencies & build
-        run: | 
-          cd WebsiteDocs~
-          npm ci
-          npm run docs:build
+
+      # - name: Set base URL for VitePress build
+      #   run: |
+      #     REPO_NAME=$(basename $(git rev-parse --show-toplevel))
+      #     echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
+
       - name: Setup Pages
+        id: pages # ID for output access
         uses: actions/configure-pages@v4
+
+      - name: Build Main Docs
+        run: | 
+          cd main-repo/WebsiteDocs~
+          npm ci
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" npm run docs:build
+
+      - name: Build Dev Docs
+        run: | 
+          cd dev-repo/WebsiteDocs~
+          npm ci
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
+
+      - name: Organize Sites to One Folder
+        run: |
+          mkdir -p final-dist
+          # Main build -> root
+          cp -R main-repo/WebsiteDocs~/.vitepress/dist/* final-dist/
+          # Dev build -> root
+          cp -R dev-repo/WebsiteDocs~/.vitepress/dist/* final-dist/dev/
+          
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: './WebsiteDocs~/.vitepress/dist'
+          path: './final-dist'
+
       - name: Deploy pages to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4
