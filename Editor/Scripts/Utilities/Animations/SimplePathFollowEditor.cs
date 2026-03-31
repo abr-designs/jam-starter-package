@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using Utilities;
 using Utilities.Animations;
+using Object = UnityEngine.Object;
 
 namespace JamStarter.Editor.Scripts.Utilities.Animations
 {
@@ -30,6 +32,12 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         {
             m_simplePathFollow = (SimplePathFollow)target;
             m_pathPointsProp = serializedObject.FindProperty(nameof(SimplePathFollow.pathPoints));
+            
+            if(PathHandleGlobal.SelectedPathIndex >= 0)
+            {
+                SelectPoint(PathHandleGlobal.SelectedPathIndex);
+                PathHandleGlobal.SelectedPathIndex = -1;
+            }
         }
 
         public override void OnInspectorGUI()
@@ -51,7 +59,6 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 return;
 
             var pathPoints = m_simplePathFollow.pathPoints;
-
 
             for (var i = pathPoints.Count - 1; i >= 0; i--)
             {
@@ -582,5 +589,76 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
         //================================================================================================================//
 
+    }
+    
+    [InitializeOnLoad]
+    internal static class PathRegistry
+    {
+        private static List<SimplePathFollow> s_paths = new();
+        private static bool s_dirty = true;
+
+        static PathRegistry()
+        {
+            EditorApplication.hierarchyChanged += () => s_dirty = true;
+            Undo.undoRedoPerformed += () => s_dirty = true;
+        }
+
+        public static List<SimplePathFollow> Paths
+        {
+            get
+            {
+                if (!s_dirty) 
+                    return s_paths;
+                
+                s_paths = Object.FindObjectsByType<SimplePathFollow>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID).ToList();
+                s_dirty = false;
+                return s_paths;
+            }
+        }
+    }
+    
+    [InitializeOnLoad]
+    internal static class PathHandleGlobal
+    {
+        internal static int SelectedPathIndex { get; set; } = -1;
+        static PathHandleGlobal()
+        {
+            SceneView.duringSceneGui += OnSceneGUI;
+        }
+
+        private static void OnSceneGUI(SceneView sceneView)
+        {
+            foreach (var simplePathFollow in PathRegistry.Paths)
+            {
+                if(Selection.activeObject == simplePathFollow)
+                    continue;
+                
+                if (simplePathFollow.pathPoints == null) 
+                    continue;
+
+                for (var i = 0; i < simplePathFollow.pathPoints.Count; i++)
+                {
+                    var point = simplePathFollow.pathPoints[i];
+                    var worldPoint = simplePathFollow.transform.TransformPoint(point);
+                    float size = HandleUtility.GetHandleSize(worldPoint) * 0.1f;
+
+                    int controlID = GUIUtility.GetControlID(FocusType.Passive);
+                    float distance = HandleUtility.DistanceToCircle(worldPoint, size);
+
+                    HandleUtility.AddControl(controlID, distance);
+
+                    if (HandleUtility.nearestControl == controlID && Event.current.type == EventType.MouseDown)
+                    {
+                        GUIUtility.hotControl = controlID;
+
+                        // Handle click
+                        Selection.activeObject = simplePathFollow;
+
+                        Event.current.Use();
+                        SelectedPathIndex = i;
+                    }
+                }
+            }
+        }
     }
 }
