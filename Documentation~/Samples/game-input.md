@@ -1,3 +1,6 @@
+---
+title: Game Input
+---
 # Game Input
 > _**NOTE** This is dependent on the New Input System package being imported_
 

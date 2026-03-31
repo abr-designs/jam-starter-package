@@ -1,6 +1,10 @@
-﻿# Fixed Palette Tool
+﻿---
+title: Fixed Palette Tool
+---
 
-![fixed-palette.png](Images/fixed-palette.png)
+# Fixed Palette Tool
+
+![fixed-palette.png](../Images/FixedPaletteTool/fixed-palette.png)
 
 The Fixed Palette Tool can be found in the Project Settings window.
 Opening the Settings will generate a settings file that can be found at `Assets/Settings/FixedPaletteSettings.asset`. This
@@ -39,7 +43,7 @@ more digestible once imported.
 > You'll notice that you can set multiple colors as **Primary**. When retrieving the primary color at runtime, it will return
 > the first in the list that has that Color Type
 
-![color-type.png](Images/color-type.png)
+![color-type.png](../Images/FixedPaletteTool/color-type.png)
 
 You are able to assign a color the types listed below. These are used to retrieve colors at runtime.
 - Primary
@@ -49,7 +53,7 @@ You are able to assign a color the types listed below. These are used to retriev
 ## Picking a Color
 
 ### `[FixedPalette]` Attribute
-![fixed-palette-inspector.png](Images/fixed-palette-inspector.png)
+![fixed-palette-inspector.png](../Images/FixedPaletteTool/fixed-palette-inspector.png)
 
 To ensure that you are able to utilize the color palette functionality, you will need to add the `[FixedPalette]` over
 any [`Color`](https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Color.html) or [`Color32`](https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Color32.html)
@@ -67,7 +71,7 @@ You are also able to change how the Color Selection window displays your palette
 as a parameter.
 
 ### `COLOR_SELECT.DEFAULT`
-![default-palette-list.png](Images/default-palette-list.png)
+![default-palette-list.png](../Images/FixedPaletteTool/default-palette-list.png)
 ```csharp
 [SerializeField, FixedPalette]
 private Color32 defaultColorSelector;
@@ -76,7 +80,7 @@ private Color32 defaultColorSelector;
 This is the default value of the optional parameter. This will include the color swatch & the name.
 
 ### `COLOR_SELECT.GRID`
-![grid-palette-list.png](Images/grid-palette-list.png)
+![grid-palette-list.png](../Images/FixedPaletteTool/grid-palette-list.png)
 ```csharp
 [SerializeField, FixedPalette(COLOR_SELECT.GRID)]
 private Color32 gridColorSelector;
@@ -85,7 +89,7 @@ private Color32 gridColorSelector;
 This display version will exclude the label, and place all of your swatches in a grid.
 
 ### `COLOR_SELECT.SHADES`
-![shades-palette-list.png](Images/shades-palette-list.png)
+![shades-palette-list.png](../Images/FixedPaletteTool/shades-palette-list.png)
 ```csharp
 [SerializeField, FixedPalette(COLOR_SELECT.SHADES)]
 private Color32 shadesColorSelector;

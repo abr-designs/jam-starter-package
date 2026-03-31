@@ -1,4 +1,7 @@
-﻿# Singletons
+﻿---
+title: Singletons
+---
+# Singletons
 The [Singleton pattern](https://refactoring.guru/design-patterns/singleton) solves two problems at the same time, violating the Single Responsibility Principle:
 1. Ensure that a class has just a single instance.
 2. Provide a global access point to that instance.

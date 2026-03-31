@@ -1,4 +1,7 @@
-﻿# Extensions
+﻿---
+title: Extensions
+---
+# Extensions
 ## Collections Extensions
 ### `PickRandomElement()`
 This function lets you select a random element from a provided list or array. It is not limited by type, so can return any
