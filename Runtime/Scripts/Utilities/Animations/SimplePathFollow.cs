@@ -19,14 +19,17 @@ namespace Utilities.Animations
         }
 
         [SerializeField]
+        //This could be in reverse, so no Min() required
+        private float speed;
+        
+        [SerializeField, Space(10f)]
         internal bool looping;
 
         [SerializeField]
         internal MOTION motion;
 
-        [SerializeField]
-        //This could be in reverse, so no Min() required
-        private float speed;
+        [SerializeField, Range(0f,1f)]
+        private float startingPosition;
         
         [SerializeField]
         //This could be in reverse, so no Min() required
@@ -60,19 +63,21 @@ namespace Utilities.Animations
             Assert.IsTrue(pathPoints.Count >= 2);
             
             BakeArcLengthTable();
-            
-            if(speed  < 0)
-                m_pingPongForward = false;
+
+            m_distanceTravelled = startingPosition * m_totalLength;
+            m_pingPongForward = speed > 0f;
         }
         
         private void Update()
         {
+            if (speed == 0f)
+                return;
             if (targetMoveTransform == null) 
                 return;
             if (m_totalLength <= 0f) 
                 return;
 
-            float delta = speed * Time.deltaTime;
+            var delta = speed * Time.deltaTime;
 
             if (looping)
             {
@@ -108,7 +113,7 @@ namespace Utilities.Animations
 
         private void BakeArcLengthTable()
         {
-            int totalSamples = motion == MOTION.LINEAR
+            var totalSamples = motion == MOTION.LINEAR
                 ? pathPoints.Count + (looping ? 1 : 0)
                 : looping
                     ? pathPoints.Count * catmullResolution + 1
@@ -117,11 +122,11 @@ namespace Utilities.Animations
             m_arcLengthTable = new float[totalSamples];
             m_arcLengthTable[0] = 0f;
 
-            Vector3 previous = SamplePathByIndex(0, totalSamples);
+            var previous = SamplePathByIndex(0, totalSamples);
 
-            for (int i = 1; i < totalSamples; i++)
+            for (var i = 1; i < totalSamples; i++)
             {
-                Vector3 current = SamplePathByIndex(i, totalSamples);
+                var current = SamplePathByIndex(i, totalSamples);
                 m_arcLengthTable[i] = m_arcLengthTable[i - 1] + Vector3.Distance(previous, current);
                 previous = current;
             }
@@ -137,7 +142,7 @@ namespace Utilities.Animations
                 if (!looping)
                     return transform.TransformPoint(pathPoints[Mathf.Clamp(i, 0, pathPoints.Count - 1)]);
 
-                int idx = i % pathPoints.Count;
+                var idx = i % pathPoints.Count;
                 return transform.TransformPoint(pathPoints[idx]);
             }
 
@@ -149,12 +154,12 @@ namespace Utilities.Animations
             if (!looping && i == totalSamples - 1)
                 return transform.TransformPoint(pathPoints[^1]);
 
-            int segCount = looping ? pathPoints.Count : pathPoints.Count - 1;
+            var segCount = looping ? pathPoints.Count : pathPoints.Count - 1;
 
-            float globalT = (float)i / (totalSamples - 1);
-            float scaledT = globalT * segCount;
-            int seg = Mathf.FloorToInt(scaledT);
-            float localT = scaledT - seg;
+            var globalT = (float)i / (totalSamples - 1);
+            var scaledT = globalT * segCount;
+            var seg = Mathf.FloorToInt(scaledT);
+            var localT = scaledT - seg;
 
             // When globalT == 1.0 (closing sample), seg == segCount; wrap it back
             if (looping)
@@ -162,10 +167,10 @@ namespace Utilities.Animations
             else
                 seg = Mathf.Clamp(seg, 0, pathPoints.Count - 2);
 
-            Vector3 p0 = GetCatmullPoint(seg - 1);
-            Vector3 p1 = GetCatmullPoint(seg);
-            Vector3 p2 = GetCatmullPoint(seg + 1);
-            Vector3 p3 = GetCatmullPoint(seg + 2);
+            var p0 = GetCatmullPoint(seg - 1);
+            var p1 = GetCatmullPoint(seg);
+            var p2 = GetCatmullPoint(seg + 1);
+            var p3 = GetCatmullPoint(seg + 2);
 
             return LerpFunctions.CatmullRom(localT, p0, p1, p2, p3);
         }
@@ -216,21 +221,21 @@ namespace Utilities.Animations
         {
             if (looping)
             {
-                int wrappedIndex = (index % pathPoints.Count + pathPoints.Count) % pathPoints.Count;
+                var wrappedIndex = (index % pathPoints.Count + pathPoints.Count) % pathPoints.Count;
                 return transform.TransformPoint(pathPoints[wrappedIndex]);
             }
 
             if (index < 0)
             {
-                Vector3 first = transform.TransformPoint(pathPoints[0]);
-                Vector3 second = transform.TransformPoint(pathPoints[1]);
+                var first = transform.TransformPoint(pathPoints[0]);
+                var second = transform.TransformPoint(pathPoints[1]);
                 return first + (first - second);
             }
 
             if (index >= pathPoints.Count)
             {
-                Vector3 last = transform.TransformPoint(pathPoints[^1]);
-                Vector3 beforeLast = transform.TransformPoint(pathPoints[^2]);
+                var last = transform.TransformPoint(pathPoints[^1]);
+                var beforeLast = transform.TransformPoint(pathPoints[^2]);
                 return last + (last - beforeLast);
             }
 
