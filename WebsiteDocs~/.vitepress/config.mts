@@ -110,7 +110,8 @@ function getVersionDropDown() {
     items: [
       { 
         text: isDevURL ? 'main' : devText, 
-        link: isDevURL ? '../' : '/dev/'
+        link: isDevURL ? '../' : '/dev/',
+        target: '_self' // skip the vitepress routing and treat as external link
       }
     ]
   }
