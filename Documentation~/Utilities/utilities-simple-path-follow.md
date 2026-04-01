@@ -5,7 +5,7 @@ title: Simple Path Follow
 # Simple Path Follow
 The SimplePathFollow component is a utility script that allows you to connect Transforms, to animate an object along a path.
 
-![path-smooth-animation.gif](../Images/path-smooth-animation.gif)
+![path-smooth-animation.gif](../Images/path-follow/path-smooth-animation.gif)
 
 | Linear                                                    | Smooth                                                     |
 |-----------------------------------------------------------|------------------------------------------------------------|
@@ -21,7 +21,7 @@ You are able to control the speed of the path traversal, but also the direction,
 There is also the option to loop the path, using the `looping` toggle on the inspector. Looping changes how the 
 traversal happens by default, as the non-looping option will have the transform ping-ponging back and forth between the start and end points.
 
-![path-linear-animation.gif](../Images/path-linear-animation.gif)
+![path-linear-animation.gif](../Images/path-follow/path-linear-animation.gif)
 
 ### Editing the path
 
