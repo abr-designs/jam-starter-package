@@ -3,11 +3,16 @@ name: Generate Documentation Website with Vitepress
 
 on:
   # Runs on pushes targeting the default branch
+  # Also limited to changes to documentation/workflow folders
   push:
     branches: 
       - 'main'
       - 'develop/v*'
-
+    paths:
+      - 'Documentation~/**'
+      - 'WebsiteDocs~/**'
+      - '.github/workflows/**'
+      
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -31,24 +36,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Current Branch (Builder)
+        uses: actions/checkout@v4
+        with:
+            path: builder-repo
+            sparse-checkout: |
+              WebsiteDocs~
+            lfs: true
+
       - name: Checkout Main
         uses: actions/checkout@v4 
         with:
             ref: main
             path: main-repo
+            sparse-checkout: |
+              Documentation~
             lfs: true
-
-      # - name: LFS Pull
-      #   run: git lfs pull
-
-      # - name: LFS Debug
-      #   run: git lfs ls-files
-
-      # - name: List Files and Sizes - Image Debug
-      #   run: |
-      #     cd Documentation~/Images
-      #     echo "Listing all files and their sizes:"
-      #     find . -type f -exec du -h {} + | sort -rh
 
       - name: Get Latest Dev Branch
         env:
@@ -70,10 +73,12 @@ jobs:
         with:
             ref: ${{ env.LATEST_DEV_BRANCH }}
             path: dev-repo
+            sparse-checkout: |
+              Documentation~
             lfs: true
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           cache-dependency-path: '**/WebsiteDocs~/package-lock.json'
           node-version: 24
@@ -90,12 +95,20 @@ jobs:
 
       - name: Build Main Docs
         run: | 
-          cd main-repo/WebsiteDocs~
+          # Clean any current docs and copy over main
+          rm -rf builder-repo/Documentation~
+          cp -R main-repo/Documentation~ builder-repo/Documentation~
+
+          cd builder-repo/WebsiteDocs~
           npm ci
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" npm run docs:build
 
       - name: Build Dev Docs
         run: | 
+          # Clean any current docs and copy over dev
+          rm -rf builder-repo/Documentation~
+          cp -R dev-repo/Documentation~ builder-repo/Documentation~
+
           cd dev-repo/WebsiteDocs~
           npm ci
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
