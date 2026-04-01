@@ -98,7 +98,7 @@ jobs:
 
       - name: Organize Sites to One Folder
         run: |
-          mkdir -p final-dist
+          mkdir -p final-dist/dev
           # Main build -> root
           cp -R main-repo/WebsiteDocs~/.vitepress/dist/* final-dist/
           # Dev build -> root
