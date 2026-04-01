@@ -104,8 +104,8 @@ jobs:
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" npm run docs:build
 
           # Copy docs to final place
-          mkdir -p final-dist
-          cp -R builder-repo/WebsiteDocs~/.vitepress/dist/* final-dist/
+          mkdir -p $GITHUB_WORKSPACE/final-dist
+          cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/
 
       - name: Build Dev Docs
         run: | 
@@ -118,8 +118,8 @@ jobs:
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
 
           # Copy docs to final place
-          mkdir -p final-dist/dev
-          cp -R builder-repo/WebsiteDocs~/.vitepress/dist/* final-dist/dev
+          mkdir -p $GITHUB_WORKSPACE/final-dist/dev
+          cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/dev
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
