@@ -8,10 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
-- 
+-
 
 ### Changed
-- 
+- Updated documentation generation workflow
+  - Added ability to generate documentation website for ``main`` and ``develop/v*`` branches
+  - Added website drop down to toggle versions
+  - Added restrictions on automatic building to the following
+    - only commits on ``main`` or ``develop/v*`` with changes to ``Documentation~``, ``.github/workflows`` or ``WebsiteDocs~``
+  - Updated workflow to use the triggering branch ``WebsiteDocs~`` for building, the workflow will checkout the ``main`` and ``develop/v*`` branches itself
 
 ### Fixed
 - 
