@@ -104,14 +104,13 @@ function getVersionDropDown() {
   const devText = `dev (${version})`;
   const baseURL = process.env.VITE_BASE_URL || '/';
   const isDevURL = baseURL.includes('/dev/') ?? false;  
-  const baseWithoutDev = baseURL.replace('/dev/', '/');
 
   return {
     text: isDevURL ?  devText : 'main',
     items: [
       { 
         text: isDevURL ? 'main' : devText, 
-        link: isDevURL ? '../' : baseWithoutDev + 'dev/'
+        link: isDevURL ? '../' : '/dev/'
       }
     ]
   }
