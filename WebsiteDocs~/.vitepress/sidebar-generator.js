@@ -1,9 +1,10 @@
-import { resolve } from 'node:path';
-import { readdirSync, statSync } from 'node:fs';
+import { resolve, basename } from 'node:path';
+import { readdirSync, statSync, readFileSync } from 'node:fs';
+import matter from 'gray-matter';
 
 // Custom ignore filter list
 // TODO -- move this into a parameter passed into function
-const excludeList = ["home.md"];
+const excludeList = ["index.md", "home.md"];
 
 /**
  * Generates a sidebar configuration for VitePress.
@@ -13,52 +14,90 @@ const excludeList = ["home.md"];
 export function generateSidebar(dirPath) {
   const rootPath = resolve(process.cwd(), dirPath);
 
-  function scanDir(path, base = '') {
-
+  // Get a list of files/folders in a path
+  function getFolderEntries(path) {
     let entries = readdirSync(path)
-      .filter(file => !file.startsWith('.') && !file.startsWith('index') && !excludeList.includes(file)) // Ignore hidden files and `index.md`
+      .filter(file => !file.startsWith('.')) // Ignore hidden files and `index.md`
       .map(file => ({
         name: file,
         path: resolve(path, file),
         isDir: statSync(resolve(path, file)).isDirectory()
       }));
-
-    // Ignore directories that contain no md files
-    if (entries.filter(e => e.name.includes(".md")).length === 0) return [];
-
-    // Order plain files on top first
-    let fileEntries = [];
-    let dirEntries = [];
-    entries.forEach(e => {
-      if(e.name.includes(".")) fileEntries.push(e);
-      else dirEntries.push(e);
-    })
-    entries = fileEntries.concat(dirEntries);
-
-    const result = entries.map(entry => {
-      const relativePath = `${base}/${entry.name}`.replace(/\.md$/, '');
-
-      if (entry.isDir) {
-        let items = scanDir(entry.path, relativePath) // Recursively scan subdirectories
-        if (items.length > 0) {
-          return {
-            text: capitalize(entry.name),
-            collapsible: true,
-            items: scanDir(entry
-              .path, relativePath) // Recursively scan subdirectories
-          };
-        } else {
-          return {}
-        }
-      }
-
-      return { text: capitalize(entry.name.replace(/\.md$/, '')), link: relativePath };
-    });
-
-    return result;
+    return entries;
   }
 
-  return scanDir(rootPath);
+  // Recursively check if this directory has markdown files
+  function dirHasMarkdown(path) {
+    const entries = getFolderEntries(path);
+    for(const e of entries) {
+      
+      if(e.isDir && dirHasMarkdown(e.path)) {
+        return true;
+      }
+
+      if(e.name.toLowerCase().endsWith('.md')) {
+        return true;
+      }
+
+    }
+    return false;
+  }
+
+  function scanDir(path, base = '') {
+
+    let entries = getFolderEntries(path);
+
+    let fileEntries = entries.filter(e => !e.isDir);
+    let dirEntries = entries.filter(e => e.isDir && dirHasMarkdown(e.path));
+
+    const fileItems = []
+    const dirItems = []
+
+    // process files
+    for (const entry of fileEntries) {
+
+      if(excludeList.includes(entry.name.toLowerCase())) {        
+        continue;
+      }
+
+      const relativePath = `${base}/${entry.name}`.replace(/\.md$/, '');
+      fileItems.push(
+        { text: getPageTitle(entry.path), link: relativePath }
+      )
+    }
+
+    // process directories
+    for (const entry of dirEntries) {
+      const relativePath = `${base}/${entry.name}`.replace(/\.md$/, '');
+
+      let items = scanDir(entry.path, relativePath) // Recursively scan subdirectories
+      if (items.length === 0) return; // skip empty directory
+
+      // TODO -- if a directory has a index.md item -- this should also be hoisted
+      // Only one file entry -- we will hoist this folder to a file item
+      if (items.length === 1 && !items[0].items) {
+        fileItems.push(items[0]);
+        continue;
+      }
+
+      // Otherwise we build a folder
+      dirItems.push({
+        text: capitalize(entry.name),
+        collapsible: true,
+        items: items
+      })
+
+    }
+
+    fileItems.sort((a, b) => { a.text.localeCompare(b.text) });
+    dirItems.sort((a, b) => { a.text.localeCompare(b.text) });
+    const result = fileItems.concat(dirItems);
+    return result;
+
+  }
+
+  const result = scanDir(rootPath);
+  return result;
 }
 
 /**
@@ -68,4 +107,26 @@ export function generateSidebar(dirPath) {
  */
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Reads the frontmatter of .md files to extract title
+ */
+function getPageTitle(filePath) {
+
+  let title = '';
+  try {
+    const content = readFileSync(filePath);
+
+    // extract YAML data
+    const { data } = matter(content);
+    title = data.title;
+
+  } catch (err) {
+    console.error('error reading page YAML data', err);
+  }
+
+  // Return the title or the filename as default
+  return title || capitalize(basename(filePath).replace(/\.md$/, ''));
+
 }

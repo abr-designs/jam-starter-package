@@ -1,4 +1,7 @@
-﻿# Level Loading
+﻿---
+title: Level Loading
+---
+# Level Loading
 > _**Author Note**: I love using this structure for Game jams, because it means I can define a first & last level then fill 
 > the space between them. That way, when time is running short, I don't have to worry about the game ending unexpectedly.
 > I also enjoy this because, when I am testing puzzles, reordering levels becomes trivial, as I just need to move them around 

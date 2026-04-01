@@ -1,4 +1,7 @@
-﻿# WaitForAnimations
+﻿---
+title: Wait For Animations
+---
+# WaitForAnimations
 
 These scripts are designed to allow editor/inspector focused animations that can be used within coroutines, giving you
 the ability to wait for sections, and to target groups of objects.
@@ -33,6 +36,16 @@ These directions are used when deciding how to animate a target
 - `START_TO_END`
 - `END_TO_START`
 
+### Animation Space
+> [!WARNING]
+> Only the `Position` & `Rotation` can be effected by the Transform Space.
+
+These enums can be set within the inspector to determine how the animation will be applied.
+- `WORLD`
+- `LOCAL`
+
+![animation-space.png](../Images/Utilities/animation-space.png)
+
 ## `IWaitForAnimation`
 All of the WaitFor animation scripts will inherit from `IWaitForAnimation` which means it can be easily called without 
 needing to know the contents of how the script operates.
@@ -41,6 +54,10 @@ Ideally, when traversing through a `Coroutine` _(For a cutscene, for example)_, 
 and all you have to do is wait for it to complete.
 
 ## `WaitForAnimationBase`
+> [!NOTE]
+> `WaitForAnimationBase` contains a public `Animate()` method, that can be easily called from 
+> [`UnityEvents`](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Events.UnityEvent.html)
+
 When inheriting from this class you will need to specify 2 value types:
 - `TR`: the type of transform that will be the target of the animation _(`Transform`, `RectTransform`)_
 - `T`: The value that will be used when Setting Values & Lerping _(`Vector3`, `Vector2`, `float`)_
@@ -69,9 +86,45 @@ protected override Vector3 Lerp(Vector3 start, Vector3 end, float t)
 }
 protected override void SetValue(AnimationData data, Vector3 value)
 {
-    data.transform.position = value;
+    switch (data.transformSpace)
+    {
+        case SPACE.WORLD:
+            data.transform.position = value;
+            break;
+        case SPACE.LOCAL:
+            data.transform.localPosition = value;
+            break;
+    }
+    
 }
 ```
+### `WaitForRotationAnimations`
+Below showcases the requirements for setting the rotation
+```csharp
+public override Coroutine DoAnimation(float time, ANIM_DIR animDir)
+{
+    return StartCoroutine(DoAnimationCoroutine(time, animDir));
+}
+protected override Vector3 Lerp(Vector3 start, Vector3 end, float t)
+{
+    return Vector3.Lerp(start, end, t);
+}
+protected override void SetValue(AnimationData data, Vector3 value)
+{
+    var rotation = Quaternion.Euler(value);
+    switch (data.transformSpace)
+    {
+        case SPACE.WORLD:
+            data.transform.rotation = rotation;
+            break;
+        case SPACE.LOCAL:
+            data.transform.localRotation = rotation;
+            break;
+    }
+    
+}
+```
+
 ### WaitForScaleAnimations
 
 `public class WaitForScaleAnimations: WaitForAnimationBase<Transform, Vector3>`

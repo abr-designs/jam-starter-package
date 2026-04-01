@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.8f1` - January 23, 2025
+### `v0.0.9` - April 1, 2026
 ### Supports Unity 6000.0
 
 ## Samples
@@ -37,10 +37,11 @@ projects & Game jams.
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features
-- ### [Fixed Palette Tool](FixedPaletteTool/Documentation~/FixedPaletteTool.md)
+- ### [Fixed Palette Tool](Documentation~/FixedPaletteTool/FixedPaletteTool.md)
 - ### [Level Loading](Documentation~/Levels.md)
 - ### [Interfaces](Documentation~/Interfaces.md)
 - ### [Utilities](Documentation~/Utilities.md)
+  - #### [Simple Path Follow](Documentation~/Utilities/utilities-simple-path-follow.md)
   - #### [Animators](Documentation~/Utilities/utilities-animators.md)
   - #### [Wait-For Animations](Documentation~/Utilities/utilities-wait-animation.md)
   - #### [Physics](Documentation~/Utilities/utilities-physics.md)
@@ -49,7 +50,7 @@ projects & Game jams.
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
   - #### [Singletons](Documentation~/Utilities/utilities-singletons.md)
-- ### [WebGL Templates](WebGLTemplates~/README.md)
+- ### [WebGL Templates](Documentation~/WebGLTemplates/README.md)
 
 ---
 
@@ -73,3 +74,6 @@ projects & Game jams.
 #### Custom NuGet Packages
 > _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
 - [ZLinq](https://github.com/Cysharp/ZLinq)
+
+## Contributing
+If you would like to contribute to this project, please review our [contribution guidelines](Documentation~/Contributing.md).

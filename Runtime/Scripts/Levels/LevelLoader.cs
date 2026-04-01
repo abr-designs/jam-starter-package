@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using NaughtyAttributes;
+using UnityEngine;
 using UnityEngine.Assertions;
 using Utilities;
 
@@ -7,9 +9,18 @@ namespace Levels
     public class LevelLoader : HiddenSingleton<LevelLoader>
     {
         public static LevelDataDefinition CurrentLevelDataDefinition { get; private set; }
+
+#if UNITY_EDITOR
+        [SerializeField, Header("Debugging")]
+        private bool useDebug;
+        [SerializeField, Min(0), EnableIf("useDebug")]
+        private int debugLoadIndex;
+#endif
+        
         private int _currentLevelIndex = -1;
         private GameObject _currentLevelGameObject;
 
+        public static IReadOnlyList<LevelDataDefinition> Levels => Instance?.levels;
         [SerializeField]
         private LevelDataDefinition[] levels;
 
@@ -62,7 +73,20 @@ namespace Levels
         
         public static void Restart() => Instance.RestartLevel();
 
-        public static void LoadFirstLevel() => Instance.LoadLevel(0);
+        public static void LoadFirstLevel()
+        {
+#if UNITY_EDITOR
+            if (Instance.useDebug)
+            {
+                Instance.LoadLevel(Instance.debugLoadIndex);
+                return;
+            }
+#endif
+            
+            Instance.LoadLevel(0);
+        }
+        
+        public static void LoadLevelAtIndex(int levelIndex) => Instance.LoadLevel(levelIndex);
         
         //============================================================================================================//
         
