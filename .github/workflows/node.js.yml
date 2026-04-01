@@ -78,6 +78,15 @@ jobs:
               package.json
             lfs: true
 
+      - name: Extract Dev Version from package.json
+        run: |
+          # Use jq to pull version field
+          VERSION=$(jq -r '.version' dev-repo/package.json)
+          echo "Found dev version: $VERSION"
+
+          # Save to environment
+          echo "DEV_VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Set up Node
         uses: actions/setup-node@v5
         with:
@@ -102,7 +111,9 @@ jobs:
 
           cd builder-repo/WebsiteDocs~
           npm ci
-          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" npm run docs:build
+          VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
+          npm run docs:build
 
           # Copy docs to final place
           mkdir -p $GITHUB_WORKSPACE/final-dist
@@ -119,7 +130,9 @@ jobs:
 
           cd builder-repo/WebsiteDocs~
           npm ci
-          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
+          VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
+          npm run docs:build
 
           # Copy docs to final place
           mkdir -p $GITHUB_WORKSPACE/final-dist/dev

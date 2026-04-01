@@ -2,9 +2,6 @@ import { defineConfig } from 'vitepress'
 import { generateSidebar } from './sidebar-generator'
 import MarkdownIt from 'markdown-it'
 import Token from 'markdown-it/lib/token.mjs';
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -101,34 +98,20 @@ function getFirstListItemText(tokens: Token[]) : Token | null {
   return null;
 }
 
-// Read package version from root and store in process.env
-function loadRepoVersion() {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const root = path.resolve(__dirname, '../../')
-  const filePath = path.resolve(root, 'package.json');
-
-  const unityJSON = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  const version = unityJSON.version;
-  process.env.VITE_REPO_VERSION = version;
-}
-loadRepoVersion();
-
-
 function getVersionDropDown() {
 
-  const version = process.env.VITE_REPO_VERSION || 'v0.1';
+  const version = process.env.VITE_DEV_VERSION || 'v0.1';
   const devText = `dev (${version})`;
   const baseURL = process.env.VITE_BASE_URL || '/';
   const isDevURL = baseURL.includes('/dev/') ?? false;  
   const baseWithoutDev = baseURL.replace('/dev/', '/');
-
 
   return {
     text: isDevURL ?  devText : 'main',
     items: [
       { 
         text: isDevURL ? 'main' : devText, 
-        link: isDevURL ? baseWithoutDev : '../'
+        link: isDevURL ? '../' : baseWithoutDev + 'dev/'
       }
     ]
   }
