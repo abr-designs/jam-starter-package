@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
 - Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
 - Added `Contributing.md` as our first pass for contribution guidelines
+- Added `SimplePathFollow.cs`
+  - Added `SimplePathFollowEditor.cs` to manage moving path point handles & drawing line gizmos
+  - Added ability for target transform to move along created path
+  - Added Documentation & images for `SimplePathFollow.cs`
 
 ### Changed
 - Updated `LevelLoader.cs` to improve its usability
