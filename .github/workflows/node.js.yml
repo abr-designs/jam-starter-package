@@ -75,6 +75,7 @@ jobs:
             path: dev-repo
             sparse-checkout: |
               Documentation~
+              package.json
             lfs: true
 
       - name: Set up Node
@@ -112,6 +113,9 @@ jobs:
           # Clean any current docs and copy over dev
           rm -rf builder-repo/Documentation~
           cp -R dev-repo/Documentation~ builder-repo/Documentation~
+
+          # We use the root package.json to get the version
+          cp dev-repo/package.json builder-repo/package.json
 
           cd builder-repo/WebsiteDocs~
           npm ci

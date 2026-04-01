@@ -128,7 +128,7 @@ function getVersionDropDown() {
     items: [
       { 
         text: isDevURL ? 'main' : devText, 
-        link: isDevURL ? baseWithoutDev : baseWithoutDev + 'dev/'
+        link: isDevURL ? baseWithoutDev : '../'
       }
     ]
   }
