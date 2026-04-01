@@ -103,6 +103,10 @@ jobs:
           npm ci
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" npm run docs:build
 
+          # Copy docs to final place
+          mkdir -p final-dist
+          cp -R builder-repo/WebsiteDocs~/.vitepress/dist/* final-dist/
+
       - name: Build Dev Docs
         run: | 
           # Clean any current docs and copy over dev
@@ -113,14 +117,9 @@ jobs:
           npm ci
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
 
-      - name: Organize Sites to One Folder
-        run: |
+          # Copy docs to final place
           mkdir -p final-dist/dev
-          # Main build -> root
-          cp -R main-repo/WebsiteDocs~/.vitepress/dist/* final-dist/
-          # Dev build -> root
-          cp -R dev-repo/WebsiteDocs~/.vitepress/dist/* final-dist/dev/
-          
+          cp -R builder-repo/WebsiteDocs~/.vitepress/dist/* final-dist/dev
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
