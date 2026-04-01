@@ -50,15 +50,19 @@ jobs:
       #     echo "Listing all files and their sizes:"
       #     find . -type f -exec du -h {} + | sort -rh
 
-      - name: Get Latest Dev Branch Name
+      - name: Get Latest Dev Branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Find the latest branch matching develop/v*
-          # sort -V handles version numbers like v0.0.10 correctly (higher than v0.0.2)
-          LATEST_DEV=$(git ls-remote --heads origin 'refs/heads/develop/v*' | cut -d/ -f3- | sort -V | tail -n1)
-          
-          # Fallback to main if no dev branch is found
-          if [ -z "$LATEST_DEV" ]; then LATEST_DEV="main"; fi
-          
+          # get branch list, filter for develop/*, sort by version and grab latest
+          LATEST_DEV=$(gh api repos/${{ github.repository }}/branches --paginate \
+            --jq '.[] | .name' | grep '^develop/v' | sort -V | tail -n1)
+
+          # Fallback if empty
+          if [ -z "$LATEST_DEV" ]; then 
+            LATEST_DEV="main"
+          fi
+
           echo "LATEST_DEV_BRANCH=$LATEST_DEV" >> $GITHUB_ENV
 
       - name: Checkout Dev Branch
