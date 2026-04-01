@@ -1,4 +1,7 @@
-﻿# Physics
+﻿---
+title: Physics
+---
+# Physics
 ## `CollisionChecks`
 > _These implementations are based on the [examples provided by Jeffery Thompson](https://www.jeffreythompson.org/collision-detection/circle-circle.php)_
 
@@ -20,8 +23,8 @@ This static class provides simple math solutions for determining overlap of spec
 This **struct** is a helper that provides a random velocity based on the parameters set by you. The intention is that this is
 called elsewhere to get the information
 
-![example](../Images/physics-launcher.png)
-![physics3d_example.gif](../Images/physics3d_example.gif)
+![example](../Images/Utilities/physics-launcher.png)
+![physics3d_example.gif](../Images/Utilities/physics3d_example.gif)
 
 - `SpawnLocation`: This can be retrieved to use as the spawn location, but is also used to display the gizmos
 - `spawnAngle`: The number of degrees in either direction that the prefab can aim in
@@ -39,7 +42,7 @@ private void OnDrawGizmos()
 }
 ```
 
-![example](../Images/physics-launcher_example.gif)
+![example](../Images/Utilities/physics-launcher_example.gif)
 
 
 This example will launch a new rigidbody based prefab once every second.

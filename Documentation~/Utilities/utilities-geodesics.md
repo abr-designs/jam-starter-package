@@ -1,4 +1,7 @@
-﻿# Geodesics Utilities
+﻿---
+title: Geodesics
+---
+# Geodesics Utilities
 These utilities provide the math functions required to work with Geodesic maths & utilize them for different character 
 controllers.
 
@@ -31,7 +34,7 @@ easily _(as there are provided overloads that will use `Torus.cs`, see [`TorusMa
 
 ### `TorusMeshGenerator`
 
-![torus-mesh-generator.png](../Images/torus-mesh-generator.png)
+![torus-mesh-generator.png](../Images/Utilities/torus-mesh-generator.png)
 
 You have the ability to generate a Torus shape using the [`TorusMeshGenerator.cs`](../../Runtime/Scripts/Utilities/Geodesics/Torus/TorusMeshGenerator.cs)
 which is **Editor-Only** code that will create & save a torus mesh where you specify.

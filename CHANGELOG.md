@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added check for correct level load flows
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
 - Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
+- Added `Contributing.md` as our first pass for contribution guidelines
 - Added `SimplePathFollow.cs`
   - Added `SimplePathFollowEditor.cs` to manage moving path point handles & drawing line gizmos
   - Added ability for target transform to move along created path
@@ -32,6 +33,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added Transform Space selection for WaitForAnimations
   - Added SPACE field into `WaitForAnimationBase.AnimationData` class
   - Added SPACE switch into `WaitForMoveAnimations.SetValue()`
+- Updated documentation to meet new decided standards
+  - `FixedPaletteTool` documentation was moved into the `/Documentation~/` directory
+  - `WebGLTemplates` documentation was moved into the `/Documentation~/` directory
+  - All images we sub categorized & placed within the `/Images/` directory
+  - All documents image links were updated to reflect the new directory structure
+  - All documents now include the yaml title tag
+  - Updated `/WebsiteDocs/package.json` to remove the now obsolete commands for moving directories
 
 ### Fixed
 - a

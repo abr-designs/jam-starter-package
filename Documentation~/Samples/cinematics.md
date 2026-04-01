@@ -1,2 +1,5 @@
+---
+title: Cinematics
+---
 # Cinematics WIP
 

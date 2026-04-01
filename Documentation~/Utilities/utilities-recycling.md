@@ -1,4 +1,7 @@
-﻿# Recycling
+﻿---
+title: Recycling
+---
+# Recycling
 
 This utility allows you to Recycle/Pool objects that may be instantiated many times while in game.
 

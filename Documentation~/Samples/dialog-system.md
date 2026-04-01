@@ -1,6 +1,9 @@
-﻿# Dialog System
+﻿---
+title: Dialog System
+---
+# Dialog System
 
-![dialog-system_example.gif](../Images/dialog-system_example.gif)
+![dialog-system_example.gif](../Images/Samples/dialog-system_example.gif)
 
 This class is an example of how you may want to create a Dialog System using the [IDisplayDialog](../Interfaces.md)
 
