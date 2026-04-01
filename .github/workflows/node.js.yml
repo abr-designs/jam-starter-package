@@ -109,7 +109,7 @@ jobs:
           rm -rf builder-repo/Documentation~
           cp -R dev-repo/Documentation~ builder-repo/Documentation~
 
-          cd dev-repo/WebsiteDocs~
+          cd builder-repo/WebsiteDocs~
           npm ci
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" npm run docs:build
 
