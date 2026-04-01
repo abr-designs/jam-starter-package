@@ -1,4 +1,7 @@
-﻿# Interfaces
+﻿---
+title: Interfaces
+---
+# Interfaces
 
 These interfaces allow for open-ended implementations of systems, where while the logic may not yet be defined, the backing
 systems are able to anticipate its implementation.

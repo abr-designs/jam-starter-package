@@ -1,8 +1,11 @@
-﻿# `Draw.cs`
+﻿---
+title: Draw.cs
+---
+# `Draw.cs`
 This class extends the existing Debug.Draw methods to include
 ## Label
 
-![example](../Images/draw-label.png)
+![example](../Images/Utilities/draw-label.png)
 
 This can only be called from [`OnDrawGizmos()`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MonoBehaviour.OnDrawGizmos.html)
 or [`OnDrawGizmosSelected()`](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/MonoBehaviour.OnDrawGizmosSelected.html) as this uses the UnityEditor.Handles class to draw
@@ -20,7 +23,7 @@ private void OnDrawGizmos()
 ## Circle
 > _**NOTE** This currently only faces the forward direction_
 
-![example](../Images/draw-circle.png)
+![example](../Images/Utilities/draw-circle.png)
 
 ```csharp
 Draw.Circle(Vector3.zero, Color.green);
@@ -29,7 +32,7 @@ Draw.Circle(Vector3.zero, Color.red, radius: 1.5f, segments: 32);
 ```
 ## Arrow
 
-![example](../Images/draw-arrow.png)
+![example](../Images/Utilities/draw-arrow.png)
 
 ```csharp
 Draw.Arrow(Vector3.zero, direction: Vector3.up, Color.green);

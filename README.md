@@ -37,7 +37,7 @@ projects & Game jams.
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
 
 ## Features
-- ### [Fixed Palette Tool](FixedPaletteTool/Documentation~/FixedPaletteTool.md)
+- ### [Fixed Palette Tool](Documentation~/FixedPaletteTool/FixedPaletteTool.md)
 - ### [Level Loading](Documentation~/Levels.md)
 - ### [Interfaces](Documentation~/Interfaces.md)
 - ### [Utilities](Documentation~/Utilities.md)
@@ -49,7 +49,7 @@ projects & Game jams.
   - #### [Debugging - Draw.cs](Documentation~/Utilities/utilities-draw.md)
   - #### [Recycling](Documentation~/Utilities/utilities-recycling.md)
   - #### [Singletons](Documentation~/Utilities/utilities-singletons.md)
-- ### [WebGL Templates](WebGLTemplates~/README.md)
+- ### [WebGL Templates](Documentation~/WebGLTemplates/README.md)
 
 ---
 
@@ -73,3 +73,6 @@ projects & Game jams.
 #### Custom NuGet Packages
 > _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
 - [ZLinq](https://github.com/Cysharp/ZLinq)
+
+## Contributing
+If you would like to contribute to this project, please review our [contribution guidelines](Documentation~/Contributing.md).
