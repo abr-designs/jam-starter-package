@@ -4,6 +4,7 @@ title: Utilities
 # Utilities
 
 - ### [Animators](Utilities/utilities-animators.md)
+- ### [Simple Path Follow](Utilities/utilities-simple-path-follow.md)
 - ### [Wait-For Animations](Utilities/utilities-wait-animation.md)
 - ### [Physics](Utilities/utilities-physics.md)
 - ### [Geodesics](Utilities/utilities-geodesics.md)

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.9-preview] - DATE
+## [0.0.9] - 2026-04-01
 
 ### Added
 - Implemented Unit Tests for `LevelLoader.cs` in `LevelLoaderTests.cs`
@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `SPACE.cs` enum to allow selection between World & Local spaces
 - Added `WaitForRotationAnimation.cs` to adjust tranform rotations easily
 - Added `Contributing.md` as our first pass for contribution guidelines
+- Added `SimplePathFollow.cs`
+  - Added `SimplePathFollowEditor.cs` to manage moving path point handles & drawing line gizmos
+  - Added ability for target transform to move along created path
+  - Added Documentation & images for `SimplePathFollow.cs`
 
 ### Changed
 - Updated `LevelLoader.cs` to improve its usability
@@ -36,11 +40,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - All documents image links were updated to reflect the new directory structure
   - All documents now include the yaml title tag
   - Updated `/WebsiteDocs/package.json` to remove the now obsolete commands for moving directories
+- Updated documentation for `WaitForAnimationBase.cs`
 
-### Fixed
-- a
-
-## [0.0.8f1] - January 23, 2026
+## [0.0.8f1] - 2026-01-23
 
 ### Fixed
 - Added `Jam-Stater.Runtime.Geodesics.asmdef` to allow awaiting for NaughtyAttributes to be included preventing compilation issue
