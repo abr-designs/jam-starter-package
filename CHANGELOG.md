@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - All documents image links were updated to reflect the new directory structure
   - All documents now include the yaml title tag
   - Updated `/WebsiteDocs/package.json` to remove the now obsolete commands for moving directories
+- Updated documentation for `WaitForAnimationBase.cs`
 
 ### Fixed
 - a
