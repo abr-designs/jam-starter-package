@@ -72,7 +72,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 var element = m_pathPointsProp.GetArrayElementAtIndex(i);
                 Vector3 point = m_simplePathFollow.transform.TransformPoint(element.vector3Value);
 
-                Handles.color = Color.red;
+                Handles.color = i ==0 ? Color.blue : Color.red;
                 if (Handles.Button(point, Quaternion.identity, 0.5f, 0.5f * 1.5f, Handles.SphereHandleCap))
                 {
                     SelectPoint(i);
@@ -107,6 +107,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             }
 
             //----------------------------------------------------------//
+            
+            if(m_selectedPathPointIndex == 0)
+                return;
 
             EditorGUI.BeginChangeCheck();
             var currentPointPosition = m_simplePathFollow.transform.TransformPoint(currentPoint.vector3Value);
@@ -129,6 +132,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         private void SelectPoint(int index)
         {
             m_selectedPathPointIndex = index;
+            
+            if(index == 0)
+                Selection.activeObject = m_simplePathFollow.gameObject;
         }
 
         private static void DrawLabel(Vector3 position, string text)
@@ -197,7 +203,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             //We only want to show the Add button when we're not looping & it's an end point
             //----------------------------------------------------------//
-            if (!deleteOnly)
+            if (!deleteOnly || (m_selectedPathPointIndex == 0 && m_selectedPathPointIndex == m_simplePathFollow.pathPoints.Count - 1 ))
             {
                 var addIcon = EditorGUIUtility.IconContent(ADD_ICON);
 
@@ -213,8 +219,12 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             
             //Delete Point
             //----------------------------------------------------------//
-            if (GUILayout.Button(removeIcon))
-                DeletePoint(m_simplePathFollow, m_selectedPathPointIndex);
+            if (m_selectedPathPointIndex > 0)
+            {
+                if (GUILayout.Button(removeIcon))
+                    DeletePoint(m_simplePathFollow, m_selectedPathPointIndex);
+            }
+
             //----------------------------------------------------------//
 
             GUI.color = oldColor;
@@ -529,9 +539,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                     throw new ArgumentOutOfRangeException();
             }
 
-            Handles.color = Color.white;
             for (int i = 0; i < arraySize; i++)
             {
+                Handles.color = i == 0 ? Color.blue : Color.white;
                 var point = GetWorldPathPoint(i);
                 var handleSize = HandleUtility.GetHandleSize(point) * 0.075f;
                 Handles.SphereHandleCap(0, point, Quaternion.identity, handleSize, EventType.Repaint);
