@@ -1,5 +1,5 @@
 name: Test package
-
+run-name: Build by @${{ github.actor }} for ${{ github.event_name }}
 on: [push, pull_request]
 
 jobs:
@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        unityVersion: '6000.4.1f1' # some version must be included for package testing
+        unityVersion: ['6000.4.1f1'] # some version must be included for package testing
         testMode: [playmode, editmode]
 
     steps:
