@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -42,7 +41,7 @@ namespace Utilities.Animations
             Vector3.forward,
         };
         
-        [SerializeField, Min(3), ShowIf(nameof(SimplePathFollow.motion), MOTION.LINEAR)]
+        [SerializeField, Min(3)]
         internal int catmullResolution = 12;
         
         [SerializeField]
