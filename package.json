@@ -17,6 +17,7 @@
   },
   "documentationUrl": "https://abr-designs.github.io/jam-starter-package/",
   "dependencies": {
+    "com.unity.ugui": "2.0.0",
     "com.unity.feature.2d": "2.0.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.cinemachine": "3.1.2",
