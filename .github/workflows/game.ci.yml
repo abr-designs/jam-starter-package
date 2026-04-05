@@ -1,9 +1,10 @@
 name: Test package
-run-name: Build by @${{ github.actor }} for ${{ github.event_name }}
+run-name: Test by @${{ github.actor }} from ${{ github.event_name }}
 on: [push, pull_request]
 
 jobs:
   testAllModes:
+    environment: game.ci
     name: Test in ${{ matrix.testMode }}
     runs-on: ubuntu-latest
     strategy:
