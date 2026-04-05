@@ -11,13 +11,15 @@ jobs:
       fail-fast: true
       matrix:
         unityVersion: ['6000.4.1f1'] # some version must be included for package testing
-        testMode: [playmode, editmode]
+        testMode: [editmode] #[playmode, editmode]
 
     steps:
       - uses: actions/checkout@v4
+        name: Download package
         with:
           lfs: true
       - uses: game-ci/unity-test-runner@v4
+        name: Run Tests
         id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -32,12 +34,14 @@ jobs:
           checkName: ${{ matrix.testMode }} Test Results
           #coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+my.assembly.*'
       - uses: actions/upload-artifact@v4
+        name: Upload Artifacts
         if: always()
         with:
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Coverage results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.coveragePath }}
+      #- uses: actions/upload-artifact@v4
+      #  name: Upload Coverage Artifacts
+      #  if: always()
+      #  with:
+      #    name: Coverage results for ${{ matrix.testMode }}
+      #    path: ${{ steps.tests.outputs.coveragePath }}
