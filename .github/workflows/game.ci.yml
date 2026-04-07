@@ -1,7 +1,7 @@
 name: Test package
 on: [push, pull_request]
 run-name: >
-  ${{ github.event_name == 'pull_request' &&
+  Testing Package From ${{ github.event_name == 'pull_request' &&
       format('PR #{0} [{1}] - {2}',
         github.event.pull_request.number,
         github.head_ref,
@@ -55,6 +55,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+Jam-starter.*'
+          customParameters: -nographics -batchmode
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
