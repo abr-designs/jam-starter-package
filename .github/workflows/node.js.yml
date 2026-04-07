@@ -3,9 +3,16 @@ name: Generate Documentation Website with Vitepress
 
 on:
   # Runs on pushes targeting the default branch
+  # Also limited to changes to documentation/workflow folders
   push:
-    branches: ['main']
-
+    branches: 
+      - 'main'
+      - 'develop/v*'
+    paths:
+      - 'Documentation~/**'
+      - 'WebsiteDocs~/**'
+      - '.github/workflows/**'
+      
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -29,44 +36,114 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Current Branch (Builder)
+        uses: actions/checkout@v4
+        with:
+            path: builder-repo
+            sparse-checkout: |
+              WebsiteDocs~
+            lfs: true
+
+      - name: Checkout Main
         uses: actions/checkout@v4 
         with:
+            ref: main
+            path: main-repo
+            sparse-checkout: |
+              Documentation~
             lfs: true
-      - name: LFS Pull
-        run: git lfs pull
 
-      - name: LFS Debug
-        run: git lfs ls-files
+      - name: Get Latest Dev Branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # get branch list, filter for develop/*, sort by version and grab latest
+          LATEST_DEV=$(gh api repos/${{ github.repository }}/branches --paginate \
+            --jq '.[] | .name' | grep '^develop/v' | sort -V | tail -n1)
 
-      # - name: List Files and Sizes - Image Debug
-      #   run: |
-      #     cd Documentation~/Images
-      #     echo "Listing all files and their sizes:"
-      #     find . -type f -exec du -h {} + | sort -rh
+          # Fallback if empty
+          if [ -z "$LATEST_DEV" ]; then 
+            LATEST_DEV="main"
+          fi
+
+          echo "LATEST_DEV_BRANCH=$LATEST_DEV" >> $GITHUB_ENV
+
+      - name: Checkout Dev Branch
+        uses: actions/checkout@v4
+        with:
+            ref: ${{ env.LATEST_DEV_BRANCH }}
+            path: dev-repo
+            sparse-checkout: |
+              Documentation~
+              package.json
+            lfs: true
+
+      - name: Extract Dev Version from package.json
+        run: |
+          # Use jq to pull version field
+          VERSION=$(jq -r '.version' dev-repo/package.json)
+          echo "Found dev version: $VERSION"
+
+          # Save to environment
+          echo "DEV_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          cache-dependency-path: WebsiteDocs~/package-lock.json
-          node-version: 20
+          cache-dependency-path: '**/WebsiteDocs~/package-lock.json'
+          node-version: 24
           cache: 'npm'
-      - name: Set base URL for VitePress build
-        run: |
-          REPO_NAME=$(basename $(git rev-parse --show-toplevel))
-          echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
-      - name: Install dependencies & build
-        run: | 
-          cd WebsiteDocs~
-          npm ci
-          npm run docs:build
+
+      # - name: Set base URL for VitePress build
+      #   run: |
+      #     REPO_NAME=$(basename $(git rev-parse --show-toplevel))
+      #     echo "VITE_BASE_URL=/${REPO_NAME}/" >> $GITHUB_ENV
+
       - name: Setup Pages
+        id: pages # ID for output access
         uses: actions/configure-pages@v4
+
+      - name: Build Main Docs
+        run: | 
+          # Clean any current docs and copy over main
+          rm -rf builder-repo/Documentation~
+          cp -R main-repo/Documentation~ builder-repo/Documentation~
+
+          cd builder-repo/WebsiteDocs~
+          npm ci
+          VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
+          npm run docs:build
+
+          # Copy docs to final place
+          mkdir -p $GITHUB_WORKSPACE/final-dist
+          cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/
+
+      - name: Build Dev Docs
+        run: | 
+          # Clean any current docs and copy over dev
+          rm -rf builder-repo/Documentation~
+          cp -R dev-repo/Documentation~ builder-repo/Documentation~
+
+          # We use the root package.json to get the version
+          cp dev-repo/package.json builder-repo/package.json
+
+          cd builder-repo/WebsiteDocs~
+          npm ci
+          VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
+          npm run docs:build
+
+          # Copy docs to final place
+          mkdir -p $GITHUB_WORKSPACE/final-dist/dev
+          cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/dev
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: './WebsiteDocs~/.vitepress/dist'
+          path: './final-dist'
+
       - name: Deploy pages to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -12,7 +12,8 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/home' }
+      { text: 'Home', link: '/home' },
+      getVersionDropDown()
       //{ text: 'Examples', link: '/markdown-examples' }
     ],
 
@@ -86,8 +87,7 @@ export default defineConfig({
   },
 })
 
-function getFirstListItemText(tokens: Token[]) : Token | null{
-
+function getFirstListItemText(tokens: Token[]) : Token | null {
   for(let i=0; i<tokens.length;i++) {
     if(tokens[i].content.length > 0) return tokens[i];
     if(tokens[i].children && tokens[i].children!.length > 0) {
@@ -96,5 +96,23 @@ function getFirstListItemText(tokens: Token[]) : Token | null{
     }
   }
   return null;
-  
+}
+
+function getVersionDropDown() {
+
+  const version = process.env.VITE_DEV_VERSION || 'v0.1';
+  const devText = `dev (${version})`;
+  const baseURL = process.env.VITE_BASE_URL || '/';
+  const isDevURL = baseURL.includes('/dev/') ?? false;  
+
+  return {
+    text: isDevURL ?  devText : 'main',
+    items: [
+      { 
+        text: isDevURL ? 'main' : devText, 
+        link: isDevURL ? '../' : '/dev/',
+        target: '_self' // skip the vitepress routing and treat as external link
+      }
+    ]
+  }
 }
