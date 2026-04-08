@@ -65,36 +65,49 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
-        if: always()
+        if: inputs.testMode == 'editmode' || inputs.testMode == 'playmode'
         with:
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
 
       - uses: actions/upload-artifact@v4
         name: Upload Coverage Artifacts
-        if: always()
+        if: inputs.testMode == 'editmode' || inputs.testMode == 'playmode'
         with:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Add Unity Code Coverage (robust)
+      - name: Add Class Coverage Breakdown
+        if: inputs.testMode == 'editmode'
         shell: bash
         run: |
-          FILE=${{ steps.tests.outputs.coveragePath }}/TempProject-opencov/Automated/TestCoverageResults_0000.xml
+          FILE=CodeCoverage/TempProject-opencov/Automated/TestCoverageResults_0000.xml
 
           if [ ! -f "$FILE" ]; then
             echo "Coverage file not found!" >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
-          LINE_RATE=$(xmllint --xpath "string(//Summary/@sequenceCoverage)" "$FILE" 2>/dev/null || echo "0")
-          BRANCH_RATE=$(xmllint --xpath "string(//Summary/@branchCoverage)" "$FILE" 2>/dev/null || echo "0")
+          echo "## 🧪 Class Coverage Breakdown" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Class | Line % | Branch % |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
 
-          LINE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $LINE_RATE * 100}")
-          BRANCH_PERCENT=$(awk "BEGIN {printf \"%.2f\", $BRANCH_RATE * 100}")
+          # Count classes
+          COUNT=$(xmllint --xpath "count(//Class)" "$FILE")
 
-          echo "## 🧪 Unity Code Coverage" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Line Coverage | ${LINE_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch Coverage | ${BRANCH_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
+          for ((i=1;i<=COUNT;i++)); do
+            CLASS_NAME=$(xmllint --xpath "string(//Class[$i]/FullName)" "$FILE")
+            LINE_RATE=$(xmllint --xpath "string(//Class[$i]/Summary/@sequenceCoverage)" "$FILE")
+            BRANCH_RATE=$(xmllint --xpath "string(//Class[$i]/Summary/@branchCoverage)" "$FILE")
+
+            LINE_RATE=${LINE_RATE:-0}
+            BRANCH_RATE=${BRANCH_RATE:-0}
+
+            LINE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $LINE_RATE * 100}")
+            BRANCH_PERCENT=$(awk "BEGIN {printf \"%.2f\", $BRANCH_RATE * 100}")
+
+            if (( $(echo "$LINE_PERCENT > 0" | bc -l) )); then
+              echo "| $CLASS_NAME | ${LINE_PERCENT}% | ${BRANCH_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
