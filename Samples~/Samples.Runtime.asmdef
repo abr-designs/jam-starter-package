@@ -1,0 +1,30 @@
+{
+    "name": "Samples.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "Jam-starter.Runtime",
+        "NaughtyAttributes.Core",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.Cinemachine",
+        "Unity.Splines",
+        "Jam-Stater.Runtime.Geodesics"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "NAUGHTY"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.dbrizov.naughtyattributes",
+            "expression": "2.1.4",
+            "define": "NAUGHTY"
+        }
+    ],
+    "noEngineReferences": false
+}
