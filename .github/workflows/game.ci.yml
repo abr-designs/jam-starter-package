@@ -2,13 +2,13 @@ name: Test package
 on: [push, pull_request]
 run-name: >
   Testing Package From ${{ github.event_name == 'pull_request' &&
-      format('PR #{0} [{1}] - {2}',
+      format('🔀 PR #{0} [{1}] - {2}',
         github.event.pull_request.number,
         github.head_ref,
         github.event.pull_request.title
       )
     ||
-      format('Push [{0}]',
+      format('➡️ Push [{0}]',
         github.ref_name
       )
   }}
@@ -18,14 +18,14 @@ jobs:
     permissions:
       checks: write
     environment: game.ci
-    name: Test in ${{ matrix.testMode }}
+    name: Test in ${{ matrix.testMode }} - ${{ matrix.unityVersion }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         projectPath: [test-project/Packages/com.abrds.jam-starter]
         unityVersion: ['6000.4.1f1'] # some version must be included for package testing
-        testMode: [editmode, playmode]
+        testMode: [editmode, playmode, Standalone]
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,12 @@ jobs:
           PROJECT=${{ matrix.projectPath }}
           mkdir -p $PROJECT
           rsync -a --exclude test-project ./ $PROJECT      
+
+      - name: Create TempProject Directory & Copy samples
+        run: |
+          SAMPLES=TempProject/Assets/Samples
+          mkdir -p $SAMPLES
+          rsync -a Samples~/ $SAMPLES      
 
       - uses: game-ci/unity-test-runner@v4
         name: Run Tests
@@ -54,7 +60,7 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+Jam-starter.*'
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
           customParameters: -nographics -batchmode
 
       - uses: actions/upload-artifact@v4
@@ -70,3 +76,25 @@ jobs:
         with:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
+
+      - name: Extract Unity Coverage & Add to Summary
+        run: |
+          FILE=${{ steps.tests.outputs.coveragePath }}/TempProject-opencov/Automated/TestCoverageResults_0000.xml
+
+          if [ ! -f "$FILE" ]; then
+            echo "Coverage file not found!" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          LINE_RATE=$(grep -oP 'line-rate="\K[0-9.]+' "$FILE")
+          BRANCH_RATE=$(grep -oP 'branch-rate="\K[0-9.]+' "$FILE")
+
+          LINE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $LINE_RATE * 100}")
+          BRANCH_PERCENT=$(awk "BEGIN {printf \"%.2f\", $BRANCH_RATE * 100}")
+
+          echo "## 🧪 Unity Code Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Line Coverage | ${LINE_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch Coverage | ${BRANCH_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
