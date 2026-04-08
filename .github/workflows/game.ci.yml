@@ -21,7 +21,7 @@ jobs:
     name: Test in ${{ matrix.testMode }} - ${{ matrix.unityVersion }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         projectPath: [test-project/Packages/com.abrds.jam-starter]
         unityVersion: ['6000.4.1f1'] # some version must be included for package testing
@@ -77,7 +77,8 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Extract Unity Coverage & Add to Summary
+      - name: Add Unity Code Coverage (robust)
+        shell: bash
         run: |
           FILE=${{ steps.tests.outputs.coveragePath }}/TempProject-opencov/Automated/TestCoverageResults_0000.xml
 
@@ -86,14 +87,13 @@ jobs:
             exit 0
           fi
 
-          LINE_RATE=$(grep -oP 'line-rate="\K[0-9.]+' "$FILE")
-          BRANCH_RATE=$(grep -oP 'branch-rate="\K[0-9.]+' "$FILE")
+          LINE_RATE=$(xmllint --xpath "string(//Summary/@sequenceCoverage)" "$FILE" 2>/dev/null || echo "0")
+          BRANCH_RATE=$(xmllint --xpath "string(//Summary/@branchCoverage)" "$FILE" 2>/dev/null || echo "0")
 
           LINE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $LINE_RATE * 100}")
           BRANCH_PERCENT=$(awk "BEGIN {printf \"%.2f\", $BRANCH_RATE * 100}")
 
           echo "## 🧪 Unity Code Coverage" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Line Coverage | ${LINE_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
