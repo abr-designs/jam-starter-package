@@ -129,55 +129,68 @@ jobs:
         run: |
           python3 << 'EOF'
           import re
+          import os
 
-          file_path = "CodeCoverage/Report/index.html"
+          file_path = "${{ steps.tests.outputs.coveragePath }}/Report/index.html"
 
-          with open(file_path, "r", encoding="utf-8") as f:
-              html = f.read()
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
 
-          rows = re.findall(r"<tr>.*?</tr>", html, re.DOTALL)
+              if not os.path.exists(file_path):
+                  summary.write("## ❌ Coverage Summary\n\n")
+                  summary.write(f"File not found: `{file_path}`\n")
+                  exit(0)
 
-          def get_emoji(percent):
-              if percent >= 80:
-                  return "🟩"
-              elif percent >= 50:
-                  return "🟨"
-              else:
-                  return "🟥"
+              with open(file_path, "r", encoding="utf-8") as f:
+                  html = f.read()
 
-          output = []
-          output.append("## 📊 Code Coverage Summary\n\n")
-          output.append("| Module | Coverage | Lines |\n")
-          output.append("|--------|----------|--------|\n")
+              rows = re.findall(r"<tr.*?>.*?</tr>", html, re.DOTALL)
 
-          for row in rows:
-              # name (either <th> or <a>)
-              name_match = re.search(r"<a[^>]*>(.*?)</a>", row)
-              if name_match:
-                  name = name_match.group(1)
-              else:
-                  name_match = re.search(r"<th[^>]*>(.*?)</th>", row)
-                  if not name_match:
+              summary.write("## 📊 Code Coverage Summary\n\n")
+              summary.write(f"_Found {len(rows)} table rows_\n\n")
+
+              summary.write("| Module | Coverage | Lines |\n")
+              summary.write("|--------|----------|--------|\n")
+
+              def get_emoji(percent):
+                  if percent >= 80:
+                      return "🟩"
+                  elif percent >= 50:
+                      return "🟨"
+                  else:
+                      return "🟥"
+
+              added = 0
+
+              for row in rows:
+                  # name (th OR anchor)
+                  name_match = re.search(r"<a[^>]*>(.*?)</a>", row)
+                  if name_match:
+                      name = name_match.group(1)
+                  else:
+                      name_match = re.search(r"<th[^>]*>(.*?)</th>", row)
+                      if not name_match:
+                          continue
+                      name = name_match.group(1)
+
+                  # coverage X/Y
+                  coverage_match = re.search(r'LineCoverage:\s*([0-9]+/[0-9]+)', row)
+
+                  # percent (more flexible)
+                  percent_match = re.search(r'>(\d+(?:\.\d+)?)%</', row)
+
+                  if not coverage_match or not percent_match:
                       continue
-                  name = name_match.group(1)
 
-              # percent
-              percent_match = re.search(r'class="right">([\d\.]+%)<', row)
-              # coverage (X/Y)
-              coverage_match = re.search(r'title="LineCoverage:\s*([^"]+)"', row)
+                  percent_value = float(percent_match.group(1))
+                  percent_text = f"{percent_value}%"
+                  lines = coverage_match.group(1)
 
-              if not percent_match or not coverage_match:
-                  continue
+                  emoji = get_emoji(percent_value)
 
-              percent_text = percent_match.group(1)
-              percent_value = float(percent_text.replace("%", ""))
-              lines = coverage_match.group(1)
+                  summary.write(f"| {emoji} {name} | {percent_text} | {lines} |\n")
+                  added += 1
 
-              emoji = get_emoji(percent_value)
-
-              output.append(f"| {emoji} {name} | {percent_text} | {lines} |\n")
-
-          with open("$GITHUB_STEP_SUMMARY", "a") as summary:
-              summary.writelines(output)
+              if added == 0:
+                  summary.write("\n⚠️ No coverage rows parsed. HTML format likely changed.\n")
 
           EOF
