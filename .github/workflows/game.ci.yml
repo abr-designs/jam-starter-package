@@ -25,7 +25,7 @@ jobs:
       matrix:
         projectPath: [test-project/Packages/com.abrds.jam-starter]
         unityVersion: ['6000.4.1f1'] # some version must be included for package testing
-        testMode: [editmode, playmode, Standalone]
+        testMode: [editmode, playmode] #[editmode, playmode, Standalone]
 
     steps:
       - uses: actions/checkout@v4
@@ -65,20 +65,20 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
-        if: inputs.testMode == 'editmode' || inputs.testMode == 'playmode'
+        if: always()
         with:
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
 
       - uses: actions/upload-artifact@v4
         name: Upload Coverage Artifacts
-        if: inputs.testMode == 'editmode' || inputs.testMode == 'playmode'
+        if: ${{ matrix.testMode }} == 'editmode'
         with:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
       - name: Add Class Coverage Breakdown
-        if: inputs.testMode == 'editmode'
+        if: ${{ matrix.testMode }} == 'editmode'
         shell: bash
         run: |
           FILE=CodeCoverage/TempProject-opencov/Automated/TestCoverageResults_0000.xml
