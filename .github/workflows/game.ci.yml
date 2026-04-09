@@ -77,11 +77,15 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
+      - name: Install xmllint
+        if: ${{ matrix.testMode }} == 'editmode'
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
       - name: Add Class Coverage Breakdown
         if: ${{ matrix.testMode }} == 'editmode'
         shell: bash
         run: |
-          FILE=CodeCoverage/TempProject-opencov/Automated/TestCoverageResults_0000.xml
+          FILE=${{ steps.tests.outputs.coveragePath }}/TempProject-opencov/Automated/TestCoverageResults_0000.xml
 
           if [ ! -f "$FILE" ]; then
             echo "Coverage file not found!" >> $GITHUB_STEP_SUMMARY
@@ -93,7 +97,6 @@ jobs:
           echo "| Class | Line % | Branch % |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
 
-          # Count classes
           COUNT=$(xmllint --xpath "count(//Class)" "$FILE")
 
           for ((i=1;i<=COUNT;i++)); do
