@@ -124,7 +124,7 @@ jobs:
         with:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
-          
+
       - name: Generate Coverage Summary Table
         run: |
           python3 << 'EOF'
@@ -181,53 +181,3 @@ jobs:
               summary.writelines(output)
 
           EOF
-              if: always()
-              run: |
-                python3 << 'EOF'
-                from bs4 import BeautifulSoup
-
-                file_path = "CodeCoverage/Report/index.html"
-
-                with open(file_path, "r", encoding="utf-8") as f:
-                    soup = BeautifulSoup(f, "html.parser")
-
-                rows = soup.find_all("tr")
-
-                def get_emoji(percent):
-                    if percent >= 80:
-                        return "🟩"
-                    elif percent >= 50:
-                        return "🟨"
-                    else:
-                        return "🟥"
-
-                output = []
-                output.append("## 📊 Code Coverage Summary\n")
-                output.append("| Module | Coverage | Lines |\n")
-                output.append("|--------|----------|--------|\n")
-
-                for row in rows:
-                    name_cell = row.find(["th", "td"])
-                    coverage_cell = row.find("td", {"class": "right", "title": True})
-
-                    if not name_cell or not coverage_cell:
-                        continue
-
-                    name = name_cell.get_text(strip=True)
-                    percent_text = coverage_cell.get_text(strip=True)
-                    title = coverage_cell.get("title", "")
-
-                    try:
-                        percent_value = float(percent_text.replace("%", ""))
-                    except:
-                        continue
-
-                    lines = title.replace("LineCoverage: ", "")
-                    emoji = get_emoji(percent_value)
-
-                    output.append(f"| {emoji} {name} | {percent_text} | {lines} |\n")
-
-                with open("$GITHUB_STEP_SUMMARY", "a") as summary:
-                    summary.writelines(output)
-
-                EOF
