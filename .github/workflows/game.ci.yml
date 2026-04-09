@@ -45,6 +45,16 @@ jobs:
           mkdir -p $SAMPLES
           rsync -a Samples~/ $SAMPLES      
 
+      - uses: actions/cache/restore@v5
+        name: Restore Library Cache
+        id: project-library-restore
+        with:
+          path: TempProject/Library
+          key: Library-TempProject
+          restore-keys: |
+            Library-TempProject-
+            Library-
+
       - uses: game-ci/unity-test-runner@v4
         name: Run Tests
         id: tests
@@ -63,33 +73,25 @@ jobs:
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
           customParameters: -nographics -batchmode
 
-      ###############################################################
-      ###############################################################
-      ###############################################################
-
-      - uses: actions/cache@v3
-        name: Cache
-        if: ${{ matrix.testMode }} == 'editmode'
+      - uses: actions/cache/save@v5
+        name: Save Library Cache
+        id: project-library-save
         with:
           path: TempProject/Library
-          key: Library-TempProject-WebGL
-          restore-keys: |
-            Library-TempProject-
-            Library-
+          key: Library-TempProject
 
       - uses: game-ci/unity-builder@v4
-        name: Build Test
-        if: ${{ matrix.testMode }} == 'editmode'
+        if: ${{ matrix.testMode == 'editmode'}}
+        name: WebGL Build Test
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: TempProject
+          allowDirtyBuild: true
           unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: WebGL
-
-      ###############################################################
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
@@ -104,7 +106,7 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Parse Coverage HTML
+      - name: Generate Coverage Summary Table
         run: |
           python3 << 'EOF'
           from bs4 import BeautifulSoup
@@ -116,7 +118,18 @@ jobs:
 
           rows = soup.find_all("tr")
 
-          print("## 📊 Code Coverage Breakdown")
+          def get_emoji(percent):
+              if percent >= 80:
+                  return "🟩"
+              elif percent >= 50:
+                  return "🟨"
+              else:
+                  return "🟥"
+
+          output = []
+          output.append("## 📊 Code Coverage Summary\n")
+          output.append("| Module | Coverage | Lines |\n")
+          output.append("|--------|----------|--------|\n")
 
           for row in rows:
               name_cell = row.find(["th", "td"])
@@ -126,8 +139,20 @@ jobs:
                   continue
 
               name = name_cell.get_text(strip=True)
-              percent = coverage_cell.get_text(strip=True)
+              percent_text = coverage_cell.get_text(strip=True)
               title = coverage_cell.get("title", "")
 
-              print(f"- **{name}** → {percent} ({title.replace('LineCoverage: ', '')})")
+              try:
+                  percent_value = float(percent_text.replace("%", ""))
+              except:
+                  continue
+
+              lines = title.replace("LineCoverage: ", "")
+              emoji = get_emoji(percent_value)
+
+              output.append(f"| {emoji} {name} | {percent_text} | {lines} |\n")
+
+          with open("$GITHUB_STEP_SUMMARY", "a") as summary:
+              summary.writelines(output)
+
           EOF
