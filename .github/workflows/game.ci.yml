@@ -60,13 +60,41 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
           customParameters: -nographics -batchmode
+
+      ###############################################################
+      ###############################################################
+      ###############################################################
+
+      - uses: actions/cache@v3
+        name: Cache
+        if: ${{ matrix.testMode }} == 'editmode'
+        with:
+          path: TempProject/Library
+          key: Library-TempProject-WebGL
+          restore-keys: |
+            Library-TempProject-
+            Library-
+
+      - uses: game-ci/unity-builder@v4
+        name: Build Test
+        if: ${{ matrix.testMode }} == 'editmode'
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          projectPath: TempProject
+          unityVersion: ${{ matrix.unityVersion }}
+          targetPlatform: WebGL
+
+      ###############################################################
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
         if: always()
-        with:
+        with: 
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
 
@@ -77,40 +105,30 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Install xmllint
-        if: ${{ matrix.testMode }} == 'editmode'
-        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
-
-      - name: Add Class Coverage Breakdown
-        if: ${{ matrix.testMode }} == 'editmode'
-        shell: bash
+      - name: Parse Coverage HTML
         run: |
-          FILE=${{ steps.tests.outputs.coveragePath }}/TempProject-opencov/Automated/TestCoverageResults_0000.xml
+          python3 << 'EOF'
+          from bs4 import BeautifulSoup
 
-          if [ ! -f "$FILE" ]; then
-            echo "Coverage file not found!" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
+          file_path = "CodeCoverage/Report/index.html"
 
-          echo "## 🧪 Class Coverage Breakdown" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Class | Line % | Branch % |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          with open(file_path, "r", encoding="utf-8") as f:
+              soup = BeautifulSoup(f, "html.parser")
 
-          COUNT=$(xmllint --xpath "count(//Class)" "$FILE")
+          rows = soup.find_all("tr")
 
-          for ((i=1;i<=COUNT;i++)); do
-            CLASS_NAME=$(xmllint --xpath "string(//Class[$i]/FullName)" "$FILE")
-            LINE_RATE=$(xmllint --xpath "string(//Class[$i]/Summary/@sequenceCoverage)" "$FILE")
-            BRANCH_RATE=$(xmllint --xpath "string(//Class[$i]/Summary/@branchCoverage)" "$FILE")
+          print("## 📊 Code Coverage Breakdown")
 
-            LINE_RATE=${LINE_RATE:-0}
-            BRANCH_RATE=${BRANCH_RATE:-0}
+          for row in rows:
+              name_cell = row.find(["th", "td"])
+              coverage_cell = row.find("td", {"class": "right", "title": True})
 
-            LINE_PERCENT=$(awk "BEGIN {printf \"%.2f\", $LINE_RATE * 100}")
-            BRANCH_PERCENT=$(awk "BEGIN {printf \"%.2f\", $BRANCH_RATE * 100}")
+              if not name_cell or not coverage_cell:
+                  continue
 
-            if (( $(echo "$LINE_PERCENT > 0" | bc -l) )); then
-              echo "| $CLASS_NAME | ${LINE_PERCENT}% | ${BRANCH_PERCENT}% |" >> $GITHUB_STEP_SUMMARY
-            fi
-          done
+              name = name_cell.get_text(strip=True)
+              percent = coverage_cell.get_text(strip=True)
+              title = coverage_cell.get("title", "")
+
+              print(f"- **{name}** → {percent} ({title.replace('LineCoverage: ', '')})")
+          EOF
