@@ -6,17 +6,13 @@ on:
     - 'WebsiteDocs~/**'
     - 'WebGLTemplates~/**'
     - 'Documentation~/**'
-    - 'README.md'
-    - 'CHANGELOG.md'
-    - 'LICENSE.md'
+    - '*.md'
   pull_request:
     paths-ignore:
     - 'WebsiteDocs~/**'
     - 'WebGLTemplates~/**'
     - 'Documentation~/**'
-    - 'README.md'
-    - 'CHANGELOG.md'
-    - 'LICENSE.md'
+    - '*.md'
 
 run-name: >
   Testing Package From ${{ github.event_name == 'pull_request' &&
@@ -68,10 +64,10 @@ jobs:
         id: project-library-restore
         with:
           path: TempProject/Library
-          key: Library-TempProject
+          key: ${{ matrix.testMode }}-Library-TempProject
           restore-keys: |
-            Library-TempProject-
-            Library-
+            ${{ matrix.testMode }}-Library-TempProject-
+            ${{ matrix.testMode }}-Library-
 
       - uses: game-ci/unity-test-runner@v4
         name: Run Tests
@@ -88,7 +84,7 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
+          coverageOptions: 'generateBadgeReport;generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
           customParameters: -nographics -batchmode
 
       - uses: actions/cache/save@v5
@@ -96,20 +92,7 @@ jobs:
         id: project-library-save
         with:
           path: TempProject/Library
-          key: Library-TempProject
-
-      #- uses: game-ci/unity-builder@v4
-      #  if: ${{ matrix.testMode == 'editmode'}}
-      #  name: WebGL Build Test
-      #  env:
-      #    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      #    UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      #    UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      #  with:
-      #    projectPath: TempProject
-      #    allowDirtyBuild: true
-      #    unityVersion: ${{ matrix.unityVersion }}
-      #    targetPlatform: WebGL
+          key: ${{ matrix.testMode }}-Library-TempProject
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts
@@ -125,7 +108,7 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Generate Coverage Summary Table
+      - name: Generate Coverage Summary + Badge
         run: |
           python3 << 'EOF'
           import re
@@ -133,7 +116,9 @@ jobs:
 
           file_path = "${{ steps.tests.outputs.coveragePath }}/Report/index.html"
 
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+          summary_path = os.environ["GITHUB_STEP_SUMMARY"]
+
+          with open(summary_path, "a") as summary:
 
               if not os.path.exists(file_path):
                   summary.write("## ❌ Coverage Summary\n\n")
@@ -143,13 +128,56 @@ jobs:
               with open(file_path, "r", encoding="utf-8") as f:
                   html = f.read()
 
+              # ---------------------------
+              # 🏷️ EXTRACT BADGE
+              # ---------------------------
+              badge_match = re.search(r'<img[^>]+src="([^"]+badge[^"]+)"', html)
+
+              if badge_match:
+                  badge_url = badge_match.group(1)
+                  summary.write(f"![Coverage Badge]({badge_url})\n\n")
+
+              # ---------------------------
+              # 📊 SUMMARY TABLE
+              # ---------------------------
+              summary.write("## 📊 Coverage Overview\n\n")
+
+              overview_match = re.search(
+                  r'<table class="overview.*?">(.*?)</table>',
+                  html,
+                  re.DOTALL
+              )
+
+              if overview_match:
+                  overview_html = overview_match.group(1)
+                  rows = re.findall(r"<tr>(.*?)</tr>", overview_html, re.DOTALL)
+
+                  summary.write("| Metric | Value |\n")
+                  summary.write("|--------|--------|\n")
+
+                  for row in rows:
+                      th = re.search(r"<th[^>]*>(.*?)</th>", row)
+                      td = re.search(r"<td[^>]*>(.*?)</td>", row)
+
+                      if not th or not td:
+                          continue
+
+                      key = re.sub("<.*?>", "", th.group(1)).strip()
+                      value = re.sub("<.*?>", "", td.group(1)).strip()
+
+                      summary.write(f"| {key} | {value} |\n")
+              else:
+                  summary.write("⚠️ Could not find summary table\n")
+
+              # ---------------------------
+              # 📉 DETAILED FILE COVERAGE
+              # ---------------------------
+              summary.write("\n## 📉 File Coverage (Filtered)\n\n")
+
               rows = re.findall(r"<tr.*?>.*?</tr>", html, re.DOTALL)
 
-              summary.write("## 📊 Code Coverage Summary\n\n")
-              summary.write(f"_Found {len(rows)} table rows_\n\n")
-
-              summary.write("| Module | Coverage | Lines |\n")
-              summary.write("|--------|----------|--------|\n")
+              summary.write("| File | Coverage | Lines |\n")
+              summary.write("|------|----------|--------|\n")
 
               def get_emoji(percent):
                   if percent >= 80:
@@ -159,23 +187,17 @@ jobs:
                   else:
                       return "🟥"
 
-              added = 0
+              entries = []
 
               for row in rows:
-                  # name (th OR anchor)
+                  # ONLY rows with <a> (skip <th> assemblies)
                   name_match = re.search(r"<a[^>]*>(.*?)</a>", row)
-                  if name_match:
-                      name = name_match.group(1)
-                  else:
-                      name_match = re.search(r"<th[^>]*>(.*?)</th>", row)
-                      if not name_match:
-                          continue
-                      name = name_match.group(1)
+                  if not name_match:
+                      continue
 
-                  # coverage X/Y
+                  name = name_match.group(1)
+
                   coverage_match = re.search(r'LineCoverage:\s*([0-9]+/[0-9]+)', row)
-
-                  # percent (more flexible)
                   percent_match = re.search(r'>(\d+(?:\.\d+)?)%</', row)
 
                   if not coverage_match or not percent_match:
@@ -185,12 +207,14 @@ jobs:
                   percent_text = f"{percent_value}%"
                   lines = coverage_match.group(1)
 
+                  entries.append((percent_value, name, percent_text, lines))
+
+              # Sort worst → best (so problems are obvious)
+              for percent_value, name, percent_text, lines in sorted(entries):
                   emoji = get_emoji(percent_value)
-
                   summary.write(f"| {emoji} {name} | {percent_text} | {lines} |\n")
-                  added += 1
 
-              if added == 0:
-                  summary.write("\n⚠️ No coverage rows parsed. HTML format likely changed.\n")
+              if not entries:
+                  summary.write("\n⚠️ No file-level coverage rows parsed.\n")
 
           EOF
