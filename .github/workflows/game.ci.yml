@@ -1,12 +1,12 @@
 # Cheat Sheet: https://github.github.io/actions-cheat-sheet/actions-cheat-sheet.html
 name: Test package
 on: 
-  push:
-    paths-ignore:
-    - 'WebsiteDocs~/**'
-    - 'WebGLTemplates~/**'
-    - 'Documentation~/**'
-    - '*.md'
+  #push:
+  #  paths-ignore:
+  #  - 'WebsiteDocs~/**'
+  #  - 'WebGLTemplates~/**'
+  #  - 'Documentation~/**'
+  #  - '*.md'
   pull_request:
     paths-ignore:
     - 'WebsiteDocs~/**'
@@ -84,7 +84,7 @@ jobs:
           artifactsPath: ${{ matrix.testMode }}-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
-          coverageOptions: 'generateBadgeReport;generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
+          coverageOptions: 'generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
           customParameters: -nographics -batchmode
 
       - uses: actions/cache/save@v5
@@ -108,7 +108,7 @@ jobs:
           name: Coverage results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.coveragePath }}
 
-      - name: Generate Coverage Summary + Badge
+      - name: Generate Coverage Summary
         run: |
           python3 << 'EOF'
           import re
@@ -127,15 +127,6 @@ jobs:
 
               with open(file_path, "r", encoding="utf-8") as f:
                   html = f.read()
-
-              # ---------------------------
-              # 🏷️ EXTRACT BADGE
-              # ---------------------------
-              badge_match = re.search(r'<img[^>]+src="([^"]+badge[^"]+)"', html)
-
-              if badge_match:
-                  badge_url = badge_match.group(1)
-                  summary.write(f"![Coverage Badge]({badge_url})\n\n")
 
               # ---------------------------
               # 📊 SUMMARY TABLE
