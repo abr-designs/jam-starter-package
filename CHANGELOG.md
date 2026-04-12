@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Updated workflow to use the triggering branch ``WebsiteDocs~`` for building, the workflow will checkout the ``main`` and ``develop/v*`` branches itself
 
 ### Fixed
-- 
+- Resolved issues with `NaughtyAttributes` attempted references before it was loaded
+- Added missing UGUI dependency for Unity 6000.3+ into `package.json`
 
 ## [0.0.9] - 2026-04-01
 
