@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Utilities;
@@ -13,7 +12,7 @@ namespace Levels
 #if UNITY_EDITOR
         [SerializeField, Header("Debugging")]
         private bool useDebug;
-        [SerializeField, Min(0), EnableIf("useDebug")]
+        [SerializeField, Min(0)]
         private int debugLoadIndex;
 #endif
         
