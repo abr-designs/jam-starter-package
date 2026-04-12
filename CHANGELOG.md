@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
 - Added missing UGUI dependency for Unity 6000.3+ into `package.json`
+- npm packages updated to fix CVE alerts 
 
 ## [0.0.9] - 2026-04-01
 
