@@ -1,0 +1,211 @@
+# Cheat Sheet: https://github.github.io/actions-cheat-sheet/actions-cheat-sheet.html
+name: Test package
+on: 
+  #push:
+  #  paths-ignore:
+  #  - 'WebsiteDocs~/**'
+  #  - 'WebGLTemplates~/**'
+  #  - 'Documentation~/**'
+  #  - '*.md'
+  pull_request:
+    paths-ignore:
+    - 'WebsiteDocs~/**'
+    - 'WebGLTemplates~/**'
+    - 'Documentation~/**'
+    - '*.md'
+
+run-name: >
+  Testing Package From ${{ github.event_name == 'pull_request' &&
+      format('🔀 PR #{0} [{1}] - {2}',
+        github.event.pull_request.number,
+        github.head_ref,
+        github.event.pull_request.title
+      )
+    ||
+      format('➡️ Push [{0}]',
+        github.ref_name
+      )
+  }}
+
+jobs:
+  testAllModes:
+    permissions:
+      checks: write
+    environment: game.ci
+    name: Test in ${{ matrix.testMode }} - ${{ matrix.unityVersion }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        projectPath: [test-project/Packages/com.abrds.jam-starter]
+        unityVersion: ['6000.4.1f1'] # some version must be included for package testing
+        testMode: [editmode, playmode] #[editmode, playmode, Standalone]
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Download package
+        with:
+          lfs: true
+
+      - name: Create test-project Directory & Copy package
+        run: |
+          PROJECT=${{ matrix.projectPath }}
+          mkdir -p $PROJECT
+          rsync -a --exclude test-project ./ $PROJECT      
+
+      - name: Create TempProject Directory & Copy samples
+        run: |
+          SAMPLES=TempProject/Assets/Samples
+          mkdir -p $SAMPLES
+          rsync -a Samples~/ $SAMPLES      
+
+      - uses: actions/cache/restore@v5
+        name: Restore Library Cache
+        id: project-library-restore
+        with:
+          path: TempProject/Library
+          key: ${{ matrix.testMode }}-Library-TempProject
+          restore-keys: |
+            ${{ matrix.testMode }}-Library-TempProject-
+            ${{ matrix.testMode }}-Library-
+
+      - uses: game-ci/unity-test-runner@v4
+        name: Run Tests
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          packageMode: true
+          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ${{ matrix.testMode }} Test Results
+          coverageOptions: 'generateHtmlReport;assemblyFilters:+Jam-starter.*,+FixedPaletteTool.Runtime'
+          customParameters: -nographics -batchmode
+
+      - uses: actions/cache/save@v5
+        name: Save Library Cache
+        id: project-library-save
+        with:
+          path: TempProject/Library
+          key: ${{ matrix.testMode }}-Library-TempProject
+
+      - uses: actions/upload-artifact@v4
+        name: Upload Artifacts
+        if: always()
+        with: 
+          name: Test results for ${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
+
+      - uses: actions/upload-artifact@v4
+        name: Upload Coverage Artifacts
+        if: always()
+        with:
+          name: Coverage results for ${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.coveragePath }}
+
+      - name: Generate Coverage Summary
+        run: |
+          python3 << 'EOF'
+          import re
+          import os
+
+          file_path = "${{ steps.tests.outputs.coveragePath }}/Report/index.html"
+
+          summary_path = os.environ["GITHUB_STEP_SUMMARY"]
+
+          with open(summary_path, "a") as summary:
+
+              if not os.path.exists(file_path):
+                  summary.write("## ❌ Coverage Summary\n\n")
+                  summary.write(f"File not found: `{file_path}`\n")
+                  exit(0)
+
+              with open(file_path, "r", encoding="utf-8") as f:
+                  html = f.read()
+
+              # ---------------------------
+              # 📊 SUMMARY TABLE
+              # ---------------------------
+              summary.write("## 📊 Coverage Overview\n\n")
+
+              overview_match = re.search(
+                  r'<table class="overview.*?">(.*?)</table>',
+                  html,
+                  re.DOTALL
+              )
+
+              if overview_match:
+                  overview_html = overview_match.group(1)
+                  rows = re.findall(r"<tr>(.*?)</tr>", overview_html, re.DOTALL)
+
+                  summary.write("| Metric | Value |\n")
+                  summary.write("|--------|--------|\n")
+
+                  for row in rows:
+                      th = re.search(r"<th[^>]*>(.*?)</th>", row)
+                      td = re.search(r"<td[^>]*>(.*?)</td>", row)
+
+                      if not th or not td:
+                          continue
+
+                      key = re.sub("<.*?>", "", th.group(1)).strip()
+                      value = re.sub("<.*?>", "", td.group(1)).strip()
+
+                      summary.write(f"| {key} | {value} |\n")
+              else:
+                  summary.write("⚠️ Could not find summary table\n")
+
+              # ---------------------------
+              # 📉 DETAILED FILE COVERAGE
+              # ---------------------------
+              summary.write("\n## 📉 File Coverage (Filtered)\n\n")
+
+              rows = re.findall(r"<tr.*?>.*?</tr>", html, re.DOTALL)
+
+              summary.write("| File | Coverage | Lines |\n")
+              summary.write("|------|----------|--------|\n")
+
+              def get_emoji(percent):
+                  if percent >= 80:
+                      return "🟩"
+                  elif percent >= 50:
+                      return "🟨"
+                  else:
+                      return "🟥"
+
+              entries = []
+
+              for row in rows:
+                  # ONLY rows with <a> (skip <th> assemblies)
+                  name_match = re.search(r"<a[^>]*>(.*?)</a>", row)
+                  if not name_match:
+                      continue
+
+                  name = name_match.group(1)
+
+                  coverage_match = re.search(r'LineCoverage:\s*([0-9]+/[0-9]+)', row)
+                  percent_match = re.search(r'>(\d+(?:\.\d+)?)%</', row)
+
+                  if not coverage_match or not percent_match:
+                      continue
+
+                  percent_value = float(percent_match.group(1))
+                  percent_text = f"{percent_value}%"
+                  lines = coverage_match.group(1)
+
+                  entries.append((percent_value, name, percent_text, lines))
+
+              # Sort worst → best (so problems are obvious)
+              for percent_value, name, percent_text, lines in sorted(entries):
+                  emoji = get_emoji(percent_value)
+                  summary.write(f"| {emoji} {name} | {percent_text} | {lines} |\n")
+
+              if not entries:
+                  summary.write("\n⚠️ No file-level coverage rows parsed.\n")
+
+          EOF
