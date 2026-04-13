@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
--
+- Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
 
 ### Changed
 - Updated documentation generation workflow
