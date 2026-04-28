@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
--
+- Added Prefab Gym & Zoo sample
+  - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
 
 ### Changed
 - Updated documentation generation workflow
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added restrictions on automatic building to the following
     - only commits on ``main`` or ``develop/v*`` with changes to ``Documentation~``, ``.github/workflows`` or ``WebsiteDocs~``
   - Updated workflow to use the triggering branch ``WebsiteDocs~`` for building, the workflow will checkout the ``main`` and ``develop/v*`` branches itself
+- Added `NAUGHTY` version define to [Jam-starter.Runtime.asmdef](Runtime/Jam-starter.Runtime.asmdef) to prevent exceptions on first compile
 
 ### Fixed
 - npm packages updated to fix CVE alerts 
