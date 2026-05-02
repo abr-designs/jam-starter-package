@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
+- Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
 - Added Prefab Gym & Zoo sample
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
 
@@ -21,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `NAUGHTY` version define to [Jam-starter.Runtime.asmdef](Runtime/Jam-starter.Runtime.asmdef) to prevent exceptions on first compile
 
 ### Fixed
+- Resolved issues with `NaughtyAttributes` attempted references before it was loaded
+- Added missing UGUI dependency for Unity 6000.3+ into `package.json`
 - npm packages updated to fix CVE alerts 
 
 ## [0.0.9] - 2026-04-01
