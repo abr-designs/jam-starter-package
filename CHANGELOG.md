@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added restrictions on automatic building to the following
     - only commits on ``main`` or ``develop/v*`` with changes to ``Documentation~``, ``.github/workflows`` or ``WebsiteDocs~``
   - Updated workflow to use the triggering branch ``WebsiteDocs~`` for building, the workflow will checkout the ``main`` and ``develop/v*`` branches itself
+- Added `ObservableCollection` NuGet package to `AddNugetPackages.cs`
+- Upgraded zLinq version from `1.5.4` to `1.5.6`
 
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded

@@ -13,7 +13,8 @@ namespace JamStarter.Editor
     {
         private static readonly (string packageId, string version)[] NugetPackages =
         {
-            ("ZLinq", "1.5.4"),
+            ("ZLinq", "1.5.6"),
+            ("ObservableCollections", "3.3.4")
         };
 
         //============================================================================================================//
