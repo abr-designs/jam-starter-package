@@ -9,8 +9,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
+- Added `ColorPickerInterceptor.cs` — global palette picker integration for all Color fields in the editor
+  - Activates via existing `FIXED_COLOR_INSPECTOR` scripting define (same toggle as MonoBehaviour inspector override)
+  - Intercepts `UnityEditor.ColorPicker` via `EditorApplication.update` + reflection — no shader or inspector modifications required
+  - Works across all inspectors (URP Lit, custom shaders, MonoBehaviours) without breaking ShaderGUI foldout structure
+  - Handles both callback path (custom editors) and `ColorPickerChanged` GUIView command path (EditorGUI.ColorField)
+  - Skips interception when no palette is configured or palette has no colors
 
 ### Changed
+- Updated `FixedPaletteSettings.cs`
+  - Added `materialColorSelect` field (`COLOR_SELECT`, default: `SHADES`) — controls display mode for Material Inspector palette picker
+- Updated `FixedPaletteSettingsProvider.cs`
+  - Added "Material Color Selector" dropdown to Project Settings UI, bound to `materialColorSelect`
 - Updated documentation generation workflow
   - Added ability to generate documentation website for ``main`` and ``develop/v*`` branches
   - Added website drop down to toggle versions
