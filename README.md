@@ -74,6 +74,7 @@ projects & Game jams.
 #### Custom NuGet Packages
 > _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
 - [ZLinq](https://github.com/Cysharp/ZLinq)
+- [ObservableCollections](https://github.com/Cysharp/ObservableCollections#unity)
 
 ## Contributing
 If you would like to contribute to this project, please review our [contribution guidelines](Documentation~/Contributing.md).
