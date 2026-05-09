@@ -61,6 +61,12 @@ namespace FixedColorPaletteTool.SettingsProviders
 
             container.Add(toggleAllInspectors);
 
+            // [Claude 2026-05-06 start]
+            var materialSelectorProperty = serializedObject.FindProperty(nameof(FixedPaletteSettings.materialColorSelect));
+            var materialSelectorField = new PropertyField(materialSelectorProperty, "Material Color Selector");
+            container.Add(materialSelectorField);
+            // [Claude 2026-05-06 end]
+
             var headerContainer = new VisualElement();
             headerContainer.style.flexDirection = FlexDirection.Row;
             headerContainer.style.flexGrow = 1;

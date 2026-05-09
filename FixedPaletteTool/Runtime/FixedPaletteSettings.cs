@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FixedColorPaletteTool.Enums;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -15,6 +16,7 @@ namespace FixedColorPaletteTool
         public const string AssetPath = "Assets/Settings/" + AssetName + ".asset";
         
         public ColorPaletteScriptableObject selectedPalette;
+        public COLOR_SELECT materialColorSelect = COLOR_SELECT.SHADES;
 
 #if !UNITY_EDITOR
         public static FixedPaletteSettings Instance => s_instance;
