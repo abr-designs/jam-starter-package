@@ -93,6 +93,11 @@
       "displayName": "Thumbnail Studio",
       "description": "Tool/Sample that enables you to create thumbnails of a collection of prefabs automatically.",
       "path": "Samples~/Thumbnail Studio"
+    },
+    {
+      "displayName": "Prefab Zoo & Gym",
+      "description": "Example prefab zoo & gym<a href=\"https://youtu.be/5PJRCz0t7yY?si=3rdhnLXqaTBd7aDQ\"><i>(see video)</i></a> to allow high overview of all assets within your project and to test them in real scenarios.",
+      "path": "Samples~/ZooGym"
     }
   ]
 }
