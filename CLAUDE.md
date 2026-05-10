@@ -2,6 +2,10 @@
 
 Guidance for Claude Code when working in this repo.
 
+## Critical Operating Instructions
+
+1. All changes made MUST be reflected with simple language into the CHANGELOG.md file
+
 ## What this repo is
 
 Unity 6 UPM package (`com.abrds.jam-starter`). Reusable game systems for game jam projects. Package dependency — not standalone Unity project.

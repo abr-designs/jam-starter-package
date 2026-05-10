@@ -179,7 +179,7 @@ namespace FixedColorPaletteTool
                 row.RegisterCallback<ClickEvent>(_ =>
                 {
                     m_onSelect?.Invoke(colorOption);
-                    Close();
+                    EditorApplication.delayCall += Close;
                 });
 
                 root.Add(row);

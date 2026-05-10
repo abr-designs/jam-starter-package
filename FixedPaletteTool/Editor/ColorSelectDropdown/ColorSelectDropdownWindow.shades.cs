@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Scripts.Utilities.Extensions;
 
@@ -110,7 +111,7 @@ namespace FixedColorPaletteTool
                 gridSlot.RegisterCallback<ClickEvent>(_ =>
                 {
                     m_onSelect?.Invoke(colorOption);
-                    Close();
+                    EditorApplication.delayCall += Close;
                 });
                 
                 return gridSlot;

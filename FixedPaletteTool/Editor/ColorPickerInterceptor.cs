@@ -7,26 +7,45 @@ using UnityEngine;
 
 namespace FixedColorPaletteTool
 {
+    // Runs unconditionally to repair the "CPickerHeight" EditorPref if it was
+    // corrupted to 0 by an earlier version of ColorPickerInterceptor that collapsed
+    // the picker's size before closing it. A 0-height pref prevents ColorPicker
+    // from ever rendering (SetHeight is gated on rect.height > 0 in OnGUI).
+    [InitializeOnLoad]
+    internal static class ColorPickerHeightPrefGuard
+    {
+        private const string k_HeightPrefKey = "CPickerHeight";
+        private const int k_MinValidHeight = 50;
+
+        static ColorPickerHeightPrefGuard()
+        {
+            var saved = EditorPrefs.GetInt(k_HeightPrefKey, k_MinValidHeight);
+            if (saved < k_MinValidHeight)
+                EditorPrefs.DeleteKey(k_HeightPrefKey);
+        }
+    }
+
 #if FIXED_COLOR_INSPECTOR
     [InitializeOnLoad]
     internal static class ColorPickerInterceptor
     {
-        private static readonly FieldInfo s_InstanceField;       // static ColorPicker s_Instance
-        private static readonly FieldInfo s_CallbackField;       // Action<Color> m_ColorChangedCallback
-        private static readonly FieldInfo s_DelegateViewField;   // GUIView m_DelegateView
-        private static readonly PropertyInfo s_ColorProperty;    // static Color color { get; set; }
-        private static readonly MethodInfo s_SendEventMethod;    // GUIView.SendEvent(Event e)
+        private static readonly FieldInfo s_InstanceField;    // static ColorPicker s_Instance
+        private static readonly FieldInfo s_CallbackField;    // Action<Color> m_ColorChangedCallback
+        private static readonly PropertyInfo s_ColorProperty; // static Color color { get; set; }
 
         private static readonly bool s_ReflectionOk;
         private static bool s_Intercepting;
-        private static EditorWindow s_OffscreenPicker;  // kept alive for GUIView path
-        private static EditorWindow s_DetectedPicker;   // picker seen last frame; wait one frame before intercepting
+        private static EditorWindow s_OffscreenPicker;      // kept alive for GUIView path
+        private static Vector2 s_PickerOriginalMinSize;     // saved before we collapse picker to zero
+        private static Vector2 s_PickerOriginalMaxSize;
+        private static Rect s_PickerOriginalPosition;       // saved before we move picker off-screen
+        private static EditorWindow s_DetectedPicker;       // picker seen last frame; wait one frame before intercepting
+        private static EditorWindow s_InterceptedPicker;    // instance we already handled; skip re-detection until cleared
 
         static ColorPickerInterceptor()
         {
             var editorAsm       = typeof(EditorWindow).Assembly;
             var colorPickerType = editorAsm.GetType("UnityEditor.ColorPicker");
-            var guiViewType     = editorAsm.GetType("UnityEditor.GUIView");
 
             if (colorPickerType == null)
             {
@@ -34,21 +53,13 @@ namespace FixedColorPaletteTool
                 return;
             }
 
-            var instFlags  = BindingFlags.Instance | BindingFlags.NonPublic;
-            var staticPriv = BindingFlags.Static   | BindingFlags.NonPublic;
-            var staticPub  = BindingFlags.Static   | BindingFlags.Public;
+            s_InstanceField = colorPickerType.GetField("s_Instance",             BindingFlags.Static   | BindingFlags.NonPublic);
+            s_CallbackField = colorPickerType.GetField("m_ColorChangedCallback", BindingFlags.Instance | BindingFlags.NonPublic);
+            s_ColorProperty = colorPickerType.GetProperty("color",               BindingFlags.Static   | BindingFlags.Public);
 
-            s_InstanceField     = colorPickerType.GetField("s_Instance",             staticPriv);
-            s_CallbackField     = colorPickerType.GetField("m_ColorChangedCallback", instFlags);
-            s_DelegateViewField = colorPickerType.GetField("m_DelegateView",         instFlags);
-            s_ColorProperty     = colorPickerType.GetProperty("color",               staticPub);
-            s_SendEventMethod   = guiViewType?.GetMethod("SendEvent",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null, new[] { typeof(Event) }, null);
-
-            s_ReflectionOk = s_InstanceField  != null
-                          && s_CallbackField  != null
-                          && s_ColorProperty  != null;
+            s_ReflectionOk = s_InstanceField != null
+                          && s_CallbackField != null
+                          && s_ColorProperty != null;
 
             if (s_ReflectionOk)
                 EditorApplication.update += OnUpdate;
@@ -65,6 +76,7 @@ namespace FixedColorPaletteTool
                     // Palette dismissed without selection — close any off-screen picker
                     CloseOffscreenPicker();
                     s_Intercepting = false;
+                    s_InterceptedPicker = null;
                 }
                 return;
             }
@@ -75,8 +87,14 @@ namespace FixedColorPaletteTool
             if (instance == null || !instance)
             {
                 s_DetectedPicker = null;
+                s_InterceptedPicker = null;
                 return;
             }
+
+            // Skip the instance we already intercepted — it may still be alive
+            // (GUIView path) or closing asynchronously (callback path). A new picker
+            // will be a different object reference.
+            if (instance == s_InterceptedPicker) return;
 
             // Wait one frame after first detecting the picker before intercepting.
             // ShowAsDropDown fails silently when called on the same frame the picker
@@ -93,10 +111,10 @@ namespace FixedColorPaletteTool
             catch { return; }
 
             s_Intercepting = true;
+            s_InterceptedPicker = instance;
 
-            var callback     = s_CallbackField.GetValue(instance) as Action<Color>;
-            var delegateView = s_DelegateViewField?.GetValue(instance);
-            var pickerPos    = instance.position;
+            var callback  = s_CallbackField.GetValue(instance) as Action<Color>;
+            var pickerPos = instance.position;
 
             if (callback != null)
             {
@@ -105,11 +123,18 @@ namespace FixedColorPaletteTool
             }
             else
             {
-                // GUIView path — inspector reads ColorPicker.color synchronously inside
-                // SendEvent, so the picker must stay alive until that call completes.
-                // Move it off-screen so it's invisible; closed in the selected callback.
-                instance.position = new Rect(-10000, -10000, pickerPos.width, pickerPos.height);
-                s_OffscreenPicker = instance;
+                // GUIView path — ColorPicker.color setter calls SetColor → OnColorChanged →
+                // m_DelegateView.SendEvent, so the picker must stay alive until SetValue is
+                // called. Collapse to zero size; Unity 6 clamps position so off-screen alone
+                // won't hide it. Save all original dimensions to restore before closing so
+                // neither EditorPrefs ("CPickerHeight") nor the layout file saves bad state.
+                s_PickerOriginalMinSize  = instance.minSize;
+                s_PickerOriginalMaxSize  = instance.maxSize;
+                s_PickerOriginalPosition = instance.position;
+                instance.minSize     = Vector2.zero;
+                instance.maxSize     = Vector2.zero;
+                instance.position    = new Rect(-10000, -10000, 0, 0);
+                s_OffscreenPicker    = instance;
             }
 
             var colorSelectMode = FixedPaletteSettings.Instance.materialColorSelect;
@@ -127,18 +152,27 @@ namespace FixedColorPaletteTool
                     {
                         callback(chosenColor);
                     }
-                    else if (delegateView != null && s_SendEventMethod != null)
+                    else
                     {
-                        // Picker is still alive (off-screen) — SetValue calls SetColor which
-                        // needs the native object intact. Inspector reads color synchronously
-                        // inside SendEvent before we close.
-                        s_ColorProperty.SetValue(null, chosenColor);
-                        var evt = EditorGUIUtility.CommandEvent("ColorPickerChanged");
-                        s_SendEventMethod.Invoke(delegateView, new object[] { evt });
+                        // ColorPicker.color setter calls SetColor → OnColorChanged →
+                        // m_DelegateView.SendEvent (notifies inspector) → GUIUtility.ExitGUI().
+                        // ExitGUI throws ExitGUIException, wrapped by reflection in
+                        // TargetInvocationException. The color is set and the inspector is
+                        // notified before the throw, so we catch and ignore it.
+                        try
+                        {
+                            s_ColorProperty.SetValue(null, chosenColor);
+                        }
+                        catch (ExitGUIException) { }
+                        catch (TargetInvocationException e) when (e.InnerException is ExitGUIException) { }
+
                         CloseOffscreenPicker();
                     }
 
                     s_Intercepting = false;
+                    // Do NOT null s_InterceptedPicker here — let OnUpdate clear it once the
+                    // picker is confirmed destroyed. Nulling early allows re-detection of a
+                    // still-alive off-screen picker on the very next frame.
                 }
             );
 
@@ -152,7 +186,16 @@ namespace FixedColorPaletteTool
         private static void CloseOffscreenPicker()
         {
             if (s_OffscreenPicker != null && s_OffscreenPicker)
+            {
+                // Restore original dimensions before closing so that:
+                // 1. OnDisable saves the correct height to EditorPrefs ("CPickerHeight").
+                // 2. The layout system saves the original position rather than (-10000,-10000),
+                //    ensuring the next ShowAuxWindow call places the picker correctly.
+                s_OffscreenPicker.minSize  = s_PickerOriginalMinSize;
+                s_OffscreenPicker.maxSize  = s_PickerOriginalMaxSize;
+                s_OffscreenPicker.position = s_PickerOriginalPosition;
                 s_OffscreenPicker.Close();
+            }
             s_OffscreenPicker = null;
         }
 
