@@ -36,7 +36,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
 - Added missing UGUI dependency for Unity 6000.3+ into `package.json`
-- npm packages updated to fix CVE alerts 
+- npm packages updated to fix CVE alerts
+- Fixed `ColorPickerInterceptor` palette window opening at top-left corner on second and subsequent opens
+  - Root cause: `ColorPicker.color` setter internally calls `GUIUtility.ExitGUI()`, throwing `ExitGUIException` (wrapped in `TargetInvocationException` by reflection), which bypassed `CloseOffscreenPicker()` and left the off-screen picker at `(-10000,-10000)`, poisoning the layout file's saved position for future opens
+  - Fixed by catching `ExitGUIException` / `TargetInvocationException` around `SetValue` so cleanup always runs
+  - Removed redundant manual `SendEvent` call — `OnColorChanged` already notifies the inspector before throwing
+  - Now saves and restores picker position (in addition to `minSize`/`maxSize`) before closing, so the layout system records the correct position
+- Fixed `ColorPickerInterceptor` palette window not closing after color selection
+  - Same `ExitGUIException` propagation was also skipping `s_Intercepting = false` and `EditorApplication.delayCall += Close`, leaving the palette open indefinitely until the user manually dismissed it
+- Added `ColorPickerHeightPrefGuard` — unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
 
 ## [0.0.9] - 2026-04-01
 
