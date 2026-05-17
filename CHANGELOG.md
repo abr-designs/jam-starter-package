@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
 - Added Prefab Gym & Zoo sample
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
+- Added `MovementDashboardController.cs` to the 3D Character Controller sample for editing `CharacterMovement3DDataScriptableObject` in playmode
+  - Changes persist to disk in Editor active in `#if DEBUG` builds, disabled in release
+  - Reset button restores all values to the snapshot captured at Play session start
+  - Added `MovementDashboard.uxml` and `MovementDashboard.uss` to `Samples~/3DCharacterController/UI/`
 
 ### Changed
 - Updated documentation generation workflow
@@ -27,6 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
 - Added missing UGUI dependency for Unity 6000.3+ into `package.json`
 - npm packages updated to fix CVE alerts 
+- Resolve log spamming emminating from `Draw.Arrow()` with `(0, 0, 0)` direction values
 
 ## [0.0.9] - 2026-04-01
 
