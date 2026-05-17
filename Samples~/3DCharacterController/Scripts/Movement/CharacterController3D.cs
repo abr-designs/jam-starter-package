@@ -13,7 +13,8 @@ namespace Samples.CharacterController3D.Scripts
     public class CharacterController3D : MonoBehaviour
     {
         public bool IsGrounded => m_3dBalancer.Grounded;
-        
+        public CharacterMovement3DDataScriptableObject MovementData => characterMovementData; // [Claude 2026-05-16]
+
         [SerializeField]
         private CharacterMovement3DDataScriptableObject characterMovementData;
 

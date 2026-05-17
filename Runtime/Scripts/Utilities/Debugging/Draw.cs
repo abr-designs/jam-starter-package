@@ -126,6 +126,9 @@ namespace Utilities.Debugging
         [Conditional("UNITY_EDITOR")]
         public static void Arrow(Vector3 pos, Vector3 direction, Color color, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20.0f)
         {
+            if (direction == Vector3.zero)
+                return;
+            
             UnityEngine.Debug.DrawRay(pos, direction, color);
 
             Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 + arrowHeadAngle, 0) *

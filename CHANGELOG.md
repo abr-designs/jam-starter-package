@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Skips interception when no palette is configured or palette has no colors
 - Added Prefab Gym & Zoo sample
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
+- Added `MovementDashboardController.cs` to the 3D Character Controller sample for editing `CharacterMovement3DDataScriptableObject` in playmode
+  - Changes persist to disk in Editor active in `#if DEBUG` builds, disabled in release
+  - Reset button restores all values to the snapshot captured at Play session start
+  - Added `MovementDashboard.uxml` and `MovementDashboard.uss` to `Samples~/3DCharacterController/UI/`
 
 ### Changed
 - Updated `FixedPaletteSettings.cs`
@@ -45,6 +49,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed `ColorPickerInterceptor` palette window not closing after color selection
   - Same `ExitGUIException` propagation was also skipping `s_Intercepting = false` and `EditorApplication.delayCall += Close`, leaving the palette open indefinitely until the user manually dismissed it
 - Added `ColorPickerHeightPrefGuard` — unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
+- Resolve log spamming emminating from `Draw.Arrow()` with `(0, 0, 0)` direction values
 
 ## [0.0.9] - 2026-04-01
 

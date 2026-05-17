@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by Claude (claude-sonnet-4-6) -->
+<!-- Date: 2026-05-16 -->
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="MovementDashboard.uss" />
+    <ui:VisualElement name="root" class="dashboard-root">
+        <ui:Button name="toggle-button" text="&#9881; Movement" class="toggle-tab" />
+        <ui:ScrollView name="dashboard-panel" class="dashboard-panel">
+            <ui:VisualElement class="dashboard-header">
+                <ui:Label text="Movement Dashboard" class="dashboard-title" />
+                <ui:Button name="reset-button" text="Reset" class="reset-button" />
+            </ui:VisualElement>
+
+            <ui:Foldout text="Locomotion" name="foldout-locomotion" value="true" class="dashboard-foldout">
+                <ui:FloatField label="Top Speed" name="field-maxSpeed"
+                    tooltip="Maximum movement speed in units/second" />
+                <ui:FloatField label="Ground Accel" name="field-groundAcceleration"
+                    tooltip="Force applied to reach top speed while on the ground. Higher = snappier response" />
+                <ui:FloatField label="Air Accel" name="field-airAcceleration"
+                    tooltip="Steering force while airborne. Lower values feel floaty" />
+                <ui:FloatField label="Max Force" name="field-maxAccelerationForce"
+                    tooltip="Caps the movement force applied per frame. Prevents instant velocity changes" />
+                <ui:VisualElement class="vec3-row"
+                    tooltip="Axis multiplier for movement force. Y=0 prevents vertical impulses from movement input">
+                    <ui:Label text="Force Scale" class="vec3-label" />
+                    <ui:FloatField label="X" name="field-forceScaleX" class="vec3-component" />
+                    <ui:FloatField label="Y" name="field-forceScaleY" class="vec3-component" />
+                    <ui:FloatField label="Z" name="field-forceScaleZ" class="vec3-component" />
+                </ui:VisualElement>
+                <ui:FloatField label="Gravity Drop" name="field-gravityScaleDrop"
+                    tooltip="Extra downward force when grounded. Keeps the character planted on slopes" />
+            </ui:Foldout>
+
+            <ui:Foldout text="Jump Config" name="foldout-jump" value="false" class="dashboard-foldout">
+                <ui:FloatField label="Jump Height" name="field-jumpHeight"
+                    tooltip="Target apex height in units. Affects gravity calculation automatically" />
+                <ui:FloatField label="Time to Apex" name="field-timeTillJumpApex"
+                    tooltip="Seconds to reach jump peak. Shorter = faster, punchier jump. Drives gravity" />
+                <ui:FloatField label="Height Correction" name="field-jumpHeightCompFactor"
+                    tooltip="Compensates for physics integration error at the apex (1.0–1.1 range)" />
+                <ui:FloatField label="Max Rise Speed" name="field-maxVerticalVelocity"
+                    tooltip="Clamps upward velocity. Acts as a safety ceiling on launch speed" />
+                <ui:FloatField label="Fall Gravity" name="field-gravityOnReleaseMultiplier"
+                    tooltip="Gravity multiplier when descending. Higher = snappier, weightier fall" />
+                <ui:FloatField label="Terminal Velocity" name="field-maxFallSpeed"
+                    tooltip="Maximum downward speed. Prevents infinite acceleration during freefall" />
+                <ui:IntegerField label="Jump Count" name="field-numberOfJumpsAllowed"
+                    tooltip="Total jumps before landing required. 1 = single jump, 2 = double jump" />
+            </ui:Foldout>
+
+            <ui:Foldout text="Jump Timing" name="foldout-timing" value="false" class="dashboard-foldout">
+                <ui:FloatField label="Jump Cut Window" name="field-timeForUpwardsCancel"
+                    tooltip="Seconds to cancel upward momentum after releasing jump. Short = tight cut feel" />
+                <ui:FloatField label="Apex Threshold" name="field-apexThreshold"
+                    tooltip="Normalised velocity (0–1) at which hang time begins near the jump peak" />
+                <ui:FloatField label="Hang Time" name="field-apexHangTime"
+                    tooltip="Seconds to float at the jump apex before gravity resumes" />
+                <ui:FloatField label="Jump Buffer" name="field-jumpBufferTime"
+                    tooltip="Seconds a jump input is remembered before landing. Allows early button presses" />
+                <ui:FloatField label="Coyote Time" name="field-jumpCoyoteTime"
+                    tooltip="Seconds after leaving a ledge during which a jump is still allowed" />
+            </ui:Foldout>
+
+            <ui:Foldout text="Balancer" name="foldout-balancer" value="false" class="dashboard-foldout">
+                <ui:FloatField label="Float Height" name="field-rideHeight"
+                    tooltip="Target gap between the character and the ground, maintained by the spring system" />
+                <ui:FloatField label="Spring Force" name="field-springStrength"
+                    tooltip="Strength of the spring pulling toward float height. Too high = jitter" />
+                <ui:FloatField label="Spring Damping" name="field-springDamper"
+                    tooltip="Dampens spring bounce. Too low = bouncy, too high = stiff" />
+                <ui:FloatField label="Turn Force" name="field-uprightStrength"
+                    tooltip="Torque applied to face the movement direction. Higher = snappier turning" />
+                <ui:FloatField label="Turn Damping" name="field-uprightDamper"
+                    tooltip="Dampens rotational overshoot when changing direction" />
+            </ui:Foldout>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

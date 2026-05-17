@@ -80,6 +80,8 @@ namespace Samples.CharacterController3D.Scripts
             CalculateValues();
         }
 
+        public void RecalculateValues() => CalculateValues();
+
         private void CalculateValues()
         {
             var adjustedJumpHeight = JumpHeight * JumpHeightCompensationFactor;
