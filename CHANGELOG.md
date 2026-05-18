@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `MovementDashboard.uxml` and `MovementDashboard.uss` to `Samples~/3DCharacterController/UI/`
 
 ### Changed
+- Extracted path data and sampling logic from `SimplePathFollow.cs` into new `SimplePath.cs` base class
+  - `SimplePathFollow.cs` now motion-only, inherits from `SimplePath`
+  - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
+  - Renamed `SimplePathFollowEditor.cs` → `SimplePathEditor.cs`, targets `SimplePathFollow` using `editorForChildClasses: true`
 - Updated `FixedPaletteSettings.cs`
   - Added `materialColorSelect` field (`COLOR_SELECT`, default: `SHADES`) — controls display mode for Material Inspector palette picker
 - Updated `FixedPaletteSettingsProvider.cs`
