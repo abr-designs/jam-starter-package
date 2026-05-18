@@ -15,13 +15,16 @@ namespace Utilities.Animations
 
         [SerializeField]
         //This could be in reverse, so no Min() required
-        private bool faceDirection;
+        protected bool faceDirection;
+
+        [SerializeField, Min(0f)]
+        protected float rotationSpeed; // [Claude 2026-05-18]
 
         [SerializeField, Range(0f, 1f)]
         private float startingPosition;
 
         [SerializeField]
-        private Transform targetMoveTransform;
+        protected Transform targetMoveTransform;
 
         private float m_distanceTravelled;
         private bool m_pingPongForward = true;
@@ -75,13 +78,37 @@ namespace Utilities.Animations
                 }
             }
 
-            targetMoveTransform.position = Evaluate(m_distanceTravelled / m_totalLength, out var tangent);
-
-            if (faceDirection)
-                targetMoveTransform.forward = speed < 0f ? -tangent : tangent;
+            var position = Evaluate(m_distanceTravelled / m_totalLength, out var tangent);
+            ApplyPathTransform(position, speed < 0f ? -tangent : tangent);
         }
 
         #endregion // Unity Functions
+
+        //Protected Methods
+        //================================================================================================================//
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Applies <paramref name="position"/> and optionally rotates <paramref name="targetMoveTransform"/> toward <paramref name="tangent"/>.
+        /// Override to customize how the follower responds to path evaluation results.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-sonnet-4-6) — 2026-05-18</remarks>
+        protected virtual void ApplyPathTransform(Vector3 position, Vector3 tangent)
+        {
+            targetMoveTransform.position = position;
+
+            if (!faceDirection || tangent == Vector3.zero)
+                return;
+
+            var targetRotation = Quaternion.LookRotation(tangent);
+
+            targetMoveTransform.rotation = rotationSpeed <= 0f
+                ? targetRotation
+                : Quaternion.RotateTowards(targetMoveTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+
+        #endregion // Protected Methods
 
         //================================================================================================================//
     }

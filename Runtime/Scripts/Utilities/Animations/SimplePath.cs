@@ -73,6 +73,36 @@ namespace Utilities.Animations
             return SamplePath(distance, out tangent);
         }
 
+        /// <summary>
+        /// Returns the normalized path position t (0–1) and world-space point on the path closest to <paramref name="worldPosition"/>.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-sonnet-4-6) — 2026-05-18</remarks>
+        public float GetClosestT(Vector3 worldPosition, out Vector3 closestPoint)
+        {
+            closestPoint = transform.TransformPoint(pathPoints[0]);
+
+            if (m_arcLengthTable == null)
+                return 0f;
+
+            var totalSamples = m_arcLengthTable.Length;
+            var bestDistanceSq = float.MaxValue;
+            var bestIndex = 0;
+
+            for (var i = 0; i < totalSamples; i++)
+            {
+                var candidate = SamplePathByIndex(i, totalSamples);
+                var distanceSq = (candidate - worldPosition).sqrMagnitude;
+                if (distanceSq >= bestDistanceSq)
+                    continue;
+
+                bestDistanceSq = distanceSq;
+                bestIndex = i;
+                closestPoint = candidate;
+            }
+
+            return m_arcLengthTable[bestIndex] / m_totalLength;
+        }
+
         internal Vector3 GetCatmullPoint(int index)
         {
             if (looping)

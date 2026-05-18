@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
 
 ### Changed
+- Added `SimplePathFollow.ApplyPathTransform()` for overridable position & rotation handling in subclasses
+  - Added `rotationSpeed` field for smooth rotation by using`RotateTowards`
+- Added `SimplePath.GetClosestT()` to get the nearest normalized path position as world point
 - Extracted path data and sampling logic from `SimplePathFollow.cs` into new `SimplePath.cs` base class
   - `SimplePathFollow.cs` now motion-only, inherits from `SimplePath`
   - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
