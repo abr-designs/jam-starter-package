@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
 
 ### Changed
+- Extracted path data and sampling logic from `SimplePathFollow.cs` into new `SimplePath.cs` base class
+  - `SimplePathFollow.cs` now motion-only, inherits from `SimplePath`
+  - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
+  - Renamed `SimplePathFollowEditor.cs` → `SimplePathEditor.cs`, targets `SimplePathFollow` using `editorForChildClasses: true`
 - Updated documentation generation workflow
   - Added ability to generate documentation website for ``main`` and ``develop/v*`` branches
   - Added website drop down to toggle versions
