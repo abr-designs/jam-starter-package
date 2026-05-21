@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 [assembly: InternalsVisibleTo("Jam-starter.Editor")]
+[assembly: InternalsVisibleTo("com.abrds.jam-starter.Editor.Tests")]
+[assembly: InternalsVisibleTo("com.abrds.jam-starter.Tests")]
 
 namespace Utilities.Animations
 {
@@ -84,6 +86,9 @@ namespace Utilities.Animations
             if (m_arcLengthTable == null)
                 return 0f;
 
+            if (motion == MOTION.LINEAR)
+                return GetClosestTLinear(worldPosition, out closestPoint);
+
             var totalSamples = m_arcLengthTable.Length;
             var bestDistanceSq = float.MaxValue;
             var bestIndex = 0;
@@ -101,6 +106,37 @@ namespace Utilities.Animations
             }
 
             return m_arcLengthTable[bestIndex] / m_totalLength;
+        }
+
+        private float GetClosestTLinear(Vector3 worldPosition, out Vector3 closestPoint)
+        {
+            closestPoint = transform.TransformPoint(pathPoints[0]);
+            var segmentCount = looping ? pathPoints.Count : pathPoints.Count - 1;
+            var bestDistanceSquared = float.MaxValue;
+            var bestArcDistance = 0f;
+
+            for (var i = 0; i < segmentCount; i++)
+            {
+                var startPoint = transform.TransformPoint(pathPoints[i]);
+                var endPoint = transform.TransformPoint(pathPoints[(i + 1) % pathPoints.Count]);
+                var direction = endPoint - startPoint;
+                var directionLengthSquared = direction.sqrMagnitude;
+                var localT = directionLengthSquared > 0f
+                    ? Mathf.Clamp01(Vector3.Dot(worldPosition - startPoint, direction) / directionLengthSquared)
+                    : 0f;
+                var candidate = startPoint + direction * localT;
+                var distanceSquared = (candidate - worldPosition).sqrMagnitude;
+
+                if (distanceSquared >= bestDistanceSquared)
+                    continue;
+
+                bestDistanceSquared = distanceSquared;
+                closestPoint = candidate;
+                var segmentLength = m_arcLengthTable[i + 1] - m_arcLengthTable[i];
+                bestArcDistance = m_arcLengthTable[i] + localT * segmentLength;
+            }
+
+            return bestArcDistance / m_totalLength;
         }
 
         internal Vector3 GetCatmullPoint(int index)

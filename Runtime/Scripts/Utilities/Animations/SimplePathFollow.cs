@@ -41,7 +41,7 @@ namespace Utilities.Animations
             base.Start();
 
             m_distanceTravelled = startingPosition * m_totalLength;
-            m_pingPongForward = speed > 0f;
+            m_pingPongForward = speed >= 0f;
         }
 
         private void Update()
