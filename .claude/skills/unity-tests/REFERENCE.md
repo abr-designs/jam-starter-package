@@ -170,6 +170,81 @@ public IEnumerator OneTimeSetup()
 
 ---
 
+## PlayMode lifecycle timing — Start() fires before the test body
+
+In Unity's PlayMode test runner, `AddComponent<T>()` calls `Awake()` and `OnEnable()` immediately. **`Start()` fires on the first frame** — which is the first `yield return null` if `[SetUp]` is synchronous. This means any field set via reflection or direct assignment *after* `AddComponent` (still in `[SetUp]`) is **not visible to `Start()`**.
+
+### What this means in practice
+
+If a MonoBehaviour reads a field in `Start()` (e.g. `speed`, `looping`) and the test sets that field after `AddComponent`, `Start()` will see the **default value**, not the test value.
+
+```csharp
+// [SetUp] — synchronous
+_follow = go.AddComponent<SimplePathFollow>(); // Awake/OnEnable run
+_follow.speed = 10f;                           // ← Start() hasn't run yet, so this IS seen...
+                                               //   only if Start() defers to first yield
+```
+
+This is safe if all setup happens before the first `yield return null`. But **reflection-set fields behave identically** — set them before the first yield and they will be visible to `Start()`.
+
+### The timing trap: setting values after Start() has run
+
+The trap appears when `Start()` initializes state (e.g. `m_pingPongForward = speed > 0f`) and the test assumes a particular value, but `Start()` ran with the default `speed = 0`.
+
+**Wrong** — Start() sees speed=0, m_pingPongForward ends up false:
+```csharp
+[UnityTest]
+public IEnumerator Bounces_ReversesAtEnd()
+{
+    SetSpeed(10000f);
+    yield return null; // Start() + Update() — but did Start() already fire?
+    yield return null;
+    Assert.IsFalse(GetPingPongForward()); // may pass or fail depending on timing
+}
+```
+
+**Correct** — yield first so Start() fires with defaults, then set test-specific values:
+```csharp
+[UnityTest]
+public IEnumerator Bounces_ReversesAtEnd()
+{
+    yield return null;   // Start() fires with default speed=0 → known initial state
+    SetSpeed(10000f);    // set after Start(); only affects Update()
+    yield return null;   // Update(): high speed hits end → direction flips
+    Assert.IsFalse(GetPingPongForward());
+}
+```
+
+### When to use [UnitySetUp] instead
+
+If *all* tests in a class need `Start()` to run before doing anything, promote `[SetUp]` to `[UnitySetUp]` and yield at the end:
+
+```csharp
+[UnitySetUp]
+public IEnumerator SetUp()
+{
+    _go = new GameObject();
+    _follow = _go.AddComponent<SimplePathFollow>();
+    _follow.pathPoints = new List<Vector3> { Vector3.zero, Vector3.forward * 2f };
+    yield return null; // Start() runs here with the above values already set
+}
+
+[UnityTest]
+public IEnumerator SomeTest()
+{
+    // Start() has already run — safe to set test-specific overrides
+    SetSpeed(10000f);
+    yield return null; // first Update()
+    ...
+}
+```
+
+### Watch for coincidental test passes
+
+A test that passes only because a wrong initial state + N bounces/flips = the expected final state is fragile. If you fix an unrelated initialization bug, the coincidental pass turns into a failure. When tests check state after N frames of bounce/toggle logic, verify that the initial state is explicitly controlled, not assumed.
+
+---
+
 ## Accessing private members in tests
 
 Use reflection sparingly — only when the private state is the only way to verify behavior:

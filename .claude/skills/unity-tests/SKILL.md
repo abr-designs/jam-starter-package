@@ -55,3 +55,5 @@ See [REFERENCE.md](REFERENCE.md) for full patterns with examples.
 - Use `WaitUntil(() => condition)` rather than `WaitForSeconds` where possible
 - Custom assertions go in private helper methods at the bottom of the class
 - Focus on game logic only — don't test that `Start()` / `Update()` ran
+- **PlayMode timing**: `Start()` fires on the first `yield return null` when `[SetUp]` is synchronous. Set all fields the component reads in `Start()` *before* that first yield, or add a leading `yield return null` to let `Start()` run first and then set test-specific overrides — see REFERENCE.md § "PlayMode lifecycle timing"
+- **Coincidental passes**: tests that rely on a wrong initial state + N state-flips equalling the expected result are fragile — always verify the initial state is explicitly controlled

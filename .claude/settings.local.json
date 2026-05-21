@@ -3,7 +3,9 @@
     "allow": [
       "WebFetch(domain:raw.githubusercontent.com)",
       "Skill(grill-me)",
-      "Skill(grill-with-docs)"
+      "Skill(grill-with-docs)",
+      "Skill(write-pr)",
+      "WebFetch(domain:docs.anthropic.com)"
     ]
   },
   "spinnerTipsEnabled": false
