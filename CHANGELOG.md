@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
+- Added `SimplePathTests.cs` (EditMode) — covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
+- Added `SimplePathFollowTests.cs` (PlayMode) — covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
 - Added Prefab Gym & Zoo sample
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
+
+### Fixed
+- Fixed `SimplePath.GetClosestT()` using per-segment projection for LINEAR paths instead of endpoint-only sampling
+- Fixed `SimplePathFollow` ping-pong direction initializing to `false` when `speed` defaults to 0 at `Start()` time; restructured bounce tests to yield before setting speed so `Start()` always runs first
 
 ### Changed
 - Added `SimplePathFollow.ApplyPathTransform()` for overridable position & rotation handling in subclasses
