@@ -87,6 +87,16 @@ Closes #N
 - Bullet list of specific changes; use nested sub-bullets for related details
 - Use `&` instead of `and` in bullet text
 
+### Tests (sub-header of Tech Notes)
+When tests are added or changed, include a `### Tests` sub-header inside Tech Notes:
+- Assembly header format: `**EditMode Tests** for \`FileName.cs\`` / `**PlayMode Tests** for \`FileName.cs\``
+  - Not `**EditMode — \`FileName.cs\`**`
+- Infrastructure notes (test helpers, reflection setup) go as an inline bullet — not a preamble paragraph before the list
+- Group related test cases into one bullet — do not split one-bullet-per-test-method
+- Lead each bullet with "Checks that" or "Ensures that"
+- State the behaviour being verified — omit internal details (return values, numeric thresholds, assertion mechanics)
+- Fewer, broader bullets over one-bullet-per-test-case
+
 ### Type of Change
 - Leave checkboxes unchecked (user fills in on GitHub)
 - Always keep the full list — do not remove inapplicable types
