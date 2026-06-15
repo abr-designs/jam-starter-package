@@ -8,12 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
-- Added `SimplePathTests.cs` (EditMode) — covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
-- Added `SimplePathFollowTests.cs` (PlayMode) — covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
+- Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
+- Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
-- Added `ColorPickerInterceptor.cs` — global palette picker integration for all Color fields in the editor
+- Added `ColorPickerInterceptor.cs`, global palette picker integration for all Color fields in the editor
   - Activates via existing `FIXED_COLOR_INSPECTOR` scripting define (same toggle as MonoBehaviour inspector override)
-  - Intercepts `UnityEditor.ColorPicker` via `EditorApplication.update` + reflection — no shader or inspector modifications required
+  - Intercepts `UnityEditor.ColorPicker` via `EditorApplication.update` + reflection, no shader or inspector modifications required
   - Works across all inspectors (URP Lit, custom shaders, MonoBehaviours) without breaking ShaderGUI foldout structure
   - Handles both callback path (custom editors) and `ColorPickerChanged` GUIView command path (EditorGUI.ColorField)
   - Skips interception when no palette is configured or palette has no colors
@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Changes persist to disk in Editor active in `#if DEBUG` builds, disabled in release
   - Reset button restores all values to the snapshot captured at Play session start
   - Added `MovementDashboard.uxml` and `MovementDashboard.uss` to `Samples~/3DCharacterController/UI/`
+- Added `TransformTweenExtensions.UniTask.cs` providing `TweenToAsync` & `TweenScaleToAsync` extensions returning `UniTask`, gated behind UniTask install
+  - Exposes `PlayerLoopTiming` & native `CancellationToken` cancellation (throws `OperationCanceledException`, freezes transform at current value)
+  - Added `TweenRegistry.cs` to cancel a prior async tween when a new one starts on the same `(Transform, TRANSFORM)` key
+- Added `TweenMath.cs` sharing curve evaluation between the sync & async tween engines
+- Added `TransformTweenExtensionsAsyncTests.cs` (PlayMode) covering await completion, token cancellation, registry preemption, destroyed-transform unwind, and the cross-backend assertion, in a UniTask-gated test assembly
 
 ### Fixed
 - Fixed `SimplePath.GetClosestT()` using per-segment projection for LINEAR paths instead of endpoint-only sampling
@@ -37,18 +42,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
   - Renamed `SimplePathFollowEditor.cs` → `SimplePathEditor.cs`, targets `SimplePathFollow` using `editorForChildClasses: true`
 - Updated `FixedPaletteSettings.cs`
-  - Added `materialColorSelect` field (`COLOR_SELECT`, default: `SHADES`) — controls display mode for Material Inspector palette picker
+  - Added `materialColorSelect` field (`COLOR_SELECT`, default: `SHADES`), controls display mode for Material Inspector palette picker
 - Updated `FixedPaletteSettingsProvider.cs`
   - Added "Material Color Selector" dropdown to Project Settings UI, bound to `materialColorSelect`
+- Documented `TweenToAsync` & `TweenScaleToAsync` in `Documentation~/Utilities/utilities-extensions-transform.md`
 - Updated documentation generation workflow
-  - Added ability to generate documentation website for ``main`` and ``develop/v*`` branches
+  - Added ability to generate documentation website for `main` and `develop/v*` branches
   - Added website drop down to toggle versions
   - Added restrictions on automatic building to the following
-    - only commits on ``main`` or ``develop/v*`` with changes to ``Documentation~``, ``.github/workflows`` or ``WebsiteDocs~``
-  - Updated workflow to use the triggering branch ``WebsiteDocs~`` for building, the workflow will checkout the ``main`` and ``develop/v*`` branches itself
+    - only commits on `main` or `develop/v*` with changes to `Documentation~`, `.github/workflows` or `WebsiteDocs~`
+  - Updated workflow to use the triggering branch `WebsiteDocs~` for building, the workflow will checkout the `main` and `develop/v*` branches itself
 - Added `ObservableCollection` NuGet package to `AddNugetPackages.cs`
 - Upgraded zLinq version from `1.5.4` to `1.5.6`
 - Added `NAUGHTY` version define to [Jam-starter.Runtime.asmdef](Runtime/Jam-starter.Runtime.asmdef) to prevent exceptions on first compile
+- Added `TweenController.HasActiveTween(Transform, TRANSFORM)` for async-side conflict detection in dev builds
+- Removed dead `TweenData.AsAsncTask()` from `TweenController.cs`
+- Extracted `GetCurveT` from `TweenController.cs` into shared `TweenMath.cs` so the sync & async tweens can use the same base
 
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
@@ -57,11 +66,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed `ColorPickerInterceptor` palette window opening at top-left corner on second and subsequent opens
   - Root cause: `ColorPicker.color` setter internally calls `GUIUtility.ExitGUI()`, throwing `ExitGUIException` (wrapped in `TargetInvocationException` by reflection), which bypassed `CloseOffscreenPicker()` and left the off-screen picker at `(-10000,-10000)`, poisoning the layout file's saved position for future opens
   - Fixed by catching `ExitGUIException` / `TargetInvocationException` around `SetValue` so cleanup always runs
-  - Removed redundant manual `SendEvent` call — `OnColorChanged` already notifies the inspector before throwing
+  - Removed redundant manual `SendEvent` call, `OnColorChanged` already notifies the inspector before throwing
   - Now saves and restores picker position (in addition to `minSize`/`maxSize`) before closing, so the layout system records the correct position
 - Fixed `ColorPickerInterceptor` palette window not closing after color selection
   - Same `ExitGUIException` propagation was also skipping `s_Intercepting = false` and `EditorApplication.delayCall += Close`, leaving the palette open indefinitely until the user manually dismissed it
-- Added `ColorPickerHeightPrefGuard` — unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
+- Added `ColorPickerHeightPrefGuard`, unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
 - Resolve log spamming emminating from `Draw.Arrow()` with `(0, 0, 0)` direction values
 
 ## [0.0.9] - 2026-04-01

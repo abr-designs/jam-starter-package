@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Unity.Profiling;
 using UnityEngine;
 using Utilities.Enums;
@@ -49,7 +48,21 @@ namespace Utilities.Tweening
             s_GetTweenDataPerfMarker.End();
 
             return tweenData;
-            
+
+        }
+
+        /// <summary>
+        /// Whether the sync engine currently drives an active tween for the given transform and transformation.
+        /// Used by the async engine to assert against cross-backend conflicts in <c>#if DEBUG</c> builds.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-opus-4-8) - 2026-06-14</remarks>
+        internal static bool HasActiveTween(Transform targetTransform, TRANSFORM transformation)
+        {
+            if (Instance == null || Instance._tweenDataDict == null)
+                return false;
+
+            var hash = HashCode.Combine(targetTransform, (int)transformation);
+            return Instance._tweenDataDict.TryGetValue(hash, out var tweenData) && tweenData.Active;
         }
 
         private void Update()
@@ -205,8 +218,6 @@ namespace Utilities.Tweening
             while (Active)
                 yield return null;
         }
-        
-        internal async Task AsAsncTask() => throw new NotImplementedException();
 
         internal bool Update(float deltaTime)
         {
@@ -223,7 +234,7 @@ namespace Utilities.Tweening
 
             //Because we're counting down, we'll need to invert then normalize the value to get the curve.T
             var normalizedTime = (_time / _totalTime);
-            var dt = GetCurveT(_curve, 1f - normalizedTime);
+            var dt = TweenMath.GetCurveT(_curve, 1f - normalizedTime);
 
             switch (Transformation)
             {
@@ -301,24 +312,6 @@ namespace Utilities.Tweening
             }
         }
         
-        private static float GetCurveT(CURVE curve, float t)
-        {
-            t = Math.Clamp(t, 0, 1);
-            switch (curve)
-            {
-                case CURVE.LINEAR:
-                    return t;
-                case CURVE.EASE_IN:
-                    return LerpFunctions.Coserp(0f, 1f, t);
-                case CURVE.EASE_OUT:
-                    return LerpFunctions.Sinerp(0f, 1f, t);
-                case CURVE.EASE_IN_OUT:
-                    return LerpFunctions.Hermite(0f, 1f, t);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(curve), curve, null);
-            }
-        }
-
         public override int GetHashCode() => CachedHash;
     }
 }
