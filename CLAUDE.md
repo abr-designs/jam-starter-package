@@ -5,6 +5,7 @@ Guidance for Claude Code when working in this repo.
 ## Critical Operating Instructions
 
 1. All changes made MUST be reflected with simple language into the CHANGELOG.md file
+2. Working/internal docs (ADRs, plans, reviews) live in `docs~/`. The `~` suffix keeps Unity from importing the folder, so do not generate `.meta` files for it and do not rename it back to `docs/`.
 
 ## What this repo is
 

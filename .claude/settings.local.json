@@ -5,8 +5,10 @@
       "Skill(grill-me)",
       "Skill(grill-with-docs)",
       "Skill(write-pr)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "PowerShell($result = node \"C:\\\\Users\\\\alex_\\\\.claude\\\\skills\\\\code-review\\\\src\\\\gen_review.js\" \"D:\\\\Repos\\\\jam-starter-package\\\\Runtime\\\\Scripts\\\\Utilities\\\\LerpFunctions.cs\" | ConvertFrom-Json; Write-Output $result.htmlPath; Write-Output $result.commentsPath; Write-Output $result.port)"
     ]
   },
-  "spinnerTipsEnabled": false
+  "spinnerTipsEnabled": false,
+  "outputStyle": "default"
 }

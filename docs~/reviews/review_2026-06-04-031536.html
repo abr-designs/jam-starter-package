@@ -1,0 +1,627 @@
+<!-- Created by Claude (claude-sonnet-4-6) -->
+<!-- Date: 2026-05-20 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Review</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+    font-size: 12px;
+    background: #f6f8fa;
+    color: #24292f;
+    line-height: 1.2;
+  }
+
+  #app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Header */
+  .review-header {
+    background: #fff;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .review-header h1 { font-size: 16px; font-weight: 600; }
+  .review-header .meta { color: #57606a; font-size: 11px; }
+  .submit-bar { display: flex; gap: 8px; }
+  .btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-approve {
+    background: #2da44e;
+    border-color: #1a7f37;
+    color: #fff;
+  }
+  .btn-approve:hover { background: #1a7f37; }
+  .btn-request {
+    background: #fff;
+    border-color: #d0d7de;
+    color: #cf222e;
+  }
+  .btn-request:hover { background: #fff1f0; border-color: #cf222e; }
+
+  /* Save status */
+  #save-status {
+    font-size: 11px;
+    color: #57606a;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  #save-status.saved  { color: #1a7f37; }
+  #save-status.saving { color: #0969da; }
+  #save-status.error  { color: #cf222e; }
+
+  /* File section */
+  .file-section {
+    background: #fff;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .file-header {
+    background: #f6f8fa;
+    border-bottom: 1px solid #d0d7de;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .file-name { font-weight: 600; font-size: 13px; }
+  .file-path { color: #57606a; font-size: 11px; margin-top: 2px; }
+  .file-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #24292f;
+  }
+  .btn-sm:hover { background: #f3f4f6; }
+
+  /* File-level comment box */
+  .file-comment-area {
+    padding: 8px 16px;
+    border-bottom: 1px solid #d0d7de;
+    background: #fff;
+  }
+  .file-comment-area textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 48px;
+  }
+  .file-comment-area textarea:focus { outline: none; border-color: #0969da; }
+  .file-comment-label { font-size: 11px; color: #57606a; margin-bottom: 4px; }
+
+  /* Diff table */
+  .diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  /* Hunk header */
+  .hunk-header td {
+    background: #ddf4ff;
+    color: #0550ae;
+    padding: 2px 12px;
+    font-size: 11px;
+    border-top: 1px solid #d0d7de;
+  }
+
+  /* Diff rows */
+  .diff-row { cursor: pointer; }
+  .diff-row:hover .line-content { filter: brightness(0.96); }
+  .diff-row td { line-height: 1; padding-top: 1px; padding-bottom: 1px; }
+
+  .line-num {
+    width: 42px;
+    min-width: 42px;
+    text-align: right;
+    padding: 1px 10px 1px 4px;
+    color: #656d76;
+    border-right: 1px solid #d0d7de;
+    user-select: none;
+    vertical-align: top;
+  }
+  .line-gutter {
+    width: 20px;
+    min-width: 20px;
+    padding: 1px 4px;
+    text-align: center;
+    font-weight: 700;
+    border-right: 3px solid transparent;
+    vertical-align: top;
+  }
+  .line-content {
+    padding: 1px 8px;
+    white-space: pre;
+    overflow-x: auto;
+    vertical-align: top;
+    width: 100%;
+  }
+
+  /* Line type colors */
+  .line-add    .line-num, .line-add    .line-gutter, .line-add    .line-content { background: #e6ffed; }
+  .line-add    .line-gutter { border-right-color: #34d058; color: #1a7f37; }
+  .line-remove .line-num, .line-remove .line-gutter, .line-remove .line-content { background: #ffeef0; }
+  .line-remove .line-gutter { border-right-color: #f97583; color: #cf222e; }
+  .line-context .line-num, .line-context .line-gutter, .line-context .line-content { background: #fff; }
+
+  .diff-row.selected .line-content { filter: brightness(0.93); }
+
+  /* Inline comment container */
+  .inline-comment-row td {
+    padding: 0;
+    background: #f0f8ff;
+    border-top: 1px solid #cae8ff;
+    border-bottom: 1px solid #cae8ff;
+  }
+  .inline-comment-box { padding: 8px 12px; }
+  .inline-comment-box textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #0969da;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 56px;
+    background: #fff;
+  }
+  .inline-comment-box textarea:focus { outline: none; }
+  .comment-actions { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+  .btn-comment-add {
+    padding: 3px 10px;
+    background: #0969da;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .btn-comment-add:hover { background: #0550ae; }
+  .btn-comment-cancel {
+    padding: 3px 10px;
+    background: transparent;
+    color: #57606a;
+    border: none;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Saved comment display */
+  .saved-comment-row td {
+    padding: 0;
+    background: #fff8c5;
+    border-top: 1px solid #f0d070;
+    border-bottom: 1px solid #f0d070;
+  }
+  .saved-comment-bubble {
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .saved-comment-text { flex: 1; font-size: 12px; color: #24292f; white-space: pre-wrap; }
+  .comment-meta { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .btn-resolve {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #57606a;
+  }
+  .btn-resolve:hover { background: #f3f4f6; }
+  .btn-resolve.resolved { background: #2da44e; color: #fff; border-color: #1a7f37; }
+  .btn-delete-comment {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ffa198;
+    background: #fff;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #cf222e;
+  }
+  .btn-delete-comment:hover { background: #fff1f0; }
+
+  /* Full-file view */
+  .full-file-view { display: none; }
+  .full-file-view.visible { display: block; }
+  .hunk-view.hidden { display: none; }
+
+  /* Fold */
+  .file-body.folded { display: none; }
+
+  /* No-changes notice */
+  .no-changes {
+    padding: 16px;
+    color: #57606a;
+    text-align: center;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="review-header">
+    <div>
+      <h1>Code Review</h1>
+      <div class="meta" id="review-meta"></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="save-status"></span>
+      <div class="submit-bar">
+        <button class="btn btn-request" onclick="submitReview('REQUEST_CHANGES')">Request Changes</button>
+        <button class="btn btn-approve"  onclick="submitReview('APPROVE')">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="files-container"></div>
+
+</div>
+
+<script>
+const REVIEW_DATA = {"session":"2026-06-04T03:15:36","port":56146,"commentsPath":"D:\\Repos\\jam-starter-package\\docs\\reviews\\review_2026-06-04-031536.comments.json","files":[{"path":"D:\\Repos\\jam-starter-package\\Runtime\\Scripts\\Utilities\\JMath.cs","name":"JMath.cs","hunks":[{"header":"@@ -108,5 +108,11 @@","startOld":108,"startNew":108,"lines":[{"type":"context","lineOld":108,"lineNew":108,"text":"        {"},{"type":"context","lineOld":109,"lineNew":109,"text":"            return new Quaternion(input.x * scalar, input.y * scalar, input.z * scalar, input.w * scalar);"},{"type":"context","lineOld":110,"lineNew":110,"text":"        }"},{"type":"add","lineOld":null,"lineNew":111,"text":""},{"type":"add","lineOld":null,"lineNew":112,"text":"        /// <summary>"},{"type":"add","lineOld":null,"lineNew":113,"text":"        /// Returns the product of two floats."},{"type":"add","lineOld":null,"lineNew":114,"text":"        /// </summary>"},{"type":"add","lineOld":null,"lineNew":115,"text":"        /// <remarks>Created by Claude (claude-sonnet-4-6) — 2026-06-03</remarks>"},{"type":"add","lineOld":null,"lineNew":116,"text":"        public static float Multiply(float a, float b) => a * b;"},{"type":"context","lineOld":111,"lineNew":117,"text":"    }"},{"type":"context","lineOld":112,"lineNew":118,"text":"}"}]}],"fullLines":[{"lineNum":1,"text":"﻿using System;"},{"lineNum":2,"text":"using UnityEngine;"},{"lineNum":3,"text":""},{"lineNum":4,"text":"namespace Utilities"},{"lineNum":5,"text":"{"},{"lineNum":6,"text":"    public static class JMath"},{"lineNum":7,"text":"    {"},{"lineNum":8,"text":"        //FIXME Convert this to use the string builder so that it will reduce operational overhead"},{"lineNum":9,"text":"        public static string ToRoman(int number)"},{"lineNum":10,"text":"        {"},{"lineNum":11,"text":"            if ((number < 0) || (number > 3999)) "},{"lineNum":12,"text":"                throw new ArgumentException(\"insert value between 1 and 3999\");"},{"lineNum":13,"text":"            "},{"lineNum":14,"text":"            if (number < 1) return string.Empty;            "},{"lineNum":15,"text":"            if (number >= 1000) return \"M\" + ToRoman(number - 1000);"},{"lineNum":16,"text":"            if (number >= 900) return \"CM\" + ToRoman(number - 900); "},{"lineNum":17,"text":"            if (number >= 500) return \"D\" + ToRoman(number - 500);"},{"lineNum":18,"text":"            if (number >= 400) return \"CD\" + ToRoman(number - 400);"},{"lineNum":19,"text":"            if (number >= 100) return \"C\" + ToRoman(number - 100);            "},{"lineNum":20,"text":"            if (number >= 90) return \"XC\" + ToRoman(number - 90);"},{"lineNum":21,"text":"            if (number >= 50) return \"L\" + ToRoman(number - 50);"},{"lineNum":22,"text":"            if (number >= 40) return \"XL\" + ToRoman(number - 40);"},{"lineNum":23,"text":"            if (number >= 10) return \"X\" + ToRoman(number - 10);"},{"lineNum":24,"text":"            if (number >= 9) return \"IX\" + ToRoman(number - 9);"},{"lineNum":25,"text":"            if (number >= 5) return \"V\" + ToRoman(number - 5);"},{"lineNum":26,"text":"            if (number >= 4) return \"IV\" + ToRoman(number - 4);"},{"lineNum":27,"text":"            if (number >= 1) return \"I\" + ToRoman(number - 1);"},{"lineNum":28,"text":"            "},{"lineNum":29,"text":"            throw new ArgumentException(\"something bad happened\");"},{"lineNum":30,"text":"        }"},{"lineNum":31,"text":"        "},{"lineNum":32,"text":"        /// <summary>"},{"lineNum":33,"text":"        /// Returns point on circle edge based on the degrees. 0deg is the top/North part of the circle"},{"lineNum":34,"text":"        /// </summary>"},{"lineNum":35,"text":"        /// <param name=\"degrees\"></param>"},{"lineNum":36,"text":"        /// <param name=\"radius\"></param>"},{"lineNum":37,"text":"        /// <returns></returns>"},{"lineNum":38,"text":"        public static Vector2 GetAsPointOnCircle(float degrees, float radius = 1f)"},{"lineNum":39,"text":"        {"},{"lineNum":40,"text":"            if(radius == 0)"},{"lineNum":41,"text":"                return Vector2.zero;"},{"lineNum":42,"text":"            "},{"lineNum":43,"text":"            var radians = degrees * Mathf.Deg2Rad;"},{"lineNum":44,"text":""},{"lineNum":45,"text":"            var x = Mathf.Cos(radians);"},{"lineNum":46,"text":"            var y = Mathf.Sin(radians);"},{"lineNum":47,"text":"            "},{"lineNum":48,"text":"            return new Vector2(x, y) * radius; //Vector2 is fine, if you're in 2D"},{"lineNum":49,"text":"        }"},{"lineNum":50,"text":""},{"lineNum":51,"text":"        /// <summary>"},{"lineNum":52,"text":"        /// Force Vector2 into a non-negative state"},{"lineNum":53,"text":"        /// </summary>"},{"lineNum":54,"text":"        /// <param name=\"vector2\"></param>"},{"lineNum":55,"text":"        /// <returns></returns>"},{"lineNum":56,"text":"        public static Vector2 Abs(this Vector2 vector2)"},{"lineNum":57,"text":"        {"},{"lineNum":58,"text":"            return new Vector2"},{"lineNum":59,"text":"            {"},{"lineNum":60,"text":"                x = Mathf.Abs(vector2.x),"},{"lineNum":61,"text":"                y = Mathf.Abs(vector2.y)"},{"lineNum":62,"text":"            };"},{"lineNum":63,"text":"        }"},{"lineNum":64,"text":"        "},{"lineNum":65,"text":"        /// <summary>"},{"lineNum":66,"text":"        /// Force Vector3 into a non-negative state"},{"lineNum":67,"text":"        /// </summary>"},{"lineNum":68,"text":"        /// <param name=\"vector2\"></param>"},{"lineNum":69,"text":"        /// <returns></returns>"},{"lineNum":70,"text":"        public static Vector3 Abs(this Vector3 vector3)"},{"lineNum":71,"text":"        {"},{"lineNum":72,"text":"            return new Vector3"},{"lineNum":73,"text":"            {"},{"lineNum":74,"text":"                x = Mathf.Abs(vector3.x),"},{"lineNum":75,"text":"                y = Mathf.Abs(vector3.y),"},{"lineNum":76,"text":"                z = Mathf.Abs(vector3.z),"},{"lineNum":77,"text":"            };"},{"lineNum":78,"text":"        }"},{"lineNum":79,"text":"        "},{"lineNum":80,"text":"        /// <summary>"},{"lineNum":81,"text":"        /// Prevents an angle (deg) from moving beyond 360, wrapping around to 0"},{"lineNum":82,"text":"        /// </summary>"},{"lineNum":83,"text":"        /// <param name=\"degrees\"></param>"},{"lineNum":84,"text":"        /// <returns></returns>"},{"lineNum":85,"text":"        public static float ClampAngle(float degrees)"},{"lineNum":86,"text":"        {"},{"lineNum":87,"text":"            degrees %= 360;"},{"lineNum":88,"text":""},{"lineNum":89,"text":"            if (degrees < 0)"},{"lineNum":90,"text":"            {"},{"lineNum":91,"text":"                return 360 + degrees;"},{"lineNum":92,"text":"            }"},{"lineNum":93,"text":""},{"lineNum":94,"text":"            return degrees;"},{"lineNum":95,"text":"        }"},{"lineNum":96,"text":"        "},{"lineNum":97,"text":"        public static Quaternion ShortestRotation(Quaternion a, Quaternion b)"},{"lineNum":98,"text":"        {"},{"lineNum":99,"text":"            if (Quaternion.Dot(a, b) < 0)"},{"lineNum":100,"text":"            {"},{"lineNum":101,"text":"                return a * Quaternion.Inverse(Multiply(b, -1));"},{"lineNum":102,"text":"            }"},{"lineNum":103,"text":""},{"lineNum":104,"text":"            return a * Quaternion.Inverse(b);"},{"lineNum":105,"text":"        }"},{"lineNum":106,"text":""},{"lineNum":107,"text":"        private static Quaternion Multiply(Quaternion input, float scalar)"},{"lineNum":108,"text":"        {"},{"lineNum":109,"text":"            return new Quaternion(input.x * scalar, input.y * scalar, input.z * scalar, input.w * scalar);"},{"lineNum":110,"text":"        }"},{"lineNum":111,"text":""},{"lineNum":112,"text":"        /// <summary>"},{"lineNum":113,"text":"        /// Returns the product of two floats."},{"lineNum":114,"text":"        /// </summary>"},{"lineNum":115,"text":"        /// <remarks>Created by Claude (claude-sonnet-4-6) — 2026-06-03</remarks>"},{"lineNum":116,"text":"        public static float Multiply(float a, float b) => a * b;"},{"lineNum":117,"text":"    }"},{"lineNum":118,"text":"}"}],"isNew":false}]};
+
+// ── State ──────────────────────────────────────────────────────────────────
+const state = {
+  comments: [],
+  nextId:   1,
+  saveTimer: null,
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('review-meta').textContent =
+    `Session: ${REVIEW_DATA.session} · ${REVIEW_DATA.files.length} file(s)`;
+  REVIEW_DATA.files.forEach(renderFile);
+});
+
+// ── Render file ────────────────────────────────────────────────────────────
+function renderFile(file) {
+  const container = document.getElementById('files-container');
+  const section   = document.createElement('div');
+  section.className = 'file-section';
+  section.id = `file-${sanitizeId(file.name)}`;
+
+  const isNewFile    = !!file.isNew;
+  const totalAdds    = file.hunks.reduce((n, h) => n + h.lines.filter(l => l.type === 'add').length, 0);
+  const totalRemoves = file.hunks.reduce((n, h) => n + h.lines.filter(l => l.type === 'remove').length, 0);
+  const changeLabel  = isNewFile ? 'new file' : (file.hunks.length === 0 ? 'no changes' : `+${totalAdds} -${totalRemoves}`);
+  const fullFileBtn  = isNewFile ? '' : `<button class="btn-sm btn-full-file" onclick="toggleFullFile('${sanitizeId(file.name)}')">Show full file</button>`;
+
+  section.innerHTML = `
+    <div class="file-header">
+      <div>
+        <div class="file-name">${escHtml(file.name)} <span style="color:#57606a;font-weight:400;font-size:11px;">${changeLabel}</span></div>
+        <div class="file-path">${escHtml(file.path)}</div>
+      </div>
+      <div class="file-actions">
+        ${fullFileBtn}
+        <button class="btn-sm btn-fold" onclick="toggleFold('${sanitizeId(file.name)}')">Fold</button>
+      </div>
+    </div>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'file-body';
+  body.id = `body-${sanitizeId(file.name)}`;
+
+  const commentArea = document.createElement('div');
+  commentArea.className = 'file-comment-area';
+  commentArea.innerHTML = `
+    <div class="file-comment-label">File-level comment</div>
+    <textarea placeholder="Leave a general comment about this file…"
+      oninput="onFileComment(this, '${escAttr(file.name)}')"
+      data-file="${escAttr(file.name)}"
+      data-comment-type="file"></textarea>
+  `;
+  body.appendChild(commentArea);
+
+  const hunkView = document.createElement('div');
+  hunkView.className = 'hunk-view';
+  hunkView.id = `hunks-${sanitizeId(file.name)}`;
+
+  if (isNewFile) {
+    const table = document.createElement('table');
+    table.className = 'diff-table';
+    file.fullLines.forEach(fl => {
+      table.appendChild(makeLineRow(null, fl.lineNum, 'add', fl.text, file.name));
+    });
+    hunkView.appendChild(table);
+  } else if (file.hunks.length === 0) {
+    hunkView.innerHTML = '<div class="no-changes">No changes detected in this file.</div>';
+  } else {
+    const table = document.createElement('table');
+    table.className = 'diff-table';
+    file.hunks.forEach((hunk, idx) => renderHunk(table, hunk, file.name, idx, file));
+    hunkView.appendChild(table);
+  }
+  body.appendChild(hunkView);
+
+  if (!isNewFile) {
+    const fullView = document.createElement('div');
+    fullView.className = 'full-file-view';
+    fullView.id = `full-${sanitizeId(file.name)}`;
+    if (file.fullLines && file.fullLines.length > 0) {
+      const ftable = document.createElement('table');
+      ftable.className = 'diff-table';
+      const changedLines = buildChangedLineMap(file.hunks);
+      file.fullLines.forEach(fl => {
+        ftable.appendChild(makeLineRow(fl.lineNum, fl.lineNum, changedLines[fl.lineNum] || 'context', fl.text, file.name));
+      });
+      fullView.appendChild(ftable);
+    } else {
+      fullView.innerHTML = '<div class="no-changes">Full file content not available.</div>';
+    }
+    body.appendChild(fullView);
+  }
+
+  section.appendChild(body);
+  container.appendChild(section);
+}
+
+function buildChangedLineMap(hunks) {
+  const map = {};
+  hunks.forEach(h => h.lines.forEach(l => {
+    if (l.type === 'add'    && l.lineNew != null) map[l.lineNew] = 'add';
+    if (l.type === 'remove' && l.lineOld != null) map[l.lineOld] = 'remove';
+  }));
+  return map;
+}
+
+function renderHunk(table, hunk, fileName, hunkIdx, file) {
+  const headerRow = document.createElement('tr');
+  headerRow.className = 'hunk-header';
+  headerRow.innerHTML = `<td colspan="3">${escHtml(hunk.header)}</td>`;
+  table.appendChild(headerRow);
+
+  hunk.lines.forEach(line => {
+    table.appendChild(makeLineRow(line.lineOld, line.lineNew, line.type, line.text, fileName));
+    insertSavedComments(table, fileName, line.lineNew ?? line.lineOld);
+  });
+}
+
+function makeLineRow(lineOld, lineNew, type, text, fileName) {
+  const tr     = document.createElement('tr');
+  const lineNum = lineNew ?? lineOld;
+  tr.className   = `diff-row line-${type}`;
+  tr.dataset.file = fileName;
+  tr.dataset.line = lineNum;
+  tr.addEventListener('click', () => openInlineComment(tr, fileName, lineNum));
+
+  tr.innerHTML = `
+    <td class="line-num">${lineOld != null ? lineOld : '&nbsp;'} / ${lineNew != null ? lineNew : '&nbsp;'}</td>
+    <td class="line-gutter">${type === 'add' ? '+' : type === 'remove' ? '-' : ' '}</td>
+    <td class="line-content">${escHtml(text)}</td>
+  `;
+  return tr;
+}
+
+function insertSavedComments(table, fileName, lineNum) {
+  state.comments
+    .filter(c => c.file === fileName && c.line === lineNum && c.type === 'line')
+    .forEach(c => table.appendChild(makeSavedCommentRow(c)));
+}
+
+// ── Inline comment input ───────────────────────────────────────────────────
+function openInlineComment(tr, fileName, lineNum) {
+  document.querySelectorAll('.inline-comment-input-row').forEach(r => r.remove());
+  if (tr.classList.contains('inline-comment-row') || tr.classList.contains('saved-comment-row')) return;
+
+  tr.classList.add('selected');
+  const inputRow = document.createElement('tr');
+  inputRow.className = 'inline-comment-row inline-comment-input-row';
+  inputRow.innerHTML = `
+    <td colspan="3">
+      <div class="inline-comment-box">
+        <textarea placeholder="Leave a comment on line ${lineNum}…" id="comment-input-${lineNum}" autofocus></textarea>
+        <div class="comment-actions">
+          <button class="btn-comment-add" onclick="addLineComment('${escAttr(fileName)}', ${lineNum})">Add comment</button>
+          <button class="btn-comment-cancel" onclick="cancelComment(this)">Cancel</button>
+        </div>
+      </div>
+    </td>
+  `;
+  tr.after(inputRow);
+  inputRow.querySelector('textarea').focus();
+}
+
+function cancelComment(btn) {
+  const row = btn.closest('tr');
+  const prev = row.previousElementSibling;
+  if (prev) prev.classList.remove('selected');
+  row.remove();
+}
+
+function addLineComment(fileName, lineNum) {
+  const ta   = document.getElementById(`comment-input-${lineNum}`);
+  const text = ta ? ta.value.trim() : '';
+  if (!text) return;
+
+  const comment = { id: state.nextId++, file: fileName, line: lineNum, type: 'line', text, resolved: false };
+  state.comments.push(comment);
+
+  const inputRow  = ta.closest('tr');
+  const anchorRow = inputRow.previousElementSibling;
+  if (anchorRow) anchorRow.classList.remove('selected');
+  inputRow.replaceWith(makeSavedCommentRow(comment));
+
+  scheduleSave();
+}
+
+function makeSavedCommentRow(comment) {
+  const tr = document.createElement('tr');
+  tr.className = 'saved-comment-row';
+  tr.id = `comment-row-${comment.id}`;
+  tr.innerHTML = `
+    <td colspan="3">
+      <div class="saved-comment-bubble">
+        <div class="saved-comment-text">${escHtml(comment.text)}</div>
+        <div class="comment-meta">
+          <button class="btn-resolve ${comment.resolved ? 'resolved' : ''}"
+            onclick="toggleResolved(${comment.id})">${comment.resolved ? '✓ Resolved' : 'Resolve'}</button>
+          <button class="btn-delete-comment" onclick="deleteComment(${comment.id})">Delete</button>
+        </div>
+      </div>
+    </td>
+  `;
+  return tr;
+}
+
+// ── File-level comment ─────────────────────────────────────────────────────
+function onFileComment(textarea, fileName) {
+  const existing = state.comments.find(c => c.file === fileName && c.type === 'file');
+  if (existing) { existing.text = textarea.value; }
+  else { state.comments.push({ id: state.nextId++, file: fileName, line: null, type: 'file', text: textarea.value, resolved: false }); }
+  scheduleSave();
+}
+
+// ── Comment actions ────────────────────────────────────────────────────────
+function toggleResolved(id) {
+  const c = state.comments.find(c => c.id === id);
+  if (!c) return;
+  c.resolved = !c.resolved;
+  const row = document.getElementById(`comment-row-${id}`);
+  if (row) {
+    const btn = row.querySelector('.btn-resolve');
+    btn.textContent = c.resolved ? '✓ Resolved' : 'Resolve';
+    btn.classList.toggle('resolved', c.resolved);
+  }
+  scheduleSave();
+}
+
+function deleteComment(id) {
+  const idx = state.comments.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  state.comments.splice(idx, 1);
+  const row = document.getElementById(`comment-row-${id}`);
+  if (row) row.remove();
+  scheduleSave();
+}
+
+// ── Review submit ──────────────────────────────────────────────────────────
+async function submitReview(status) {
+  const existing = state.comments.find(c => c.type === 'status');
+  if (existing) existing.text = status;
+  else state.comments.push({ id: state.nextId++, file: '__review__', line: null, type: 'status', text: status, resolved: false });
+
+  document.querySelector('.btn-approve').style.outline  = status === 'APPROVE'          ? '2px solid #2da44e' : '';
+  document.querySelector('.btn-request').style.outline  = status === 'REQUEST_CHANGES'  ? '2px solid #cf222e' : '';
+
+  await persistComments();
+  window.close();
+  // Fallback if browser blocks window.close() (tab not opened by script)
+  setTimeout(() => {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:ui-monospace,monospace;font-size:13px;color:#57606a;">Review submitted — you can close this tab.</div>';
+  }, 300);
+}
+
+// ── Full file toggle ───────────────────────────────────────────────────────
+function toggleFullFile(fileId) {
+  const hunkView = document.getElementById(`hunks-${fileId}`);
+  const fullView = document.getElementById(`full-${fileId}`);
+  const btn      = document.getElementById(`file-${fileId}`).querySelector('.btn-full-file');
+  const showFull = !fullView.classList.contains('visible');
+  fullView.classList.toggle('visible', showFull);
+  hunkView.classList.toggle('hidden',  showFull);
+  if (btn) btn.textContent = showFull ? 'Show diff only' : 'Show full file';
+}
+
+// ── Fold toggle ────────────────────────────────────────────────────────────
+function toggleFold(fileId) {
+  const body = document.getElementById(`body-${fileId}`);
+  const btn  = document.getElementById(`file-${fileId}`).querySelector('.btn-fold');
+  const folded = body.classList.toggle('folded');
+  btn.textContent = folded ? 'Unfold' : 'Fold';
+}
+
+// ── Auto-save via companion server ─────────────────────────────────────────
+function collectComments() {
+  document.querySelectorAll('textarea[data-comment-type="file"]').forEach(ta => {
+    const fileName = ta.dataset.file;
+    const text     = ta.value.trim();
+    const existing = state.comments.find(c => c.file === fileName && c.type === 'file');
+    if (text) {
+      if (existing) existing.text = text;
+      else state.comments.push({ id: state.nextId++, file: fileName, line: null, type: 'file', text, resolved: false });
+    } else if (existing) {
+      state.comments.splice(state.comments.indexOf(existing), 1);
+    }
+  });
+  return state.comments.filter(c => c.text && c.text.trim());
+}
+
+function scheduleSave() {
+  clearTimeout(state.saveTimer);
+  setStatus('saving', 'Saving…');
+  state.saveTimer = setTimeout(persistComments, 600);
+}
+
+async function persistComments() {
+  const data = collectComments();
+  try {
+    const res = await fetch(`http://127.0.0.1:${REVIEW_DATA.port}/comments`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data),
+    });
+    if (res.ok) { setStatus('saved', 'Auto-saved'); return; }
+  } catch (_) {}
+  setStatus('error', 'Auto-save failed — server unreachable');
+}
+
+function setStatus(cls, text) {
+  const el = document.getElementById('save-status');
+  el.className   = cls;
+  el.textContent = text;
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return escHtml(s); }
+function sanitizeId(s) { return String(s).replace(/[^a-zA-Z0-9_-]/g, '_'); }
+</script>
+</body>
+</html>
