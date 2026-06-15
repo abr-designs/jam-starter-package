@@ -23,6 +23,28 @@ for all the Tweening.
   - The original tween will be overwritten with the new tween
   - > **NOTE** _This means that if you set a Callback, the original will also be overwritten!!_
 
+## Async (UniTask)
+If your project has [UniTask](https://github.com/Cysharp/UniTask) installed, you also get an awaitable variant:
+[`TweenToAsync()`](../../Runtime/Scripts/Utilities/Tweening/UniTask/TransformTweenExtensions.UniTask.cs) _(or `TweenScaleToAsync()`)_.
+These return a `UniTask` that you can `await`, compose with `UniTask.WhenAll()`, and cancel natively. They live in a
+separate assembly that only compiles when UniTask is present, so the core package keeps UniTask optional.
+
+Unlike the sync engine, the async path has no central `TweenController`. Each call is its own async state machine driven
+by UniTask's player loop, so you pick the backend at the call site by choosing which method to call.
+
+### Features
+- Choose which `PlayerLoopTiming` ticks the tween, such as `Update`, `FixedUpdate` or `LateUpdate`!
+- Cancel with a `CancellationToken`!
+  - Cancelling throws an `OperationCanceledException` and freezes the Transform at its current value
+  - Use `.SuppressCancellationThrow()` if you would rather not handle the exception
+- `await` the call instead of passing a `callback`
+- Shares the same [Curves](#curves) and `SPACE.WORLD` / `SPACE.LOCAL` options as the sync engine
+
+### Stacking Async Tweens
+- If you call an async tween on a `Transform` that is already running an async tween on the same property
+  - The original async tween is cancelled, throwing an `OperationCanceledException` to whoever was awaiting it
+- > **NOTE** _Mixing a sync `TweenTo()` and an async `TweenToAsync()` on the same `Transform` & property at the same time is undefined behaviour. In `DEBUG` builds an assertion will fire to warn you._
+
 ## Curves
 Provided are some options for how your target transform should Lerp from A to B. By default, calling `.TweenTo()` will 
 use `LINEAR` but below are the current options.
