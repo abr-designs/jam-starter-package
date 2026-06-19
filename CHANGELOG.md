@@ -19,10 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Skips interception when no palette is configured or palette has no colors
 - Added Prefab Gym & Zoo sample
   - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
-- Added `MovementDashboardController.cs` to the 3D Character Controller sample for editing `CharacterMovement3DDataScriptableObject` in playmode
-  - Changes persist to disk in Editor active in `#if DEBUG` builds, disabled in release
-  - Reset button restores all values to the snapshot captured at Play session start
-  - Added `MovementDashboard.uxml` and `MovementDashboard.uss` to `Samples~/3DCharacterController/UI/`
 - Added `TransformTweenExtensions.UniTask.cs` providing `TweenToAsync` & `TweenScaleToAsync` extensions returning `UniTask`, gated behind UniTask install
   - Exposes `PlayerLoopTiming` & native `CancellationToken` cancellation (throws `OperationCanceledException`, freezes transform at current value)
   - Added `TweenRegistry.cs` to cancel a prior async tween when a new one starts on the same `(Transform, TRANSFORM)` key
@@ -41,10 +37,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - `SimplePathFollow.cs` now motion-only, inherits from `SimplePath`
   - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
   - Renamed `SimplePathFollowEditor.cs` → `SimplePathEditor.cs`, targets `SimplePathFollow` using `editorForChildClasses: true`
-- Updated `FixedPaletteSettings.cs`
-  - Added `materialColorSelect` field (`COLOR_SELECT`, default: `SHADES`), controls display mode for Material Inspector palette picker
-- Updated `FixedPaletteSettingsProvider.cs`
-  - Added "Material Color Selector" dropdown to Project Settings UI, bound to `materialColorSelect`
 - Documented `TweenToAsync` & `TweenScaleToAsync` in `Documentation~/Utilities/utilities-extensions-transform.md`
 - Updated documentation generation workflow
   - Added ability to generate documentation website for `main` and `develop/v*` branches
@@ -62,16 +54,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
 - Added missing UGUI dependency for Unity 6000.3+ into `package.json`
-- npm packages updated to fix CVE alerts
-- Fixed `ColorPickerInterceptor` palette window opening at top-left corner on second and subsequent opens
-  - Root cause: `ColorPicker.color` setter internally calls `GUIUtility.ExitGUI()`, throwing `ExitGUIException` (wrapped in `TargetInvocationException` by reflection), which bypassed `CloseOffscreenPicker()` and left the off-screen picker at `(-10000,-10000)`, poisoning the layout file's saved position for future opens
-  - Fixed by catching `ExitGUIException` / `TargetInvocationException` around `SetValue` so cleanup always runs
-  - Removed redundant manual `SendEvent` call, `OnColorChanged` already notifies the inspector before throwing
-  - Now saves and restores picker position (in addition to `minSize`/`maxSize`) before closing, so the layout system records the correct position
-- Fixed `ColorPickerInterceptor` palette window not closing after color selection
-  - Same `ExitGUIException` propagation was also skipping `s_Intercepting = false` and `EditorApplication.delayCall += Close`, leaving the palette open indefinitely until the user manually dismissed it
-- Added `ColorPickerHeightPrefGuard`, unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
-- Resolve log spamming emminating from `Draw.Arrow()` with `(0, 0, 0)` direction values
+- npm packages updated to fix CVE alerts 
 
 ## [0.0.9] - 2026-04-01
 
