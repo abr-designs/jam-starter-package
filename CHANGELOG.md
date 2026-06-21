@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TweenController.HasActiveTween(Transform, TRANSFORM)` for async-side conflict detection in dev builds
 - Removed dead `TweenData.AsAsncTask()` from `TweenController.cs`
 - Extracted `GetCurveT` from `TweenController.cs` into shared `TweenMath.cs` so the sync & async tweens can use the same base
+- Reformatted `docs~/plans/` to the arch-plan template using ADR-style numbering (`0001-simple-path`, `0002-async-tweening`)
 
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded
