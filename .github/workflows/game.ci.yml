@@ -1,18 +1,25 @@
 # Cheat Sheet: https://github.github.io/actions-cheat-sheet/actions-cheat-sheet.html
 name: Test package
-on: 
+on:
   #push:
-  #  paths-ignore:
-  #  - 'WebsiteDocs~/**'
-  #  - 'WebGLTemplates~/**'
-  #  - 'Documentation~/**'
-  #  - '*.md'
+  #  paths:
+  #  - '**/*.cs'
+  #  - '**/*.asmdef'
+  #  - '**/*.asmref'
+  #  - 'package.json'
+  #  - '.github/workflows/game.ci.yml'
+  #  - '!Samples~/**'
   pull_request:
-    paths-ignore:
-    - 'WebsiteDocs~/**'
-    - 'WebGLTemplates~/**'
-    - 'Documentation~/**'
-    - '*.md'
+    # Only run tests when code that affects them changes.
+    # '**/*.cs' covers Runtime, Editor, Tests, FixedPaletteTool & CastVisualizer.
+    # '!Samples~/**' must stay last so it overrides the positive patterns for samples.
+    paths:
+    - '**/*.cs'
+    - '**/*.asmdef'
+    - '**/*.asmref'
+    - 'package.json'
+    - '.github/workflows/game.ci.yml'
+    - '!Samples~/**'
 
 run-name: >
   Testing Package From ${{ github.event_name == 'pull_request' &&
