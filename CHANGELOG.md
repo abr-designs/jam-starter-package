@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
+- Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, no MonoBehaviour added to text GameObjects
+  - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface
+  - Added `TextEffect.cs` abstract base & `TextEffectAttribute.cs` so effects are added by subclassing & tagging a link id
+  - Added `TextEffectRegistry.cs` to auto-discover effects by reflection & cache one shared instance per key
+  - Added `AnimatedText.cs` to cache `<link>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
+  - Added `CharMod.cs` & `EffectSpan.cs` for per-character offset, rotation, scale & color output
+  - Added `ShakeEffect.cs`, `WaveEffect.cs`, `JitterEffect.cs` & `PulseEffect.cs` built-in effects, keyed `shake`, `wave`, `jitter` & `pulse`
+  - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
+  - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
+  - Added `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering effect output bounds, `CharMod.Identity` & reflection discovery (built-in, custom & unknown keys)
+  - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking & per-character displacement/restore across `TextMeshProUGUI` & `TextMeshPro`
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
