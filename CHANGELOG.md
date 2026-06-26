@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `ShakeEffect.cs`, `WaveEffect.cs`, `JitterEffect.cs` & `PulseEffect.cs` built-in effects, keyed `shake`, `wave`, `jitter` & `pulse`
   - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
   - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
+  - Added `utilities-text-animation.md` documenting link-tag authoring, the opt-in API, effect loading & adding a new effect
   - Added `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering effect output bounds, `CharMod.Identity` & reflection discovery (built-in, custom & unknown keys)
   - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking & per-character displacement/restore across `TextMeshProUGUI` & `TextMeshPro`
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
