@@ -1,5 +1,5 @@
 {
-    "name": "Jam-starter.Editor.TextAnimation",
+    "name": "Jam-starter.Runtime.Editor.TextAnimation",
     "rootNamespace": "",
     "references": [
         "Jam-starter.Runtime.TextAnimation",
