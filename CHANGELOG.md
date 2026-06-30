@@ -8,15 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
-- Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, no MonoBehaviour added to text GameObjects
-  - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface
+- Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, ticking centrally rather than one MonoBehaviour per label
+  - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface, adding & removing the `AnimatedTextMarker` to match the inspector toggle
+  - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
   - Added `TextEffect.cs` abstract base & `TextEffectAttribute.cs` so effects are added by subclassing & tagging a link id
   - Added `TextEffectRegistry.cs` to auto-discover effects by reflection & cache one shared instance per key
   - Added `AnimatedText.cs` to cache `<link>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
+  - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown
   - Added `CharMod.cs` & `EffectSpan.cs` for per-character offset, rotation, scale & color output
   - Added `ShakeEffect.cs`, `WaveEffect.cs`, `JitterEffect.cs` & `PulseEffect.cs` built-in effects, keyed `shake`, `wave`, `jitter` & `pulse`
   - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
   - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
+  - Added `AnimatedTextHeaderToggle.cs` appending an "Animate Text" toggle to the GameObject inspector header of TMP text objects via `finishedDefaultHeaderGUI`, toggling the marker without replacing TMP's editor
   - Added `utilities-text-animation.md` documenting link-tag authoring, the opt-in API, effect loading & adding a new effect
   - Added `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering effect output bounds, `CharMod.Identity` & reflection discovery (built-in, custom & unknown keys)
   - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking & per-character displacement/restore across `TextMeshProUGUI` & `TextMeshPro`

@@ -45,8 +45,13 @@ Hello <link="shake">world</link>! Watch this <link="wave">wave</link> go by.
 > _In the Editor, any loaded TMP text containing a `<link>` tag previews automatically, so you do not need to call
 > `PlayTextAnimation()` to see it animate in Scene or Game view. The call is what opts the text in at runtime._
 
-Call the [`PlayTextAnimation()`](../../Runtime/Scripts/Utilities/TextAnimation/TMP_TextExtensions.cs) extension method on
-any `TMP_Text`. Call `StopTextAnimation()` to restore the original mesh & unregister it.
+Enabling animation on a GameObject means it uses an [`AnimatedTextMarker`](../../Runtime/Scripts/Utilities/TextAnimation/AnimatedTextMarker.cs) component. This is how the animation is 
+registered & updated. 
+There are three ways to add it:
+1. Enabled the inspector "Animate Text" toggle
+2. Calling the `PlayTextAnimation()` extension method
+3. Adding the `AnimatedTextMarker` manually
+   - Call the [`PlayTextAnimation()`](../../Runtime/Scripts/Utilities/TextAnimation/TMP_TextExtensions.cs) extension method on any `TMP_Text` to add the marker. Call `StopTextAnimation()` to remove it, restoring the original mesh & unregistering the text.
 
 ```csharp
 using TMPro;
@@ -70,6 +75,29 @@ public class TextAnimationExample : MonoBehaviour
     }
 }
 ```
+
+### Inspector toggle
+
+> [!NOTE]
+> _`AnimatedTextMarker` is `[ExecuteAlways]`, so the toggle also enables the live edit-mode preview in Scene & Game view._
+
+[`AnimatedTextHeaderToggle`](../../Runtime/Scripts/Utilities/TextAnimation/Editor/AnimatedTextHeaderToggle.cs) appends an "Animate Text" toggle to the GameObject inspector header 
+of any GameObject carrying a `TMP_Text`. 
+- [x] Enabled adds an `AnimatedTextMarker` component _(Will Animate)_
+- [ ] Disabled removes the `AnimatedTextMarker` component _(Wont Animate)_
+
+![text-animation-toggle.png](../Images/Utilities/text-animation-toggle.png)
+
+### Pausing while not visible
+> [!NOTE]
+> _UGUI has no frustum culling, so scrolling a UGUI label fully off a screen edge does not pause it. Only the signals listed above do._
+
+Animated labels skip their per-character work while not visible & resume seamlessly when shown again.
+
+What "Not visible" entails:
+- The text is inactive or disabled.
+- World-space 3D TMP text that is frustum-culled off screen.
+- UGUI TMP text whose `CanvasRenderer` is culled, whose inherited alpha is approximately 0.0, or whose `Canvas` is disabled.
 
 ## How effects are loaded
 > [!IMPORTANT]

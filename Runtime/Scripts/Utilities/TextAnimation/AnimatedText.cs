@@ -23,6 +23,9 @@ namespace Utilities.TextAnimation
 
         private readonly TMP_Text m_textComponent;
         private readonly List<EffectRange> m_effectRangeList;
+        private readonly TextMeshProUGUI m_uguiText;
+        private readonly CanvasRenderer m_canvasRenderer;
+        private readonly Renderer m_meshRenderer;
 
         private Vector3[] m_originalVertices;
         private Color32[] m_originalColors;
@@ -54,6 +57,12 @@ namespace Utilities.TextAnimation
             m_textComponent = textComponent;
             m_effectRangeList = new List<EffectRange>();
 
+            m_uguiText = textComponent as TextMeshProUGUI;
+            if (m_uguiText != null)
+                m_canvasRenderer = m_uguiText.canvasRenderer;
+            else
+                m_meshRenderer = textComponent.GetComponent<Renderer>();
+
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
             Refresh();
         }
@@ -81,7 +90,7 @@ namespace Utilities.TextAnimation
 
         public void Apply(float time)
         {
-            if (IsValid == false || HasSpans == false)
+            if (IsValid == false || HasSpans == false || IsVisible() == false)
                 return;
 
             var textInfo = m_textComponent.textInfo;
@@ -223,6 +232,25 @@ namespace Utilities.TextAnimation
                 vertices[vertexIndex + corner] = center + rotation * offsetFromCenter + mod.Offset;
                 colors[vertexIndex + corner] = MultiplyColor(m_originalColors[sourceBase + corner], mod.Color);
             }
+        }
+
+        // Cheap, per-frame gate so hidden labels skip the per-character vertex work. Effects are
+        // stateless in time, so a paused label resumes seamlessly once it is shown again.
+        private bool IsVisible()
+        {
+            if (!m_textComponent.isActiveAndEnabled)
+                return false;
+
+            if (m_uguiText == null) 
+                return m_meshRenderer == null || m_meshRenderer.isVisible;
+            
+            if (m_canvasRenderer != null &&
+                (m_canvasRenderer.cull || m_canvasRenderer.GetInheritedAlpha() <= 0.001f))
+                return false;
+
+            var canvas = m_uguiText.canvas;
+            return canvas != null && canvas.isActiveAndEnabled;
+
         }
 
         private void OnTextChanged(UnityEngine.Object changedObject)

@@ -11,9 +11,10 @@ using UnityEngine.PlayerLoop;
 namespace Utilities.TextAnimation
 {
     /// <summary>
-    /// Static manager that drives every opted-in <see cref="TMP_Text"/> from a single PlayerLoop tick.
-    /// No MonoBehaviour or component is added to text GameObjects. Prefer the
-    /// <see cref="TMP_TextExtensions.PlayTextAnimation"/> extension method as the opt-in surface.
+    /// Static manager that drives every opted-in <see cref="TMP_Text"/> from a single PlayerLoop tick,
+    /// so ticking costs one shared update rather than a MonoBehaviour per label. Text opts in by carrying
+    /// an <see cref="AnimatedTextMarker"/>; prefer the <see cref="TMP_TextExtensions.PlayTextAnimation"/>
+    /// extension method or the inspector toggle to add it.
     /// </summary>
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-23</remarks>
     public static class TextAnimator
