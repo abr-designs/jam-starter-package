@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `utilities-text-animation.md` documenting link-tag authoring, the opt-in API, effect loading & adding a new effect
   - Added `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering effect output bounds, `CharMod.Identity` & reflection discovery (built-in, custom & unknown keys)
   - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking & per-character displacement/restore across `TextMeshProUGUI` & `TextMeshPro`
+  - Added `TmpEssentialsCiImporter.cs` importing the TMP Essential Resources in headless CI, so the mesh-dependent tests run against a real font instead of failing on a fontless mesh
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
