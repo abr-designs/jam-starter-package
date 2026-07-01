@@ -76,7 +76,7 @@ namespace Tests.Utilities.TextAnimation
             var animated = Animate(text);
 
             var before = CaptureCharCenters(text);
-            animated.Apply(POSITIVE_PHASE_TIME);
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
             var after = CaptureCharCenters(text);
 
             var textInfo = text.textInfo;
@@ -103,7 +103,7 @@ namespace Tests.Utilities.TextAnimation
             var animated = Animate(text);
 
             var before = CaptureCharCenters(text);
-            animated.Apply(POSITIVE_PHASE_TIME);
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
             var after = CaptureCharCenters(text);
 
             var delta = after[0] - before[0];
@@ -119,7 +119,7 @@ namespace Tests.Utilities.TextAnimation
             var animated = Animate(text);
 
             var before = CharacterDiagonal(text, 0);
-            animated.Apply(POSITIVE_PHASE_TIME);
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
             var after = CharacterDiagonal(text, 0);
 
             Assert.Greater(after, before, "Pulse at a positive phase should grow the character.");
@@ -134,7 +134,7 @@ namespace Tests.Utilities.TextAnimation
             var animated = Animate(text);
 
             var before = CaptureCharCenters(text);
-            animated.Apply(POSITIVE_PHASE_TIME);
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
             animated.Restore();
             var after = CaptureCharCenters(text);
 

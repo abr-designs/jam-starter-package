@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `TextEffect.cs` abstract base & `TextEffectAttribute.cs` so effects are added by subclassing & tagging a link id
   - Added `TextEffectRegistry.cs` to auto-discover effects by reflection & cache one shared instance per key
   - Added `AnimatedText.cs` to cache `<link>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
-  - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown
+  - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown, with an optional `Apply(force)` bypass for off-screen callers
   - Added `CharMod.cs` & `EffectSpan.cs` for per-character offset, rotation, scale & color output
   - Added `ShakeEffect.cs`, `WaveEffect.cs`, `JitterEffect.cs` & `PulseEffect.cs` built-in effects, keyed `shake`, `wave`, `jitter` & `pulse`
   - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define

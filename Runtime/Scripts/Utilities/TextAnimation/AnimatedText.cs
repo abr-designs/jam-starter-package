@@ -88,9 +88,10 @@ namespace Utilities.TextAnimation
             m_isRefreshing = false;
         }
 
-        public void Apply(float time)
+        // force skips the visibility gate so callers can apply while off-screen; the tick loop leaves it false.
+        public void Apply(float time, bool force = false)
         {
-            if (IsValid == false || HasSpans == false || IsVisible() == false)
+            if (IsValid == false || HasSpans == false || (force == false && IsVisible() == false))
                 return;
 
             var textInfo = m_textComponent.textInfo;
