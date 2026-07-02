@@ -13,16 +13,20 @@ namespace Utilities.TextAnimation
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-23</remarks>
     [Preserve]
     [TextEffect("shake")]
-    public class ShakeEffect : TextEffect
+    public class ShakeMotionEffect : MotionTextEffect
     {
         protected float m_amplitude = 4f;
         protected float m_frequency = 25f;
 
-        public override void Apply(ref CharMod mod, int charIndex, float time)
+        // Inline args: shake(amplitude, frequency).
+        public override void Apply(ref CharMod mod, int charIndex, int spanLength, float time, in EffectArgs args)
         {
-            var noiseTime = time * m_frequency;
-            var offsetX = (Mathf.PerlinNoise(charIndex, noiseTime) - 0.5f) * 2f * m_amplitude;
-            var offsetY = (Mathf.PerlinNoise(charIndex + 100f, noiseTime) - 0.5f) * 2f * m_amplitude;
+            var amplitude = args.GetFloat(0, m_amplitude);
+            var frequency = args.GetFloat(1, m_frequency);
+
+            var noiseTime = time * frequency;
+            var offsetX = (Mathf.PerlinNoise(charIndex, noiseTime) - 0.5f) * 2f * amplitude;
+            var offsetY = (Mathf.PerlinNoise(charIndex + 100f, noiseTime) - 0.5f) * 2f * amplitude;
 
             mod.Offset = new Vector3(offsetX, offsetY, 0f);
         }

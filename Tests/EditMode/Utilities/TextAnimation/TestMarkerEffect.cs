@@ -13,11 +13,11 @@ namespace Tests.Utilities.TextAnimation
     /// </summary>
     [Preserve]
     [TextEffect("__test_marker")]
-    public class TestMarkerEffect : TextEffect
+    public class TestMarkerEffect : MotionTextEffect
     {
         public static readonly Vector3 MarkerOffset = new Vector3(7f, 0f, 0f);
 
-        public override void Apply(ref CharMod mod, int charIndex, float time)
+        public override void Apply(ref CharMod mod, int charIndex, int spanLength, float time, in EffectArgs args)
         {
             mod.Offset = MarkerOffset;
         }

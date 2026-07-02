@@ -12,15 +12,20 @@ namespace Utilities.TextAnimation
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-23</remarks>
     [Preserve]
     [TextEffect("wave")]
-    public class WaveEffect : TextEffect
+    public class WaveMotionEffect : MotionTextEffect
     {
         protected float m_amplitude = 5f;
         protected float m_speed = 6f;
         protected float m_charPhase = 0.5f;
 
-        public override void Apply(ref CharMod mod, int charIndex, float time)
+        // Inline args: wave(amplitude, speed, charPhase).
+        public override void Apply(ref CharMod mod, int charIndex, int spanLength, float time, in EffectArgs args)
         {
-            var y = Mathf.Sin(time * m_speed + charIndex * m_charPhase) * m_amplitude;
+            var amplitude = args.GetFloat(0, m_amplitude);
+            var speed = args.GetFloat(1, m_speed);
+            var charPhase = args.GetFloat(2, m_charPhase);
+
+            var y = Mathf.Sin(time * speed + charIndex * charPhase) * amplitude;
             mod.Offset = new Vector3(0f, y, 0f);
         }
     }

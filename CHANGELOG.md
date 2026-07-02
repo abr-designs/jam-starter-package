@@ -11,18 +11,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, ticking centrally rather than one MonoBehaviour per label
   - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface, adding & removing the `AnimatedTextMarker` to match the inspector toggle
   - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
-  - Added `TextEffect.cs` abstract base & `TextEffectAttribute.cs` so effects are added by subclassing & tagging a link id
-  - Added `TextEffectRegistry.cs` to auto-discover effects by reflection & cache one shared instance per key
-  - Added `AnimatedText.cs` to cache `<link>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
+  - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(20, 2)"`
+  - Added `AnimTagPreprocessor.cs`, an `ITextPreprocessor` stripping `<anim>` tags before TMP parses & recording each run's range & keys, mapped back to characters via `TMP_CharacterInfo.index`
+  - Added `TextEffect.cs` abstract base with `MotionTextEffect.cs` & `ColorTextEffect.cs` channel bases & `TextEffectAttribute.cs`, so effects are added by subclassing a channel & tagging a key
+  - Added `TextEffectRegistry.cs` to auto-discover effects by reflection per channel & cache one shared instance per key
+  - Added `AnimatedText.cs` to cache `<anim>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
   - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown, with an optional `Apply(force)` bypass for off-screen callers
-  - Added `CharMod.cs` & `EffectSpan.cs` for per-character offset, rotation, scale & color output
-  - Added `ShakeEffect.cs`, `WaveEffect.cs`, `JitterEffect.cs` & `PulseEffect.cs` built-in effects, keyed `shake`, `wave`, `jitter` & `pulse`
+  - Added `CharMod.cs`, `EffectRange.cs`, `RawAnimSpan.cs` & `EffectArgs.cs` for per-character output, resolved spans & raw-token inline arguments read through non-allocating typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`)
+  - Added `ShakeMotionEffect.cs`, `WaveMotionEffect.cs`, `JitterMotionEffect.cs` & `PulseMotionEffect.cs` motion effects, keyed `shake`, `wave`, `jitter` & `pulse`
+  - Added `RainbowColorEffect.cs`, `GradientColorEffect.cs`, `FadeColorEffect.cs` & `FlashColorEffect.cs` color effects, keyed `rainbow`, `gradient`, `fade` & `flash`
   - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
   - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
   - Added `AnimatedTextHeaderToggle.cs` appending an "Animate Text" toggle to the GameObject inspector header of TMP text objects via `finishedDefaultHeaderGUI`, toggling the marker without replacing TMP's editor
-  - Added `utilities-text-animation.md` documenting link-tag authoring, the opt-in API, effect loading & adding a new effect
-  - Added `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering effect output bounds, `CharMod.Identity` & reflection discovery (built-in, custom & unknown keys)
-  - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking & per-character displacement/restore across `TextMeshProUGUI` & `TextMeshPro`
+  - Added `utilities-text-animation.md` documenting `<anim>`-tag authoring, inline arguments, the two channels, the opt-in API, effect loading & adding a new effect
+  - Added `AnimTagPreprocessorTests.cs`, `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering tag stripping & range recording, inline-argument parsing, effect output bounds, `CharMod.Identity` & per-channel reflection discovery (built-in, custom & unknown keys)
+  - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking, per-character displacement/restore & motion-with-color composition across `TextMeshProUGUI` & `TextMeshPro`
   - Added `TmpEssentialsCiImporter.cs` importing the TMP Essential Resources in headless CI, so the mesh-dependent tests run against a real font instead of failing on a fontless mesh
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation

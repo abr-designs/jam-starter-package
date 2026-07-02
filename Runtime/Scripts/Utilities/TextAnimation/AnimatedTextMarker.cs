@@ -9,7 +9,7 @@ namespace Utilities.TextAnimation
 {
     /// <summary>
     /// Registers its <see cref="TMP_Text"/> with the <see cref="TextAnimator"/> while enabled and
-    /// unregisters on disable. Add it to opt a label in; the &lt;link&gt; markup selects the effect.
+    /// unregisters on disable. Add it to opt a label in; the &lt;anim&gt; markup selects the effect.
     /// </summary>
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-29</remarks>
     [ExecuteAlways]

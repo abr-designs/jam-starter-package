@@ -50,21 +50,21 @@ namespace Tests.Utilities.TextAnimation
         // --- Span building ---
 
         [Test]
-        public void Spans_AnimatedLink_AreBuilt([Values] TmpKind kind)
+        public void Spans_AnimatedTag_AreBuilt([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "Hello <link=\"wave\">world</link>!");
+            var text = CreateText(kind, "Hello <anim motion=\"wave\">world</anim>!");
             var animated = Animate(text);
 
             Assert.IsTrue(animated.HasSpans);
         }
 
         [Test]
-        public void Spans_UnknownLink_AreNotBuilt([Values] TmpKind kind)
+        public void Spans_UnknownKey_AreNotBuilt([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "Hello <link=\"nope\">world</link>!");
+            var text = CreateText(kind, "Hello <anim motion=\"nope\">world</anim>!");
             var animated = Animate(text);
 
-            Assert.IsFalse(animated.HasSpans, "A link with no matching effect should stay inert.");
+            Assert.IsFalse(animated.HasSpans, "A tag whose keys match no effect should stay inert.");
         }
 
         // --- Displacement ---
@@ -72,17 +72,16 @@ namespace Tests.Utilities.TextAnimation
         [Test]
         public void Apply_SpanChars_Move_NonSpanChars_StayPut([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "AAA<link=\"wave\">BBB</link>CCC");
+            // Visible characters are "AAABBBCCC"; the wave wraps the middle three (indices 3..5).
+            var text = CreateText(kind, "AAA<anim motion=\"wave\">BBB</anim>CCC");
             var animated = Animate(text);
+
+            const int spanStart = 3;
+            const int spanEnd = 6;
 
             var before = CaptureCharCenters(text);
             animated.Apply(POSITIVE_PHASE_TIME, force: true);
             var after = CaptureCharCenters(text);
-
-            var textInfo = text.textInfo;
-            var linkInfo = textInfo.linkInfo[0];
-            var spanStart = linkInfo.linkTextfirstCharacterIndex;
-            var spanEnd = spanStart + linkInfo.linkTextLength;
 
             foreach (var entry in before)
             {
@@ -99,7 +98,7 @@ namespace Tests.Utilities.TextAnimation
         [Test]
         public void Wave_OffsetsSpanVerticesVertically([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "<link=\"wave\">W</link>");
+            var text = CreateText(kind, "<anim motion=\"wave\">W</anim>");
             var animated = Animate(text);
 
             var before = CaptureCharCenters(text);
@@ -115,7 +114,7 @@ namespace Tests.Utilities.TextAnimation
         [Test]
         public void Pulse_ChangesSpanCharacterSize([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "<link=\"pulse\">W</link>");
+            var text = CreateText(kind, "<anim motion=\"pulse\">W</anim>");
             var animated = Animate(text);
 
             var before = CharacterDiagonal(text, 0);
@@ -125,12 +124,51 @@ namespace Tests.Utilities.TextAnimation
             Assert.Greater(after, before, "Pulse at a positive phase should grow the character.");
         }
 
+        // --- Color channel ---
+
+        [Test]
+        public void Color_ChangesVertexColor_PositionStays([Values] TmpKind kind)
+        {
+            var text = CreateText(kind, "<anim color=\"rainbow\">WWWW</anim>");
+            var animated = Animate(text);
+
+            var beforeCenters = CaptureCharCenters(text);
+            var beforeColors = CaptureCharColors(text);
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
+            var afterCenters = CaptureCharCenters(text);
+            var afterColors = CaptureCharColors(text);
+
+            foreach (var entry in beforeCenters)
+            {
+                var drift = (afterCenters[entry.Key] - entry.Value).sqrMagnitude;
+                Assert.Less(drift, MOVED_THRESHOLD, $"Color-only span moved character {entry.Key}.");
+                Assert.AreNotEqual(beforeColors[entry.Key], afterColors[entry.Key],
+                    $"Color-only span should have recolored character {entry.Key}.");
+            }
+        }
+
+        [Test]
+        public void MotionAndColor_ComposeOnSameSpan([Values] TmpKind kind)
+        {
+            var text = CreateText(kind, "<anim motion=\"wave\" color=\"rainbow\">W</anim>");
+            var animated = Animate(text);
+
+            var beforeCenter = CaptureCharCenters(text)[0];
+            var beforeColor = CaptureCharColors(text)[0];
+            animated.Apply(POSITIVE_PHASE_TIME, force: true);
+            var afterCenter = CaptureCharCenters(text)[0];
+            var afterColor = CaptureCharColors(text)[0];
+
+            Assert.Greater((afterCenter - beforeCenter).y, 0f, "Motion channel should still move the character.");
+            Assert.AreNotEqual(beforeColor, afterColor, "Color channel should still recolor the character.");
+        }
+
         // --- Restore ---
 
         [Test]
         public void Restore_ReturnsVerticesToOriginal([Values] TmpKind kind)
         {
-            var text = CreateText(kind, "AAA<link=\"wave\">BBB</link>");
+            var text = CreateText(kind, "AAA<anim motion=\"wave\">BBB</anim>");
             var animated = Animate(text);
 
             var before = CaptureCharCenters(text);
@@ -155,7 +193,7 @@ namespace Tests.Utilities.TextAnimation
 
             Assert.IsFalse(animated.HasSpans);
 
-            text.text = "now <link=\"wave\">animated</link>";
+            text.text = "now <anim motion=\"wave\">animated</anim>";
             text.ForceMeshUpdate(); // raises TEXT_CHANGED, which drives AnimatedText.Refresh
 
             Assert.IsTrue(animated.HasSpans, "AnimatedText should rebuild spans after the text changes.");
@@ -219,6 +257,24 @@ namespace Tests.Utilities.TextAnimation
             }
 
             return centers;
+        }
+
+        private static Dictionary<int, Color32> CaptureCharColors(TMP_Text text)
+        {
+            var textInfo = text.textInfo;
+            var colors = new Dictionary<int, Color32>();
+
+            for (int i = 0; i < textInfo.characterCount; i++)
+            {
+                var characterInfo = textInfo.characterInfo[i];
+                if (characterInfo.isVisible == false)
+                    continue;
+
+                var vertexColors = textInfo.meshInfo[characterInfo.materialReferenceIndex].colors32;
+                colors[i] = vertexColors[characterInfo.vertexIndex];
+            }
+
+            return colors;
         }
 
         private static float CharacterDiagonal(TMP_Text text, int characterIndex)

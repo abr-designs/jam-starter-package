@@ -91,7 +91,7 @@ namespace Tests.Utilities.TextAnimation
                 NUnit.Framework.Assert.Ignore("TMP Essential Resources not imported; skipping PlayerLoop mesh smoke test.");
 
             m_text.font = TMP_Settings.defaultFontAsset;
-            m_text.text = "<link=\"wave\">animate</link>";
+            m_text.text = "<anim motion=\"wave\">animate</anim>";
             m_text.ForceMeshUpdate();
 
             var baselineY = SampleFirstSpanVertexY(m_text);

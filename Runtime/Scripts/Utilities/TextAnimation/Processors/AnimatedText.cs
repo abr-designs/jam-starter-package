@@ -10,7 +10,7 @@ namespace Utilities.TextAnimation
 {
     /// <summary>
     /// Holds the parse state for a single <see cref="TMP_Text"/> and runs its effect spans each frame.
-    /// Caches the link spans and a snapshot of the un-animated vertices so per-frame work stays pure math.
+    /// Caches the &lt;anim&gt; spans and a snapshot of the un-animated vertices so per-frame work stays pure math.
     /// The snapshot is kept in flat buffers that are reused across refreshes and indexed per material.
     /// </summary>
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-23</remarks>
@@ -23,6 +23,7 @@ namespace Utilities.TextAnimation
 
         private readonly TMP_Text m_textComponent;
         private readonly List<EffectRange> m_effectRangeList;
+        private readonly AnimTagPreprocessor m_preprocessor;
         private readonly TextMeshProUGUI m_uguiText;
         private readonly CanvasRenderer m_canvasRenderer;
         private readonly Renderer m_meshRenderer;
@@ -62,6 +63,11 @@ namespace Utilities.TextAnimation
                 m_canvasRenderer = m_uguiText.canvasRenderer;
             else
                 m_meshRenderer = textComponent.GetComponent<Renderer>();
+
+            // The preprocessor must be attached before the first mesh build so <anim> tags are stripped
+            // and recorded during ParseInputText; Refresh then reads the spans it produced.
+            m_preprocessor = new AnimTagPreprocessor();
+            textComponent.textPreprocessor = m_preprocessor;
 
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
             Refresh();
@@ -109,7 +115,7 @@ namespace Utilities.TextAnimation
                     if (characterInfo.isVisible == false)
                         continue;
 
-                    ApplyToCharacter(textInfo, characterInfo, span.Effect, charOffset, time);
+                    ApplyToCharacter(textInfo, characterInfo, span, charOffset, time);
                 }
             }
 
@@ -139,6 +145,9 @@ namespace Utilities.TextAnimation
         public void Dispose()
         {
             TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextChanged);
+
+            if (m_textComponent != null && ReferenceEquals(m_textComponent.textPreprocessor, m_preprocessor))
+                m_textComponent.textPreprocessor = null;
         }
 
         #endregion //Public Methods
@@ -183,27 +192,85 @@ namespace Utilities.TextAnimation
         {
             m_effectRangeList.Clear();
 
-            var textInfo = m_textComponent.textInfo;
-            for (int i = 0; i < textInfo.linkCount; i++)
-            {
-                var linkInfo = textInfo.linkInfo[i];
-                var effect = TextEffectRegistry.Get(linkInfo.GetLinkID());
-                if (effect == null)
-                    continue;
+            var spans = m_preprocessor.Spans;
+            if (spans.Count == 0)
+                return;
 
-                m_effectRangeList.Add(new EffectRange
+            var textInfo = m_textComponent.textInfo;
+
+            // Walk the generated characters and coalesce consecutive characters that resolve to the same
+            // <anim> span into one range. characterInfo[i].index is the character's position in the
+            // stripped string, so it lines up with the span source ranges the preprocessor recorded.
+            int currentSpan = -1;
+            int runStart = 0;
+            int runLength = 0;
+
+            for (int i = 0; i < textInfo.characterCount; i++)
+            {
+                int sourceIndex = textInfo.characterInfo[i].index;
+                int spanIndex = FindSpan(spans, sourceIndex);
+
+                if (spanIndex != currentSpan)
                 {
-                    Effect = effect,
-                    Start = linkInfo.linkTextfirstCharacterIndex,
-                    Length = linkInfo.linkTextLength,
-                });
+                    FlushRun(spans, currentSpan, runStart, runLength);
+                    currentSpan = spanIndex;
+                    runStart = i;
+                    runLength = 0;
+                }
+
+                runLength++;
             }
+
+            FlushRun(spans, currentSpan, runStart, runLength);
+        }
+
+        // Innermost span wins when ranges overlap, matching the flat "inner replaces" rule.
+        private static int FindSpan(IReadOnlyList<RawAnimSpan> spans, int sourceIndex)
+        {
+            int best = -1;
+            int bestStart = -1;
+
+            for (int s = 0; s < spans.Count; s++)
+            {
+                var span = spans[s];
+                if (sourceIndex >= span.SourceStart && sourceIndex < span.SourceEnd && span.SourceStart > bestStart)
+                {
+                    best = s;
+                    bestStart = span.SourceStart;
+                }
+            }
+
+            return best;
+        }
+
+        private void FlushRun(IReadOnlyList<RawAnimSpan> spans, int spanIndex, int start, int length)
+        {
+            if (spanIndex < 0 || length == 0)
+                return;
+
+            var raw = spans[spanIndex];
+            var motion = string.IsNullOrEmpty(raw.MotionKey) ? null : TextEffectRegistry.GetMotion(raw.MotionKey);
+            var color = string.IsNullOrEmpty(raw.ColorKey) ? null : TextEffectRegistry.GetColor(raw.ColorKey);
+
+            // A span whose keys resolve to nothing stays inert, just like an unrecognized effect.
+            if (motion == null && color == null)
+                return;
+
+            m_effectRangeList.Add(new EffectRange
+            {
+                Start = start,
+                Length = length,
+                Motion = motion,
+                MotionArgs = raw.MotionArgs,
+                Color = color,
+                ColorArgs = raw.ColorArgs,
+            });
         }
 
         private void ApplyToCharacter(
             TMP_TextInfo textInfo,
             TMP_CharacterInfo characterInfo,
-            TextEffect effect,
+            EffectRange range,
             int charIndex,
             float time)
         {
@@ -214,8 +281,13 @@ namespace Utilities.TextAnimation
             var vertices = textInfo.meshInfo[materialIndex].vertices;
             var colors = textInfo.meshInfo[materialIndex].colors32;
 
+            // Both channels compose onto one CharMod: motion writes offset/scale/rotation, color writes
+            // the tint. A null channel leaves its axis at identity, so the character keeps its original.
             var mod = CharMod.Identity;
-            effect.Apply(ref mod, charIndex, time);
+            if (range.Motion != null)
+                range.Motion.Apply(ref mod, charIndex, range.Length, time, in range.MotionArgs);
+            if (range.Color != null)
+                range.Color.Apply(ref mod, charIndex, range.Length, time, in range.ColorArgs);
 
             var center =
                 (m_originalVertices[sourceBase] +

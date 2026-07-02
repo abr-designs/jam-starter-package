@@ -41,7 +41,7 @@ namespace Tests.Utilities.TextAnimation
             {
                 var time = i * 0.05f;
                 var mod = CharMod.Identity;
-                effect.Apply(ref mod, 0, time);
+                effect.Apply(ref mod, 0, 1, time, default);
 
                 Assert.AreEqual(0f, mod.Offset.x, TOLERANCE);
                 Assert.AreEqual(0f, mod.Offset.z, TOLERANCE);
@@ -69,7 +69,7 @@ namespace Tests.Utilities.TextAnimation
             {
                 var time = i * 0.05f;
                 var mod = CharMod.Identity;
-                effect.Apply(ref mod, 0, time);
+                effect.Apply(ref mod, 0, 1, time, default);
 
                 Assert.LessOrEqual(Mathf.Abs(mod.Scale - 1f), effect.Amplitude + TOLERANCE);
                 Assert.AreEqual(Vector3.zero, mod.Offset);
@@ -93,8 +93,8 @@ namespace Tests.Utilities.TextAnimation
             // Same time yields the same offset (Perlin noise, no randomness).
             var first = CharMod.Identity;
             var second = CharMod.Identity;
-            effect.Apply(ref first, 0, 0.37f);
-            effect.Apply(ref second, 0, 0.37f);
+            effect.Apply(ref first, 0, 1, 0.37f, default);
+            effect.Apply(ref second, 0, 1, 0.37f, default);
             Assert.AreEqual(first.Offset, second.Offset);
 
             // Perlin output can drift slightly outside [0,1], so allow a margin on the amplitude bound.
@@ -105,7 +105,7 @@ namespace Tests.Utilities.TextAnimation
             {
                 var time = i * 0.03f;
                 var mod = CharMod.Identity;
-                effect.Apply(ref mod, 0, time);
+                effect.Apply(ref mod, 0, 1, time, default);
 
                 Assert.LessOrEqual(Mathf.Abs(mod.Offset.x), bound);
                 Assert.LessOrEqual(Mathf.Abs(mod.Offset.y), bound);
@@ -128,7 +128,7 @@ namespace Tests.Utilities.TextAnimation
             for (int i = 0; i < 1000; i++)
             {
                 var mod = CharMod.Identity;
-                effect.Apply(ref mod, 0, i * 0.01f);
+                effect.Apply(ref mod, 0, 1, i * 0.01f, default);
 
                 Assert.LessOrEqual(Mathf.Abs(mod.Offset.x), effect.PositionAmount + TOLERANCE);
                 Assert.LessOrEqual(Mathf.Abs(mod.Offset.y), effect.PositionAmount + TOLERANCE);
@@ -140,22 +140,22 @@ namespace Tests.Utilities.TextAnimation
         // --- Testable subclasses exposing the protected tuning fields ---
         // These carry no [TextEffect] attribute, so the registry scan ignores them.
 
-        private sealed class TestableWave : WaveEffect
+        private sealed class TestableWave : WaveMotionEffect
         {
             public float Amplitude => m_amplitude;
         }
 
-        private sealed class TestablePulse : PulseEffect
+        private sealed class TestablePulse : PulseMotionEffect
         {
             public float Amplitude => m_amplitude;
         }
 
-        private sealed class TestableShake : ShakeEffect
+        private sealed class TestableShake : ShakeMotionEffect
         {
             public float Amplitude => m_amplitude;
         }
 
-        private sealed class TestableJitter : JitterEffect
+        private sealed class TestableJitter : JitterMotionEffect
         {
             public float PositionAmount => m_positionAmount;
             public float RotationAmount => m_rotationAmount;

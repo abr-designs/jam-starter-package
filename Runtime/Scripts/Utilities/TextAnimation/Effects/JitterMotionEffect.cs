@@ -13,19 +13,23 @@ namespace Utilities.TextAnimation
     /// <remarks>Created by Claude (claude-opus-4-8) on 2026-06-23</remarks>
     [Preserve]
     [TextEffect("jitter")]
-    public class JitterEffect : TextEffect
+    public class JitterMotionEffect : MotionTextEffect
     {
         protected float m_positionAmount = 3f;
         protected float m_rotationAmount = 8f;
 
-        public override void Apply(ref CharMod mod, int charIndex, float time)
+        // Inline args: jitter(positionAmount, rotationAmount).
+        public override void Apply(ref CharMod mod, int charIndex, int spanLength, float time, in EffectArgs args)
         {
+            var positionAmount = args.GetFloat(0, m_positionAmount);
+            var rotationAmount = args.GetFloat(1, m_rotationAmount);
+
             mod.Offset = new Vector3(
-                Random.Range(-m_positionAmount, m_positionAmount),
-                Random.Range(-m_positionAmount, m_positionAmount),
+                Random.Range(-positionAmount, positionAmount),
+                Random.Range(-positionAmount, positionAmount),
                 0f);
 
-            mod.RotationDeg = Random.Range(-m_rotationAmount, m_rotationAmount);
+            mod.RotationDeg = Random.Range(-rotationAmount, rotationAmount);
         }
     }
 }
