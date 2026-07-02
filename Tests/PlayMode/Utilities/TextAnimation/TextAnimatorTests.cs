@@ -110,14 +110,23 @@ namespace Tests.Utilities.TextAnimation
                 $"Expected the PlayerLoop tick to animate span vertices; max delta was {maxDelta}.");
         }
 
+        // The <anim> tag is stripped by the preprocessor, so there is no TMP link to read. The span is
+        // the whole visible string, so sample the first visible character's top-left vertex.
         private static float SampleFirstSpanVertexY(TMP_Text text)
         {
             var textInfo = text.textInfo;
-            var linkInfo = textInfo.linkInfo[0];
-            var characterInfo = textInfo.characterInfo[linkInfo.linkTextfirstCharacterIndex];
-            var vertices = textInfo.meshInfo[characterInfo.materialReferenceIndex].vertices;
 
-            return vertices[characterInfo.vertexIndex].y;
+            for (int i = 0; i < textInfo.characterCount; i++)
+            {
+                var characterInfo = textInfo.characterInfo[i];
+                if (characterInfo.isVisible == false)
+                    continue;
+
+                var vertices = textInfo.meshInfo[characterInfo.materialReferenceIndex].vertices;
+                return vertices[characterInfo.vertexIndex].y;
+            }
+
+            return 0f;
         }
     }
 }

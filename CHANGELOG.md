@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TransformTweenExtensionsAsyncTests.cs` (PlayMode) covering await completion, token cancellation, registry preemption, destroyed-transform unwind, and the cross-backend assertion, in a UniTask-gated test assembly
 
 ### Fixed
+- Fixed `AnimatedText` throwing `NullReferenceException` in `SnapshotVertices()` when a marked label enabled before TMP built its mesh, e.g. opening a prefab, aborting registration so the text never animated until cycling the marker
 - Fixed `SimplePath.GetClosestT()` using per-segment projection for LINEAR paths instead of endpoint-only sampling
 - Fixed `SimplePathFollow` ping-pong direction initializing to `false` when `speed` defaults to 0 at `Start()` time; restructured bounce tests to yield before setting speed so `Start()` always runs first
 

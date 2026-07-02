@@ -133,6 +133,9 @@ namespace Utilities.TextAnimation
             for (int i = 0; i < meshCount; i++)
             {
                 var meshInfo = textInfo.meshInfo[i];
+                if (meshInfo.vertices == null || meshInfo.colors32 == null)
+                    continue;
+
                 var start = m_meshVertexStart[i];
 
                 Array.Copy(m_originalVertices, start, meshInfo.vertices, 0, meshInfo.vertices.Length);
@@ -160,6 +163,16 @@ namespace Utilities.TextAnimation
         private void SnapshotVertices()
         {
             var textInfo = m_textComponent.textInfo;
+
+            // Opening a prefab enables the marker before TMP has generated geometry, so meshInfo exists
+            // but its vertex arrays are still null. Treat that as an empty snapshot; the TEXT_CHANGED
+            // subscription re-runs Refresh once TMP builds the mesh.
+            if (textInfo == null || textInfo.meshInfo == null)
+            {
+                m_meshCount = 0;
+                return;
+            }
+
             m_meshCount = textInfo.meshInfo.Length;
 
             if (m_meshVertexStart == null || m_meshVertexStart.Length < m_meshCount)
@@ -169,7 +182,8 @@ namespace Utilities.TextAnimation
             for (int i = 0; i < m_meshCount; i++)
             {
                 m_meshVertexStart[i] = totalVertices;
-                totalVertices += textInfo.meshInfo[i].vertices.Length;
+                var vertices = textInfo.meshInfo[i].vertices;
+                totalVertices += vertices == null ? 0 : vertices.Length;
             }
 
             if (m_originalVertices == null || m_originalVertices.Length < totalVertices)
@@ -181,6 +195,9 @@ namespace Utilities.TextAnimation
             for (int i = 0; i < m_meshCount; i++)
             {
                 var meshInfo = textInfo.meshInfo[i];
+                if (meshInfo.vertices == null || meshInfo.colors32 == null)
+                    continue;
+
                 var start = m_meshVertexStart[i];
 
                 Array.Copy(meshInfo.vertices, 0, m_originalVertices, start, meshInfo.vertices.Length);
