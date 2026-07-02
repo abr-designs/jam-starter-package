@@ -47,10 +47,12 @@ This repo is set up to work with AI coding agents (Claude Code, Cursor, OpenAI C
 `AGENTS.md` and `CLAUDE.md` sit at the package root, so Unity imports them as `TextAsset`s and they ship committed `.meta` files (the same as `README.md`). The `.gemini/` folder is hidden from Unity by its leading dot. Do not generate `.meta` files for any `.`-prefixed or `~`-suffixed path.
 
 ### Included skills
-Skills live in `.claude/skills/` and run as slash commands in Claude Code:
+Skills live in `.claude/skills/` as markdown workflows. In Claude Code they run as slash commands; any other agent that reads `AGENTS.md` finds them in the `Skills` catalog there and follows the matching `SKILL.md` directly. Skill bodies may name Claude Code tools (e.g. `AskUserQuestion`); an agent without that tool just does the plain equivalent (asks the user).
 - **`/new-sample`**: scaffolds a new Sample end to end (the `package.json` entry, `Samples~` directory, `Documentation~` markdown, and README entry).
 - **`/unity-tests`**: writes EditMode or PlayMode tests for game logic, focused on the script logic rather than MonoBehaviour lifecycle.
 - **`/write-pr`**: drafts a pull request body from the branch diff and commits, following the repo PR template.
+
+When you add or rename a skill, update the `Skills` table in `AGENTS.md` to match its `SKILL.md` frontmatter. The catalog is hand-maintained, so this keeps cross-tool discovery in sync.
 
 ## Features & Samples
 WIP

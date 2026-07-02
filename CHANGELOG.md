@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `docs~/adr/0002-agentic-config-single-source.md` recording the decision
   - Documented the agent setup & included skills (`/new-sample`, `/unity-tests`, `/write-pr`) in `Documentation~/Contributing.md`
   - Linked the Agentic AI section from `README.md`
+- Added a `Skills` catalog to `AGENTS.md` so any agent that reads it, not just Claude Code, can discover & follow the included skills
+  - Added a note that agents lacking a named Claude tool should use the plain equivalent
+  - Documented the rule to update the catalog when adding or renaming a skill in `Documentation~/Contributing.md`
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode

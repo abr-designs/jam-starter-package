@@ -7,6 +7,20 @@ Guidance for AI coding agents working in this repo. This is the single source of
 1. All changes made MUST be reflected with simple language into the CHANGELOG.md file
 2. Working/internal docs (ADRs, plans, reviews) live in `docs~/`. The `~` suffix keeps Unity from importing the folder, so do not generate `.meta` files for it and do not rename it back to `docs/`.
 
+## Skills
+
+This repo ships reusable skills in `.claude/skills/`. Each is a markdown workflow you can read and follow, regardless of which agent you are. If a row below matches the user's intent, open that `SKILL.md` and follow it.
+
+Skill bodies may name Claude Code tools (e.g. `AskUserQuestion`). If your agent lacks the named tool, perform the plain-language equivalent (just ask the user). In Claude Code these also run as slash commands.
+
+| Skill | When | Follow |
+|---|---|---|
+| new-sample | User wants to add a new Sample to the package | `.claude/skills/new-sample/SKILL.md` |
+| unity-tests | User wants EditMode or PlayMode tests for game logic | `.claude/skills/unity-tests/SKILL.md` |
+| write-pr | User wants to draft a pull request body | `.claude/skills/write-pr/SKILL.md` |
+
+Each skill's `SKILL.md` frontmatter holds its full trigger phrases. When you add or rename a skill, update this table to match.
+
 ## What this repo is
 
 Unity 6 UPM package (`com.abrds.jam-starter`). Reusable game systems for game jam projects. Package dependency, not a standalone Unity project.
