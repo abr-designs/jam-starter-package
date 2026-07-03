@@ -32,7 +32,7 @@ The tweening subsystem runs on **two independent backends**.
 - **Sync engine** drives `TweenTo(...)` and `TweenToCoroutine(...)`. Lives in the core asmdef. A `HiddenSingleton<TweenController>` ticks pooled `TweenData` every `Update()`.
 - **Async engine** drives `TweenToAsync(...)`. Lives in the gated asmdef `Jam-starter.Runtime.tweening.unitask`, only compiled when UniTask is installed. Each tween is its own async state machine scheduled by UniTask's `PlayerLoopTiming`.
 
-Both engines share curve evaluation through `TweenMath`. Callers pick the backend at the call site by choosing which extension method to use. See `docs/adr/0001-dual-backend-tweening.md`.
+Both engines share curve evaluation through `TweenMath`. Callers pick the backend at the call site by choosing which extension method to use. See `.agents/docs/adr/0001-dual-backend-tweening.md`.
 
 ### Tween conflict
 Two tweens racing on the same `(Transform, TRANSFORM)` key. Each backend resolves its own intra-backend conflicts:

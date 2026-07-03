@@ -212,4 +212,4 @@ Under `Tests/PlayMode/Tweening/`:
 - Sample scene demonstrating `UniTask.WhenAll` sequencing
 - A `Documentation~/` page describing the dual-backend model
 
-See `docs~/adr/0001-dual-backend-tweening.md` for the accepted decision record.
+See `.agents/docs/adr/0001-dual-backend-tweening.md` for the accepted decision record.

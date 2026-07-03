@@ -5,7 +5,8 @@ Guidance for AI coding agents working in this repo. This is the single source of
 ## Critical Operating Instructions
 
 1. All changes made MUST be reflected with simple language into the CHANGELOG.md file
-2. Working/internal docs (ADRs, plans, reviews) live in `docs~/`. The `~` suffix keeps Unity from importing the folder, so do not generate `.meta` files for it and do not rename it back to `docs/`.
+2. Working/internal docs (ADRs, plans, reviews) live in `.agents/docs/`. The `.` prefix keeps Unity from importing the folder, so do not generate `.meta` files for it. See `.agents/docs/README.md` for an index of every ADR and plan with its status, the place to learn what features are planned, implemented, or otherwise decided.
+3. `CONTEXT.md` (repo root) is the domain-language context map for runtime systems (Path System, Tweening). Consult it before working on those systems, and keep it current when domain concepts or terminology change.
 
 ## Skills
 
