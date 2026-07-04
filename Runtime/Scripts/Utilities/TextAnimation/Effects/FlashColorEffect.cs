@@ -28,5 +28,7 @@ namespace Utilities.TextAnimation
 
             mod.Color = Mathf.Repeat(time, period) < period * 0.5f ? m_colorA : m_colorB;
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "period");
     }
 }

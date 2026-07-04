@@ -49,6 +49,24 @@ namespace Utilities.TextAnimation
             return bool.TryParse(GetString(index), out var value) ? value : fallback;
         }
 
+        /// <summary>
+        /// True when the slot is absent (the effect falls back to its default) or present and parseable as
+        /// a float. False only when a token is present but not a number, so an effect can flag it once at
+        /// build time from <see cref="TextEffect.ValidateArgs"/> rather than silently swallowing it.
+        /// </summary>
+        public bool IsFloat(int index)
+        {
+            var token = GetString(index);
+            return token == null || float.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
+        }
+
+        /// <summary>Integer counterpart of <see cref="IsFloat"/>: true when the slot is absent or parseable as an int.</summary>
+        public bool IsInt(int index)
+        {
+            var token = GetString(index);
+            return token == null || int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
+        }
+
         /// <summary>Parse a token as an HTML color (e.g. <c>#FF0044</c> or a named color), else the fallback.</summary>
         public Color GetColor(int index, Color fallback)
         {

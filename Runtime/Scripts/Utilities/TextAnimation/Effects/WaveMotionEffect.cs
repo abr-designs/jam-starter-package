@@ -29,5 +29,7 @@ namespace Utilities.TextAnimation
             var y = Mathf.Sin(time * speed + charIndex * charPhase) * amplitude;
             mod.Offset = new Vector3(0f, y, 0f);
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "amplitude", "speed", "charPhase");
     }
 }

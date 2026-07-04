@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
   - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(0.3, 2)"`
   - Added em-normalized motion offsets, scaling `CharMod.Offset` by each character's line height so an amplitude reads the same on canvas & world-space text; offsets are authored in ems (`1` = one line height)
+  - Added author diagnostics for `<anim>` tags: an unresolved effect key warns with a cross-channel hint (`motion="rainbow"` points to `color`), & a bad inline argument like `wave(foo)` warns via a `TextEffect.ValidateArgs` hook, once per span build
+  - Added case-insensitive effect key resolution, so `motion="Wave"` matches `wave`
+  - Added `textPreprocessor` chaining, running & restoring an existing preprocessor instead of replacing it
+  - Added a duplicate-tick guard to `TextAnimator` install against a repeated PlayerLoop injection
   - Added `AnimTagPreprocessor.cs`, an `ITextPreprocessor` stripping `<anim>` tags before TMP parses & recording each run's range & keys, mapped back to characters via `TMP_CharacterInfo.index`
   - Added `TextEffect.cs` abstract base with `MotionTextEffect.cs` & `ColorTextEffect.cs` channel bases & `TextEffectAttribute.cs`, so effects are added by subclassing a channel & tagging a key
   - Added `TextEffectRegistry.cs` to auto-discover effects by reflection per channel & cache one shared instance per key

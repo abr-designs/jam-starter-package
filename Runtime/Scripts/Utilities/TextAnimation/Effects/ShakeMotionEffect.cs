@@ -31,5 +31,7 @@ namespace Utilities.TextAnimation
 
             mod.Offset = new Vector3(offsetX, offsetY, 0f);
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "amplitude", "frequency");
     }
 }

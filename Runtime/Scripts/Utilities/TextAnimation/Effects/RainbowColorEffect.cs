@@ -27,5 +27,7 @@ namespace Utilities.TextAnimation
             var hue = Mathf.Repeat(time * speed * 0.1f + charIndex * charPhase, 1f);
             mod.Color = Color.HSVToRGB(hue, 1f, 1f);
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "speed", "charPhase");
     }
 }

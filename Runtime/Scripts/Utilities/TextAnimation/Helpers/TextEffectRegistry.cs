@@ -70,8 +70,11 @@ namespace Utilities.TextAnimation
 
         private static void ScanAssemblies()
         {
-            s_MotionEffects = new Dictionary<string, MotionTextEffect>();
-            s_ColorEffects = new Dictionary<string, ColorTextEffect>();
+            // Ordinal-ignore-case so motion="Wave" resolves like motion="wave", matching the
+            // case-insensitive tag and attribute matching the preprocessor already does. Duplicate
+            // detection in Register then also treats keys differing only in case as the same key.
+            s_MotionEffects = new Dictionary<string, MotionTextEffect>(StringComparer.OrdinalIgnoreCase);
+            s_ColorEffects = new Dictionary<string, ColorTextEffect>(StringComparer.OrdinalIgnoreCase);
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)

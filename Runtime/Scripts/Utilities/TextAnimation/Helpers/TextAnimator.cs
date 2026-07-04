@@ -92,6 +92,11 @@ namespace Utilities.TextAnimation
 
             var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
 
+            // Install can run again for a single loop when domain reload is disabled, which would stack a
+            // second tick system onto the one already there. Skip if our system is already present.
+            if (ContainsSystem(ref playerLoop, typeof(TextAnimator)))
+                return;
+
             var tickSystem = new PlayerLoopSystem
             {
                 type = typeof(TextAnimator),
@@ -153,6 +158,25 @@ namespace Utilities.TextAnimation
             }
 
             return null;
+        }
+
+        // Depth-first search for a system of systemType anywhere under parent, so a repeated Install does
+        // not stack a duplicate tick.
+        private static bool ContainsSystem(ref PlayerLoopSystem parent, Type systemType)
+        {
+            if (parent.subSystemList == null)
+                return false;
+
+            for (int i = 0; i < parent.subSystemList.Length; i++)
+            {
+                if (parent.subSystemList[i].type == systemType)
+                    return true;
+
+                if (ContainsSystem(ref parent.subSystemList[i], systemType))
+                    return true;
+            }
+
+            return false;
         }
 
         private static bool TryInsertSystem(

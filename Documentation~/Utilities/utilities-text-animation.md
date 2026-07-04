@@ -17,7 +17,7 @@ which is automatically added when animation on the object is enabled.
 
 ## Writing the text
 > [!NOTE]
-> _An `<anim>` tag whose keys match no registered effect will not animate_
+> _An `<anim>` tag whose keys match no registered effect will not animate, and logs a warning naming the unresolved key. If the key belongs to the other channel (e.g. `motion="rainbow"`, a color effect) the warning points you to the right channel._
 
 > [!WARNING]
 > **_`<anim>` tags do not layer: a character belongs to one tag. When tags overlap, the innermost tag will be used_**
@@ -186,6 +186,9 @@ What "Not visible" entails:
 > [!IMPORTANT]
 > TMP only understands its own rich-text tags, so [`AnimTagPreprocessor`](../../Runtime/Scripts/Utilities/TextAnimation/AnimTagPreprocessor.cs) (an `ITextPreprocessor`) strips every `<anim>` tag before TMP parses & records each run's range and keys. Every other tag is passed through untouched.
 
+> [!NOTE]
+> _If the label already carried a `textPreprocessor`, it is chained rather than replaced: the existing one runs first, then `<anim>` stripping runs on its output. Stopping the animation restores the original preprocessor._
+
 `AnimatedText` maps those recorded ranges back to visible characters using `TMP_CharacterInfo.index`, then resolves each channel through the registry.
 
 ## How effects are loaded
@@ -194,7 +197,7 @@ What "Not visible" entails:
 
 Effects are discovered by reflection at boot time using `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`. The [`TextEffectRegistry`](../../Runtime/Scripts/Utilities/TextAnimation/TextEffectRegistry.cs) scans every loaded
 assembly for non-abstract [`MotionTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/MotionTextEffect.cs) & [`ColorTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/ColorTextEffect.cs) subclasses carrying a [`[TextEffect("key")]`](../../Runtime/Scripts/Utilities/TextAnimation/TextEffectAttribute.cs) attribute, instantiates
-one shared instance per key. Keys resolve per channel, so a motion key & a color key may reuse the same string.
+one shared instance per key. Keys resolve per channel, so a motion key & a color key may reuse the same string. Key lookups are case-insensitive, so `motion="Wave"` resolves the same effect as `motion="wave"`.
 
 ## Adding a new effect
 
@@ -207,6 +210,14 @@ per-character math. The base you extend is what routes the key into the motion o
 
 Inline arguments arrive as raw tokens in [`EffectArgs`](../../Runtime/Scripts/Utilities/TextAnimation/EffectArgs.cs); read them with the typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`),
 each taking a fallback for when the author omitted that argument. The getters do not allocate, so reading them each frame is free.
+
+To surface a mistyped argument (like `swing(foo)`) to whoever authored the tag, override `ValidateArgs(in EffectArgs)` and return a message describing the problem, or null when the args are fine. It runs once when spans are built, not per frame, so it is where validation belongs rather than silently falling back inside `Apply`. The `ValidateFloats(args, ...names)` helper covers the common case where every listed slot must be a number:
+
+```csharp
+public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "angle", "speed");
+```
+
+`EffectArgs.IsFloat(index)` & `IsInt(index)` back the helper and are there for custom checks: each is true when the slot is absent or parses, false only when a token is present but the wrong type.
 
 ```csharp
 using UnityEngine;

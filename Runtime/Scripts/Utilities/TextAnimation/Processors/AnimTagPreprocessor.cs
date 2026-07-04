@@ -29,8 +29,26 @@ namespace Utilities.TextAnimation
         private readonly List<RawAnimSpan> m_spans = new();
         private readonly List<RawAnimSpan> m_openStack = new();
         private readonly StringBuilder m_output = new();
+        private readonly ITextPreprocessor m_inner;
 
         #endregion //Fields
+
+        //Constructors
+        //================================================================================================================//
+
+        #region Constructors
+
+        /// <summary>
+        /// <paramref name="inner"/> is the preprocessor this one displaced on the label, or null. It runs
+        /// first in <see cref="PreprocessText"/> so its substitutions are in place before we strip
+        /// &lt;anim&gt; tags and record span indices into the final string TMP parses.
+        /// </summary>
+        public AnimTagPreprocessor(ITextPreprocessor inner = null)
+        {
+            m_inner = inner;
+        }
+
+        #endregion //Constructors
 
         //Properties
         //================================================================================================================//
@@ -49,6 +67,10 @@ namespace Utilities.TextAnimation
 
         public string PreprocessText(string text)
         {
+            // Let the displaced preprocessor transform the raw text first; we strip and index its result.
+            if (m_inner != null)
+                text = m_inner.PreprocessText(text);
+
             m_spans.Clear();
             m_openStack.Clear();
             m_output.Clear();

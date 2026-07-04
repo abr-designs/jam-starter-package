@@ -28,5 +28,7 @@ namespace Utilities.TextAnimation
             var alpha = Mathf.Lerp(minAlpha, 1f, wave);
             mod.Color = new Color(1f, 1f, 1f, alpha);
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "speed", "minAlpha");
     }
 }

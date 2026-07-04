@@ -28,5 +28,7 @@ namespace Utilities.TextAnimation
 
             mod.Scale = 1f + Mathf.Sin(time * speed + charIndex * charPhase) * amplitude;
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "amplitude", "speed", "charPhase");
     }
 }

@@ -24,6 +24,7 @@ namespace Utilities.TextAnimation
         private readonly TMP_Text m_textComponent;
         private readonly List<EffectRange> m_effectRangeList;
         private readonly AnimTagPreprocessor m_preprocessor;
+        private readonly ITextPreprocessor m_previousPreprocessor;
         private readonly TextMeshProUGUI m_uguiText;
         private readonly CanvasRenderer m_canvasRenderer;
         private readonly Renderer m_meshRenderer;
@@ -65,8 +66,14 @@ namespace Utilities.TextAnimation
                 m_meshRenderer = textComponent.GetComponent<Renderer>();
 
             // The preprocessor must be attached before the first mesh build so <anim> tags are stripped
-            // and recorded during ParseInputText; Refresh then reads the spans it produced.
-            m_preprocessor = new AnimTagPreprocessor();
+            // and recorded during ParseInputText; Refresh then reads the spans it produced. Chain any
+            // preprocessor the label already had so it keeps running, and restore it on Dispose. A leftover
+            // anim pass is never chained: it would strip our tags before we see them.
+            m_previousPreprocessor = textComponent.textPreprocessor is AnimTagPreprocessor
+                ? null
+                : textComponent.textPreprocessor;
+
+            m_preprocessor = new AnimTagPreprocessor(m_previousPreprocessor);
             textComponent.textPreprocessor = m_preprocessor;
 
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
@@ -150,7 +157,7 @@ namespace Utilities.TextAnimation
             TMPro_EventManager.TEXT_CHANGED_EVENT.Remove(OnTextChanged);
 
             if (m_textComponent != null && ReferenceEquals(m_textComponent.textPreprocessor, m_preprocessor))
-                m_textComponent.textPreprocessor = null;
+                m_textComponent.textPreprocessor = m_previousPreprocessor;
         }
 
         #endregion //Public Methods
@@ -266,10 +273,28 @@ namespace Utilities.TextAnimation
                 return;
 
             var raw = spans[spanIndex];
-            var motion = string.IsNullOrEmpty(raw.MotionKey) ? null : TextEffectRegistry.GetMotion(raw.MotionKey);
-            var color = string.IsNullOrEmpty(raw.ColorKey) ? null : TextEffectRegistry.GetColor(raw.ColorKey);
 
-            // A span whose keys resolve to nothing stays inert, just like an unrecognized effect.
+            MotionTextEffect motion = null;
+            if (string.IsNullOrEmpty(raw.MotionKey) == false)
+            {
+                motion = TextEffectRegistry.GetMotion(raw.MotionKey);
+                if (motion == null)
+                    WarnUnresolvedKey("motion", "color", raw.MotionKey, TextEffectRegistry.GetColor(raw.MotionKey) != null);
+                else
+                    WarnBadArgs(motion, raw.MotionKey, in raw.MotionArgs);
+            }
+
+            ColorTextEffect color = null;
+            if (string.IsNullOrEmpty(raw.ColorKey) == false)
+            {
+                color = TextEffectRegistry.GetColor(raw.ColorKey);
+                if (color == null)
+                    WarnUnresolvedKey("color", "motion", raw.ColorKey, TextEffectRegistry.GetMotion(raw.ColorKey) != null);
+                else
+                    WarnBadArgs(color, raw.ColorKey, in raw.ColorArgs);
+            }
+
+            // A span whose keys resolve to nothing stays inert; the warnings above tell the author why.
             if (motion == null && color == null)
                 return;
 
@@ -282,6 +307,30 @@ namespace Utilities.TextAnimation
                 Color = color,
                 ColorArgs = raw.ColorArgs,
             });
+        }
+
+        // A specified key that resolves to nothing: point at the other channel when the key lives there
+        // (motion="rainbow"), otherwise it is an unknown key. Runs once per span build, not per frame.
+        private void WarnUnresolvedKey(string channel, string otherChannel, string key, bool existsInOtherChannel)
+        {
+            if (existsInOtherChannel)
+                Debug.LogWarning(
+                    $"[AnimatedText] '{key}' is a {otherChannel} effect, not a {channel} effect. " +
+                    $"Did you mean {otherChannel}=\"{key}\"? (on '{m_textComponent.name}')",
+                    m_textComponent);
+            else
+                Debug.LogWarning(
+                    $"[AnimatedText] Unknown {channel} effect '{key}' (on '{m_textComponent.name}').",
+                    m_textComponent);
+        }
+
+        private void WarnBadArgs(TextEffect effect, string key, in EffectArgs args)
+        {
+            var problem = effect.ValidateArgs(in args);
+            if (string.IsNullOrEmpty(problem))
+                return;
+
+            Debug.LogWarning($"[AnimatedText] {key}: {problem} (on '{m_textComponent.name}').", m_textComponent);
         }
 
         private void ApplyToCharacter(

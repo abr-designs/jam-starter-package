@@ -20,5 +20,30 @@ namespace Utilities.TextAnimation
         /// <param name="time">Seconds since startup, shared across every animated text.</param>
         /// <param name="args">Inline positional arguments from the tag, empty when the author gave none.</param>
         public abstract void Apply(ref CharMod mod, int charIndex, int spanLength, float time, in EffectArgs args);
+
+        /// <summary>
+        /// Optionally report a problem with the inline <paramref name="args"/> so a typo like
+        /// <c>wave(foo)</c> surfaces to the author. Return null when the args are fine. This is called once
+        /// when spans are built (on text change), never per frame, so it is the place to validate rather
+        /// than repeatedly falling back inside <see cref="Apply"/>. Default: no validation.
+        /// </summary>
+        public virtual string ValidateArgs(in EffectArgs args) => null;
+
+        /// <summary>
+        /// Helper for the common case where every listed slot must be a number: returns a message naming the
+        /// first slot that is present but not a float, or null when they are all absent or numeric.
+        /// </summary>
+        protected static string ValidateFloats(in EffectArgs args, params string[] names)
+        {
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (args.IsFloat(i))
+                    continue;
+
+                return $"argument {i} ({names[i]}) is '{args.GetString(i)}', which is not a number";
+            }
+
+            return null;
+        }
     }
 }

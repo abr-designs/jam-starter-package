@@ -32,5 +32,7 @@ namespace Utilities.TextAnimation
 
             mod.RotationDeg = Random.Range(-rotationAmount, rotationAmount);
         }
+
+        public override string ValidateArgs(in EffectArgs args) => ValidateFloats(args, "positionAmount", "rotationAmount");
     }
 }
