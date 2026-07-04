@@ -314,12 +314,18 @@ namespace Utilities.TextAnimation
 
             var rotation = Quaternion.AngleAxis(mod.RotationDeg, Vector3.forward);
 
+            // Offset is authored in ems: one line height. Scaling it by the character's line height keeps
+            // an amplitude reading the same in canvas and world space, where the raw mesh units differ.
+            // Scale and rotation are already space-independent, so only the offset is normalized.
+            var emScale = Mathf.Max(0.0001f, characterInfo.ascender - characterInfo.descender);
+            var offset = mod.Offset * emScale;
+
             for (int corner = 0; corner < 4; corner++)
             {
                 var source = m_originalVertices[sourceBase + corner];
                 var offsetFromCenter = (source - center) * mod.Scale;
 
-                vertices[vertexIndex + corner] = center + rotation * offsetFromCenter + mod.Offset;
+                vertices[vertexIndex + corner] = center + rotation * offsetFromCenter + offset;
                 colors[vertexIndex + corner] = MultiplyColor(m_originalColors[sourceBase + corner], mod.Color);
             }
         }

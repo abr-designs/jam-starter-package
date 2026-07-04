@@ -15,7 +15,8 @@ namespace Utilities.TextAnimation
     [TextEffect("jitter")]
     public class JitterMotionEffect : MotionTextEffect
     {
-        protected float m_positionAmount = 3f;
+        // positionAmount is in ems: 1 = one line height. rotationAmount is in degrees.
+        protected float m_positionAmount = 0.1f;
         protected float m_rotationAmount = 8f;
 
         // Inline args: jitter(positionAmount, rotationAmount).

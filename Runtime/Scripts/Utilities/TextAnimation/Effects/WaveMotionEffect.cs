@@ -14,7 +14,8 @@ namespace Utilities.TextAnimation
     [TextEffect("wave")]
     public class WaveMotionEffect : MotionTextEffect
     {
-        protected float m_amplitude = 5f;
+        // amplitude is in ems: 1 = one line height. 0.2 lifts each character a fifth of a line.
+        protected float m_amplitude = 0.2f;
         protected float m_speed = 6f;
         protected float m_charPhase = 0.5f;
 

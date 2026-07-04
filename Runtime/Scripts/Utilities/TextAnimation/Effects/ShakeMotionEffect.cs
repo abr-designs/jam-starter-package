@@ -15,7 +15,8 @@ namespace Utilities.TextAnimation
     [TextEffect("shake")]
     public class ShakeMotionEffect : MotionTextEffect
     {
-        protected float m_amplitude = 4f;
+        // amplitude is in ems: 1 = one line height.
+        protected float m_amplitude = 0.12f;
         protected float m_frequency = 25f;
 
         // Inline args: shake(amplitude, frequency).

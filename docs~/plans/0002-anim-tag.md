@@ -9,16 +9,17 @@
 |---|---|
 | Status | In Progress |
 | Created | 2026-07-01 |
-| Updated | 2026-07-01 |
+| Updated | 2026-07-04 |
 | Proficiency | 3/10 |
 | Engine | Unity 6 / C# |
-| Revisions | 2 (latest: U-002) |
+| Revisions | 3 (latest: U-003) |
 | Summary | Replace `<link>`-driven effects with a custom `<anim motion="..." color="...">` tag that layers an independent motion channel and color channel per character. |
 
 ## Revision Log
 
 | ID | Date | Type | Change |
 |---|---|---|---|
+| U-003 | 2026-07-04 | Update | Review feedback: normalize the motion offset by per-character line height (`ascender - descender`) so a given amplitude reads the same in canvas & world space. Offset is now authored in ems (1.0 = one line); scale & rotation are left untouched because they are already space-independent. Re-tuned the offset-writing effects (`wave`, `shake`, `jitter`) to em fractions. |
 | U-002 | 2026-07-01 | Update | Review feedback: renamed the channel bases to `MotionTextEffect` / `ColorTextEffect`, and changed `EffectArgs` from fixed float slots to raw string tokens with non-allocating typed getters, so custom effects can take any argument type & count. |
 | U-001 | 2026-07-01 | Update | Resolved the Gradient open question by adding `int spanLength` to `TextEffect.Apply`, so any effect can normalize `charIndex` across its span without a per-frame allocation. |
 
@@ -211,3 +212,4 @@ Changes: construct + assign `m_textComponent.textPreprocessor = m_preprocessor` 
 - **Effects migration:** `WaveMotionEffect`, `ShakeMotionEffect`, `JitterMotionEffect`, `PulseMotionEffect` change their base from `TextEffect` to `MotionTextEffect` and adopt the `in EffectArgs` parameter (reading their existing tuning fields as arg fallbacks).
 - **Tests to add:** preprocessor strip + range recording (incl. a run containing a nested non-anim tag like `<b>`), positional arg parse + fallback, per-channel registry resolution, motion+color composition on one range, and the four color effects' sign/bounds checks. EditMode for pure parse/math, PlayMode for mesh.
 - **CHANGELOG:** update under Unreleased per house style; note the `<link>` -> `<anim>` change as a behavior change, not just an addition.
+- **Offset normalization (em units, U-003):** `ApplyToCharacter` multiplies `mod.Offset` by `emScale = Mathf.Max(0.0001f, characterInfo.ascender - characterInfo.descender)` before adding it, so an offset of `1.0` equals one line height regardless of the canvas-vs-world scale that produced the mesh. The value is applied after rotation, so it reads as an em-space translation. Only offset is normalized: `Scale` is a multiplier about the glyph center and `RotationDeg` is in degrees, both already space-independent. Offset-writing effects re-tune their defaults to em fractions (`wave` ~0.2, `shake` ~0.12, `jitter` position ~0.1); `pulse` writes `Scale` and is unchanged. `emScale` is constant per character between text changes, so it may be cached alongside the vertex snapshot rather than recomputed each frame. Rejected alternatives: the reviewer's per-glyph rendered height (`top - bottom`), which gives short glyphs like `.` far less travel than tall ones and an uneven wave baseline; and a reference-size divisor (`lineHeight / 36`), which preserves old amplitude numbers but bakes in an arbitrary constant. EditMode effect-math tests assert the raw `CharMod.Offset` (now in ems) and are unaffected; mesh/smoke tests assert bounded/sign movement and still hold.

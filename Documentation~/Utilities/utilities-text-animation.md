@@ -10,7 +10,7 @@ which is automatically added when animation on the object is enabled.
 - Per `TMP_Text` via a single extension method, works with both UGUI (`TextMeshProUGUI`) & world-space (`TextMeshPro`) text
 - A `motion` channel (offset / scale / rotation) & a `color` channel (tint / alpha) that compose on the same characters
 - Inline arguments allows you to adjust an effect per tag
-  - e.g. `motion="wave(20, 2)"`
+  - e.g. `motion="wave(0.3, 2)"`
 - Effects are discovered automatically using reflection, **allowing you to create your own effects**
 - Animations will preview live in the Editor, in both Scene & Game view
 - Re-parses automatically only when the text changes, so swapping strings at runtime keeps animating
@@ -36,13 +36,27 @@ Watch this <anim motion="wave" color="rainbow">wave</anim> go by.
 An effect key may carry positional arguments in parentheses to tune it for that one tag. Omitted arguments fall back to the effect's defaults.
 
 ```
-<anim motion="wave(20, 2)">big slow wave</anim>
+<anim motion="wave(0.3, 2)">big slow wave</anim>
 <anim color="fade(4)">breathing text</anim>
 ```
 
 ## Built-in Effets
 The built-in effects each show a different channel: `shake` & `wave` drive `Offset`, `jitter` adds `RotationDeg`,
 [`PulseMotionEffect`](../../Runtime/Scripts/Utilities/TextAnimation/Effects/PulseMotionEffect.cs) drives `Scale`, and the color effects drive `Color`. Read those for reference patterns.
+
+### Argument value spaces
+
+Every inline argument below is a number in one of these spaces:
+
+| Space | Meaning |
+|---|---|
+| **em** | A multiple of the character's line height (its ascender-to-descender box). `1` em is one full line tall, `0.2` is a fifth of a line. Resolution independent, so the same value looks the same on canvas & world-space text, whose raw mesh units differ. Used by every positional offset. |
+| **degrees** | Rotation about the character center on the Z axis. |
+| **scale** | A unitless size multiplier around the character center. `0.25` swings the size by up to +/-25%; `0` is unchanged. |
+| **rad/s** | Angular speed of the effect's sine or noise clock. Higher is faster. |
+| **phase/char** | Amount added to the clock per character index, so the effect ripples along the span. `0` moves every character together; larger values tighten the ripple. |
+| **0..1** | A normalized fraction, e.g. alpha or a hue turn. |
+| **seconds** | Real elapsed time. |
 
 ### Built-in motion effects
 
@@ -52,6 +66,22 @@ The built-in effects each show a different channel: `shake` & `wave` drive `Offs
 | `wave` | Travelling vertical sine wave | `wave(amplitude, speed, charPhase)` |
 | `jitter` | Random position & rotation jitter | `jitter(positionAmount, rotationAmount)` |
 | `pulse` | Per-character size pulse (scale) | `pulse(amplitude, speed, charPhase)` |
+
+| Effect | Argument | Space | Default | Meaning |
+|---|---|---|---|---|
+| `shake` | `amplitude` | em | `0.12` | Peak offset distance on each axis |
+| | `frequency` | rad/s | `25` | Noise speed; higher is twitchier |
+| `wave` | `amplitude` | em | `0.2` | Peak vertical offset |
+| | `speed` | rad/s | `6` | How fast the wave travels |
+| | `charPhase` | phase/char | `0.5` | Phase step per character; `0` bobs the whole span together |
+| `jitter` | `positionAmount` | em | `0.1` | Max random offset per axis, re-rolled each frame |
+| | `rotationAmount` | degrees | `8` | Max random rotation, re-rolled each frame |
+| `pulse` | `amplitude` | scale | `0.25` | Size swing, so `0.25` is +/-25% |
+| | `speed` | rad/s | `6` | Pulse speed |
+| | `charPhase` | phase/char | `0.5` | Phase step per character |
+
+> [!NOTE]
+> _Positional amounts (`shake`/`wave` amplitude, `jitter` position) are in **ems** so they read the same on canvas & world-space text. Scale (`pulse`) & rotation (`jitter`) are already size-independent._
 
 ![text-motion-animation-example.gif](../Images/Utilities/text-motion-animation-example.gif)
 
@@ -73,6 +103,15 @@ The built-in effects each show a different channel: `shake` & `wave` drive `Offs
 | `gradient` | Static two-color blend across the span | none |
 | `fade` | Alpha breathes over time | `fade(speed, minAlpha)` |
 | `flash` | Blinks between two colors on a period | `flash(period)` |
+
+| Effect | Argument | Space | Default | Meaning |
+|---|---|---|---|---|
+| `rainbow` | `speed` | rad/s | `2` | Hue cycle speed over time |
+| | `charPhase` | 0..1 per char | `0.15` | Hue turn offset per character; spreads the rainbow along the span |
+| `gradient` | none | | | Blends the first character's color to the last across the span |
+| `fade` | `speed` | rad/s | `3` | Breathing speed |
+| | `minAlpha` | 0..1 | `0.15` | Alpha floor at the dim end of the breath |
+| `flash` | `period` | seconds | `0.5` | Full blink period; the color swaps at the half point |
 
 ![text-color-animation-example.gif](../Images/Utilities/text-color-animation-example.gif)
 
@@ -200,7 +239,7 @@ every channel an effect can drive, and starts at an identity value (zero offset,
 
 | Field | Type | Channel | Meaning |
 |---|---|---|---|
-| `Offset` | `Vector3` | motion | Position offset, applied after rotation & scale |
+| `Offset` | `Vector3` | motion | Position offset in ems (`1` = one line height), applied after rotation & scale |
 | `RotationDeg` | `float` | motion | Rotation about the character center, in degrees (Z axis) |
 | `Scale` | `float` | motion | Uniform scale about the character center, `1` is unchanged |
 | `Color` | `Color32` | color | Multiplied against the character's original vertex color |

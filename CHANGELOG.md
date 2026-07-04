@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, ticking centrally rather than one MonoBehaviour per label
   - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface, adding & removing the `AnimatedTextMarker` to match the inspector toggle
   - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
-  - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(20, 2)"`
+  - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(0.3, 2)"`
+  - Added em-normalized motion offsets, scaling `CharMod.Offset` by each character's line height so an amplitude reads the same on canvas & world-space text; offsets are authored in ems (`1` = one line height)
   - Added `AnimTagPreprocessor.cs`, an `ITextPreprocessor` stripping `<anim>` tags before TMP parses & recording each run's range & keys, mapped back to characters via `TMP_CharacterInfo.index`
   - Added `TextEffect.cs` abstract base with `MotionTextEffect.cs` & `ColorTextEffect.cs` channel bases & `TextEffectAttribute.cs`, so effects are added by subclassing a channel & tagging a key
   - Added `TextEffectRegistry.cs` to auto-discover effects by reflection per channel & cache one shared instance per key
