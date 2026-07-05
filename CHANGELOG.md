@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.10-preview] - DATE
 
 ### Added
+- Added `AGENTS.md` as the single source of truth for AI agent guidance, migrated from `CLAUDE.md`
+  - Reduced `CLAUDE.md` to a one-line `@AGENTS.md` import
+  - Added `.gemini/settings.json` pointing Gemini CLI at `AGENTS.md` via `contextFileName`
+  - Added `docs~/adr/0002-agentic-config-single-source.md` recording the decision
+  - Documented the agent setup & included skills (`/new-sample`, `/unity-tests`, `/write-pr`) in `Documentation~/Contributing.md`
+  - Linked the Agentic AI section from `README.md`
+- Added a `Skills` catalog to `AGENTS.md` so any agent that reads it, not just Claude Code, can discover & follow the included skills
+  - Added a note that agents lacking a named Claude tool should use the plain equivalent
+  - Documented the rule to update the catalog when adding or renaming a skill in `Documentation~/Contributing.md`
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
@@ -46,6 +55,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Extracted `GetCurveT` from `TweenController.cs` into shared `TweenMath.cs` so the sync & async tweens can use the same base
 - Changed test workflow to only run on code changes (`.cs`, `.asmdef`, `.asmref`, `package.json`, the workflow file), so doc & config edits no longer trigger builds
   - Excluded `Samples~/` so sample changes no longer trigger test builds
+- Reformatted `docs~/plans/` to the arch-plan template using ADR-style numbering (`0001-simple-path`, `0002-async-tweening`)
 
 ### Fixed
 - Resolved issues with `NaughtyAttributes` attempted references before it was loaded

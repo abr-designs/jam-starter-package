@@ -32,5 +32,27 @@ information is provided, so please make sure to fill out all fields.
 - At least one person must review the pull request before it can be merged.
 - Ensure that you link the issue within the pull request
 
+## AI Agents
+This repo is set up to work with AI coding agents (Claude Code, Cursor, OpenAI Codex, Gemini CLI, and others).
+
+### How it works
+- **`AGENTS.md`** at the repo root is the single source of truth. It holds all repo guidance for agents.
+- Tool-specific files point back to it, so there is only ever one file to edit:
+  - `CLAUDE.md` imports it with a one-line `@AGENTS.md`.
+  - `.gemini/settings.json` sets `contextFileName` to `AGENTS.md`.
+  - Cursor, Codex, Factory, Jules, Zed, and Amp read `AGENTS.md` natively, so they need no extra file.
+- **Edit `AGENTS.md` only.** Do not copy guidance into the pointer files; that reintroduces drift.
+
+### Unity note
+`AGENTS.md` and `CLAUDE.md` sit at the package root, so Unity imports them as `TextAsset`s and they ship committed `.meta` files (the same as `README.md`). The `.gemini/` folder is hidden from Unity by its leading dot. Do not generate `.meta` files for any `.`-prefixed or `~`-suffixed path.
+
+### Included skills
+Skills live in `.claude/skills/` as markdown workflows. In Claude Code they run as slash commands; any other agent that reads `AGENTS.md` finds them in the `Skills` catalog there and follows the matching `SKILL.md` directly. Skill bodies may name Claude Code tools (e.g. `AskUserQuestion`); an agent without that tool just does the plain equivalent (asks the user).
+- **`/new-sample`**: scaffolds a new Sample end to end (the `package.json` entry, `Samples~` directory, `Documentation~` markdown, and README entry).
+- **`/unity-tests`**: writes EditMode or PlayMode tests for game logic, focused on the script logic rather than MonoBehaviour lifecycle.
+- **`/write-pr`**: drafts a pull request body from the branch diff and commits, following the repo PR template.
+
+When you add or rename a skill, update the `Skills` table in `AGENTS.md` to match its `SKILL.md` frontmatter. The catalog is hand-maintained, so this keeps cross-tool discovery in sync.
+
 ## Features & Samples
 WIP

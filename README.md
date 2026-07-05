@@ -78,3 +78,5 @@ projects & Game jams.
 
 ## Contributing
 If you would like to contribute to this project, please review our [contribution guidelines](Documentation~/Contributing.md).
+
+Working with an AI coding agent? See [Agentic AI support](Documentation~/Contributing.md#ai-agents).
