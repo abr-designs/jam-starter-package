@@ -5,6 +5,97 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.10] - 2026-07-05
+
+### Added
+- Added `AGENTS.md` as the single source of truth for AI agent guidance, migrated from `CLAUDE.md`
+  - Reduced `CLAUDE.md` to a one-line `@AGENTS.md` import
+  - Added `.gemini/settings.json` pointing Gemini CLI at `AGENTS.md` via `contextFileName`
+  - Added `docs~/adr/0002-agentic-config-single-source.md` recording the decision
+  - Documented the agent setup & included skills (`/new-sample`, `/unity-tests`, `/write-pr`) in `Documentation~/Contributing.md`
+  - Linked the Agentic AI section from `README.md`
+- Added a `Skills` catalog to `AGENTS.md` so any agent that reads it, not just Claude Code, can discover & follow the included skills
+  - Added a note that agents lacking a named Claude tool should use the plain equivalent
+  - Documented the rule to update the catalog when adding or renaming a skill in `Documentation~/Contributing.md`
+- Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, ticking centrally rather than one MonoBehaviour per label
+  - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface, adding & removing the `AnimatedTextMarker` to match the inspector toggle
+  - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
+  - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(0.3, 2)"`
+  - Added em-normalized motion offsets, scaling `CharMod.Offset` by each character's line height so an amplitude reads the same on canvas & world-space text; offsets are authored in ems (`1` = one line height)
+  - Added author diagnostics for `<anim>` tags: an unresolved effect key warns with a cross-channel hint (`motion="rainbow"` points to `color`), & a bad inline argument like `wave(foo)` warns via a `TextEffect.ValidateArgs` hook, once per span build
+  - Added case-insensitive effect key resolution, so `motion="Wave"` matches `wave`
+  - Added `textPreprocessor` chaining, running & restoring an existing preprocessor instead of replacing it
+  - Added a duplicate-tick guard to `TextAnimator` install against a repeated PlayerLoop injection
+  - Added `AnimTagPreprocessor.cs`, an `ITextPreprocessor` stripping `<anim>` tags before TMP parses & recording each run's range & keys, mapped back to characters via `TMP_CharacterInfo.index`
+  - Added `TextEffect.cs` abstract base with `MotionTextEffect.cs` & `ColorTextEffect.cs` channel bases & `TextEffectAttribute.cs`, so effects are added by subclassing a channel & tagging a key
+  - Added `TextEffectRegistry.cs` to auto-discover effects by reflection per channel & cache one shared instance per key
+  - Added `AnimatedText.cs` to cache `<anim>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
+  - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown, with an optional `Apply(force)` bypass for off-screen callers
+  - Added `CharMod.cs`, `EffectRange.cs`, `RawAnimSpan.cs` & `EffectArgs.cs` for per-character output, resolved spans & raw-token inline arguments read through non-allocating typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`)
+  - Added `ShakeMotionEffect.cs`, `WaveMotionEffect.cs`, `JitterMotionEffect.cs` & `PulseMotionEffect.cs` motion effects, keyed `shake`, `wave`, `jitter` & `pulse`
+  - Added `RainbowColorEffect.cs`, `GradientColorEffect.cs`, `FadeColorEffect.cs` & `FlashColorEffect.cs` color effects, keyed `rainbow`, `gradient`, `fade` & `flash`
+  - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
+  - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
+  - Added `AnimatedTextHeaderToggle.cs` appending an "Animate Text" toggle to the GameObject inspector header of TMP text objects via `finishedDefaultHeaderGUI`, toggling the marker without replacing TMP's editor
+  - Added `utilities-text-animation.md` documenting `<anim>`-tag authoring, inline arguments, the two channels, the opt-in API, effect loading & adding a new effect
+  - Added `AnimTagPreprocessorTests.cs`, `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering tag stripping & range recording, inline-argument parsing, effect output bounds, `CharMod.Identity` & per-channel reflection discovery (built-in, custom & unknown keys)
+  - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking, per-character displacement/restore & motion-with-color composition across `TextMeshProUGUI` & `TextMeshPro`
+  - Added `TmpEssentialsCiImporter.cs` importing the TMP Essential Resources in headless CI, so the mesh-dependent tests run against a real font instead of failing on a fontless mesh
+- Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
+- Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
+- Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
+- Added Prefab Gym & Zoo sample
+  - Added `ZooLayout.cs` as Editor Only Script to manage the layout of the zoo
+- Added `TransformTweenExtensions.UniTask.cs` providing `TweenToAsync` & `TweenScaleToAsync` extensions returning `UniTask`, gated behind UniTask install
+  - Exposes `PlayerLoopTiming` & native `CancellationToken` cancellation (throws `OperationCanceledException`, freezes transform at current value)
+  - Added `TweenRegistry.cs` to cancel a prior async tween when a new one starts on the same `(Transform, TRANSFORM)` key
+- Added `TweenMath.cs` sharing curve evaluation between the sync & async tween engines
+- Added `TransformTweenExtensionsAsyncTests.cs` (PlayMode) covering await completion, token cancellation, registry preemption, destroyed-transform unwind, and the cross-backend assertion, in a UniTask-gated test assembly
+
+### Fixed
+- Fixed `AnimatedText` throwing `NullReferenceException` in `SnapshotVertices()` when a marked label enabled before TMP built its mesh, e.g. opening a prefab, aborting registration so the text never animated until cycling the marker
+- Fixed `SimplePath.GetClosestT()` using per-segment projection for LINEAR paths instead of endpoint-only sampling
+- Fixed `SimplePathFollow` ping-pong direction initializing to `false` when `speed` defaults to 0 at `Start()` time; restructured bounce tests to yield before setting speed so `Start()` always runs first
+
+### Changed
+- Added `SimplePathFollow.ApplyPathTransform()` for overridable position & rotation handling in subclasses
+  - Added `rotationSpeed` field for smooth rotation by using`RotateTowards`
+- Added `SimplePath.GetClosestT()` to get the nearest normalized path position as world point
+- Extracted path data and sampling logic from `SimplePathFollow.cs` into new `SimplePath.cs` base class
+  - `SimplePathFollow.cs` now motion-only, inherits from `SimplePath`
+  - Fixed negative-speed tangent direction in `SimplePathFollow.Update()`
+  - Renamed `SimplePathFollowEditor.cs` → `SimplePathEditor.cs`, targets `SimplePathFollow` using `editorForChildClasses: true`
+- Documented `TweenToAsync` & `TweenScaleToAsync` in `Documentation~/Utilities/utilities-extensions-transform.md`
+- Updated documentation generation workflow
+  - Added ability to generate documentation website for `main` and `develop/v*` branches
+  - Added website drop down to toggle versions
+  - Added restrictions on automatic building to the following
+    - only commits on `main` or `develop/v*` with changes to `Documentation~`, `.github/workflows` or `WebsiteDocs~`
+  - Updated workflow to use the triggering branch `WebsiteDocs~` for building, the workflow will checkout the `main` and `develop/v*` branches itself
+- Added `ObservableCollection` NuGet package to `AddNugetPackages.cs`
+- Upgraded zLinq version from `1.5.4` to `1.5.6`
+- Added `NAUGHTY` version define to [Jam-starter.Runtime.asmdef](Runtime/Jam-starter.Runtime.asmdef) to prevent exceptions on first compile
+- Added `TweenController.HasActiveTween(Transform, TRANSFORM)` for async-side conflict detection in dev builds
+- Removed dead `TweenData.AsAsncTask()` from `TweenController.cs`
+- Extracted `GetCurveT` from `TweenController.cs` into shared `TweenMath.cs` so the sync & async tweens can use the same base
+- Changed test workflow to only run on code changes (`.cs`, `.asmdef`, `.asmref`, `package.json`, the workflow file), so doc & config edits no longer trigger builds
+  - Excluded `Samples~/` so sample changes no longer trigger test builds
+- Reformatted `docs~/plans/` to the arch-plan template using ADR-style numbering (`0001-simple-path`, `0002-async-tweening`)
+
+### Fixed
+- Resolved issues with `NaughtyAttributes` attempted references before it was loaded
+- Added missing UGUI dependency for Unity 6000.3+ into `package.json`
+- npm packages updated to fix CVE alerts
+- Fixed `ColorPickerInterceptor` palette window opening at top-left corner on second and subsequent opens
+  - Root cause: `ColorPicker.color` setter internally calls `GUIUtility.ExitGUI()`, throwing `ExitGUIException` (wrapped in `TargetInvocationException` by reflection), which bypassed `CloseOffscreenPicker()` and left the off-screen picker at `(-10000,-10000)`, poisoning the layout file's saved position for future opens
+  - Fixed by catching `ExitGUIException` / `TargetInvocationException` around `SetValue` so cleanup always runs
+  - Removed redundant manual `SendEvent` call — `OnColorChanged` already notifies the inspector before throwing
+  - Now saves and restores picker position (in addition to `minSize`/`maxSize`) before closing, so the layout system records the correct position
+- Fixed `ColorPickerInterceptor` palette window not closing after color selection
+  - Same `ExitGUIException` propagation was also skipping `s_Intercepting = false` and `EditorApplication.delayCall += Close`, leaving the palette open indefinitely until the user manually dismissed it
+- Added `ColorPickerHeightPrefGuard` — unconditional `[InitializeOnLoad]` class that resets the `CPickerHeight` EditorPref if it was corrupted to zero by a prior version of the interceptor, restoring the default ColorPicker window height
+- Resolve log spamming emminating from `Draw.Arrow()` with `(0, 0, 0)` direction values
+
 ## [0.0.9] - 2026-04-01
 
 ### Added

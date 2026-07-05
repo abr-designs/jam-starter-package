@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,10 +9,10 @@ using Object = UnityEngine.Object;
 
 namespace JamStarter.Editor.Scripts.Utilities.Animations
 {
-    [CustomEditor(typeof(SimplePathFollow))]
-    public class SimplePathFollowEditor : UnityEditor.Editor
+    [CustomEditor(typeof(SimplePath), editorForChildClasses: true)]
+    public class SimplePathEditor : UnityEditor.Editor
     {
-        private SimplePathFollow m_simplePathFollow;
+        private SimplePath m_simplePath;
         private SerializedProperty m_pathPointsProp;
 
         private int m_selectedPathPointIndex = -1;
@@ -21,19 +21,19 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         private static readonly Color LabelBackgroundColor = new Color(0, 0, 0, 0.6f);
         private static readonly Color DeleteButtonColor = new Color(0.8588f, 0.2431f, 0.1137f);
         private static readonly Color InsertPointColor = new Color32(90, 184, 92, 255);
-        
+
         private Rect m_buttonWindowRect;
-        
+
 
         //Unity Editor Functions
         //================================================================================================================//
 
         private void OnEnable()
         {
-            m_simplePathFollow = (SimplePathFollow)target;
-            m_pathPointsProp = serializedObject.FindProperty(nameof(SimplePathFollow.pathPoints));
-            
-            if(PathHandleGlobal.SelectedPathIndex >= 0)
+            m_simplePath = (SimplePath)target;
+            m_pathPointsProp = serializedObject.FindProperty(nameof(SimplePath.pathPoints));
+
+            if (PathHandleGlobal.SelectedPathIndex >= 0)
             {
                 SelectPoint(PathHandleGlobal.SelectedPathIndex);
                 PathHandleGlobal.SelectedPathIndex = -1;
@@ -46,19 +46,19 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             if (GUILayout.Button("Add Point"))
             {
-                m_simplePathFollow.AddPoint();
+                m_simplePath.AddPoint();
             }
         }
 
         private void OnSceneGUI()
         {
-            if (m_simplePathFollow == null)
+            if (m_simplePath == null)
                 return;
 
             if (m_pathPointsProp == null || !m_pathPointsProp.isArray)
                 return;
 
-            var pathPoints = m_simplePathFollow.pathPoints;
+            var pathPoints = m_simplePath.pathPoints;
 
             for (var i = pathPoints.Count - 1; i >= 0; i--)
             {
@@ -70,9 +70,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                     return;
 
                 var element = m_pathPointsProp.GetArrayElementAtIndex(i);
-                Vector3 point = m_simplePathFollow.transform.TransformPoint(element.vector3Value);
+                Vector3 point = m_simplePath.transform.TransformPoint(element.vector3Value);
 
-                Handles.color = i ==0 ? Color.blue : Color.red;
+                Handles.color = i == 0 ? Color.blue : Color.red;
                 if (Handles.Button(point, Quaternion.identity, 0.5f, 0.5f * 1.5f, Handles.SphereHandleCap))
                 {
                     SelectPoint(i);
@@ -81,9 +81,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
                 DrawLabel(point, $"Element {i}");
             }
-            
+
             DrawNewPointPreview();
-            
+
             //Checks to ensure that the element selected is still alive & available
             //----------------------------------------------------------//
             if (m_selectedPathPointIndex == -1)
@@ -107,12 +107,12 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             }
 
             //----------------------------------------------------------//
-            
-            if(m_selectedPathPointIndex == 0)
+
+            if (m_selectedPathPointIndex == 0)
                 return;
 
             EditorGUI.BeginChangeCheck();
-            var currentPointPosition = m_simplePathFollow.transform.TransformPoint(currentPoint.vector3Value);
+            var currentPointPosition = m_simplePath.transform.TransformPoint(currentPoint.vector3Value);
 
             Handles.color = Color.white;
             Handles.SphereHandleCap(0, currentPointPosition, Quaternion.identity, 0.5f, EventType.Repaint);
@@ -121,7 +121,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.Update();
-                currentPoint.vector3Value = m_simplePathFollow.transform.InverseTransformPoint(newPos);
+                currentPoint.vector3Value = m_simplePath.transform.InverseTransformPoint(newPos);
 
                 serializedObject.ApplyModifiedProperties();
             }
@@ -132,9 +132,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         private void SelectPoint(int index)
         {
             m_selectedPathPointIndex = index;
-            
-            if(index == 0)
-                Selection.activeObject = m_simplePathFollow.gameObject;
+
+            if (index == 0)
+                Selection.activeObject = m_simplePath.gameObject;
         }
 
         private static void DrawLabel(Vector3 position, string text)
@@ -177,17 +177,17 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
         private void DrawUtilityWindow()
         {
-            const string DELETE_ICON ="TreeEditor.Trash";
+            const string DELETE_ICON = "TreeEditor.Trash";
             const string ADD_ICON = "Toolbar Plus";
-            
+
             const int BUTTON_WIDTH = 30;
             const int BUTTON_HEIGHT = 30;
-            
-            if (m_simplePathFollow.pathPoints.Count < 2)
+
+            if (m_simplePath.pathPoints.Count < 2)
                 return;
 
-            var deleteOnly = m_selectedPathPointIndex != m_simplePathFollow.pathPoints.Count - 1 || m_simplePathFollow.looping;
-            var worldPathPoint = m_simplePathFollow.transform.TransformPoint(m_simplePathFollow.pathPoints[m_selectedPathPointIndex]);
+            var deleteOnly = m_selectedPathPointIndex != m_simplePath.pathPoints.Count - 1 || m_simplePath.looping;
+            var worldPathPoint = m_simplePath.transform.TransformPoint(m_simplePath.pathPoints[m_selectedPathPointIndex]);
             var guiPos = HandleUtility.WorldToGUIPoint(worldPathPoint);
             var rectWidth = deleteOnly ? BUTTON_WIDTH : BUTTON_WIDTH * 2;
 
@@ -203,12 +203,12 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             //We only want to show the Add button when we're not looping & it's an end point
             //----------------------------------------------------------//
-            if (!deleteOnly || (m_selectedPathPointIndex == 0 && m_selectedPathPointIndex == m_simplePathFollow.pathPoints.Count - 1 ))
+            if (!deleteOnly || (m_selectedPathPointIndex == 0 && m_selectedPathPointIndex == m_simplePath.pathPoints.Count - 1))
             {
                 var addIcon = EditorGUIUtility.IconContent(ADD_ICON);
 
                 if (GUILayout.Button(addIcon))
-                    AddPoint(m_simplePathFollow, m_selectedPathPointIndex + 1);
+                    AddPoint(m_simplePath, m_selectedPathPointIndex + 1);
             }
             //----------------------------------------------------------//
 
@@ -216,13 +216,13 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             var oldColor = GUI.color;
 
             GUI.color = DeleteButtonColor;
-            
+
             //Delete Point
             //----------------------------------------------------------//
             if (m_selectedPathPointIndex > 0)
             {
                 if (GUILayout.Button(removeIcon))
-                    DeletePoint(m_simplePathFollow, m_selectedPathPointIndex);
+                    DeletePoint(m_simplePath, m_selectedPathPointIndex);
             }
 
             //----------------------------------------------------------//
@@ -239,24 +239,19 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
         //Adding Points
         //================================================================================================================//
 
-        private void AddPoint(SimplePathFollow path, int index)
+        private void AddPoint(SimplePath path, int index)
         {
             Undo.RecordObject(path, "Add Path Point");
 
             Vector3 newPoint;
-            // Parent it
-            // Position it (simple example)
             if (path.pathPoints.Count >= 2)
             {
-
                 var previousPointA = path.pathPoints[^2];
                 var previousPointB = path.pathPoints[^1];
 
                 var tangent = previousPointB - previousPointA;
 
                 newPoint = previousPointB + tangent.normalized * tangent.magnitude;
-
-                //newPoint = path.pathPoints[prevIndex] + path.transform.forward;
             }
             else
             {
@@ -267,21 +262,21 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             SelectPoint(index);
             EditorUtility.SetDirty(path);
         }
-        
+
         private void InsertPoint(Vector3 position, int index)
         {
-            Undo.RegisterCompleteObjectUndo(m_simplePathFollow, "Insert Path Point");
+            Undo.RegisterCompleteObjectUndo(m_simplePath, "Insert Path Point");
 
-            var localPosition = m_simplePathFollow.transform.InverseTransformPoint(position);
+            var localPosition = m_simplePath.transform.InverseTransformPoint(position);
 
-            m_simplePathFollow.pathPoints.Insert(index + 1, localPosition);
+            m_simplePath.pathPoints.Insert(index + 1, localPosition);
 
-            EditorUtility.SetDirty(m_simplePathFollow);
-            
+            EditorUtility.SetDirty(m_simplePath);
+
             SelectPoint(index + 1);
         }
 
-        private void DeletePoint(SimplePathFollow path, int index)
+        private void DeletePoint(SimplePath path, int index)
         {
             if (path.pathPoints.Count <= 1)
                 return;
@@ -313,12 +308,12 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                 Index = index;
             }
         }
-        
+
         private readonly Segment[] m_segments = new Segment[200];
 
         private void DrawNewPointPreview()
         {
-            if (m_simplePathFollow.pathPoints.Count < 2)
+            if (m_simplePath.pathPoints.Count < 2)
                 return;
 
             var e = Event.current;
@@ -329,8 +324,8 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             //We don't want to add points when attempting to select a path point
             if (IsMouseCloseToPathPoint(
-                    m_simplePathFollow.transform, 
-                    m_simplePathFollow.pathPoints,
+                    m_simplePath.transform,
+                    m_simplePath.pathPoints,
                     Event.current.mousePosition))
                 return;
 
@@ -357,7 +352,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
                 if (dist >= minDist)
                     continue;
-                
+
                 minDist = dist;
                 bestPoint = point;
                 bestSegmentIndex = seg.Index;
@@ -365,10 +360,10 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             //Give the currently selected point UX priority, so that a new point isn't created when trying to move
             //----------------------------------------------------------//
-            if (m_selectedPathPointIndex >= 0 && m_selectedPathPointIndex < m_simplePathFollow.pathPoints.Count)
+            if (m_selectedPathPointIndex >= 0 && m_selectedPathPointIndex < m_simplePath.pathPoints.Count)
             {
-                var selectedWorldPos = m_simplePathFollow.transform.TransformPoint(
-                    m_simplePathFollow.pathPoints[m_selectedPathPointIndex]);
+                var selectedWorldPos = m_simplePath.transform.TransformPoint(
+                    m_simplePath.pathPoints[m_selectedPathPointIndex]);
 
                 if (PointWithinThreshold(selectedWorldPos, bestPoint))
                     return;
@@ -416,41 +411,41 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             var outCount = 0;
 
-            switch (m_simplePathFollow.motion)
+            switch (m_simplePath.motion)
             {
-                case SimplePathFollow.MOTION.LINEAR:
-                    for (var i = 0; i < m_simplePathFollow.pathPoints.Count - 1 || outCount == segments.Length - 1; i++)
+                case SimplePath.MOTION.LINEAR:
+                    for (var i = 0; i < m_simplePath.pathPoints.Count - 1 || outCount == segments.Length - 1; i++)
                     {
                         segments[outCount++] = new Segment(
-                                GetPoint(i),
-                                GetPoint(i + 1),
-                                i);
+                            GetPoint(i),
+                            GetPoint(i + 1),
+                            i);
                     }
 
-                    if (m_simplePathFollow.looping)
+                    if (m_simplePath.looping)
                     {
                         segments[outCount++] = new Segment(
-                            GetPoint(m_simplePathFollow.pathPoints.Count - 1),
+                            GetPoint(m_simplePath.pathPoints.Count - 1),
                             GetPoint(0),
-                            m_simplePathFollow.pathPoints.Count - 1);
+                            m_simplePath.pathPoints.Count - 1);
                     }
                     break;
-                case SimplePathFollow.MOTION.SMOOTH:
-                    var segmentCount = m_simplePathFollow.looping
-                        ? m_simplePathFollow.pathPoints.Count
-                        : m_simplePathFollow.pathPoints.Count - 1;
+                case SimplePath.MOTION.SMOOTH:
+                    var segmentCount = m_simplePath.looping
+                        ? m_simplePath.pathPoints.Count
+                        : m_simplePath.pathPoints.Count - 1;
 
                     for (var i = 0; i < segmentCount && outCount < segments.Length; i++)
                     {
-                        var p0 = m_simplePathFollow.GetCatmullPoint(i - 1);
-                        var p1 = m_simplePathFollow.GetCatmullPoint(i);
-                        var p2 = m_simplePathFollow.GetCatmullPoint(i + 1);
-                        var p3 = m_simplePathFollow.GetCatmullPoint(i + 2);
+                        var p0 = m_simplePath.GetCatmullPoint(i - 1);
+                        var p1 = m_simplePath.GetCatmullPoint(i);
+                        var p2 = m_simplePath.GetCatmullPoint(i + 1);
+                        var p3 = m_simplePath.GetCatmullPoint(i + 2);
 
-                        for (var j = 0; j < m_simplePathFollow.catmullResolution && outCount < segments.Length; j++)
+                        for (var j = 0; j < m_simplePath.catmullResolution && outCount < segments.Length; j++)
                         {
-                            var t0 = j / (float)m_simplePathFollow.catmullResolution;
-                            var t1 = (j + 1) / (float)m_simplePathFollow.catmullResolution;
+                            var t0 = j / (float)m_simplePath.catmullResolution;
+                            var t1 = (j + 1) / (float)m_simplePath.catmullResolution;
 
                             var a = LerpFunctions.CatmullRom(t0, p0, p1, p2, p3);
                             var b = LerpFunctions.CatmullRom(t1, p0, p1, p2, p3);
@@ -468,14 +463,14 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
         private Vector3 GetPoint(int index)
         {
-            index = Mathf.Clamp(index, 0, m_simplePathFollow.pathPoints.Count - 1);
-            return m_simplePathFollow.transform.TransformPoint(m_simplePathFollow.pathPoints[index]);
+            index = Mathf.Clamp(index, 0, m_simplePath.pathPoints.Count - 1);
+            return m_simplePath.transform.TransformPoint(m_simplePath.pathPoints[index]);
         }
-        
+
         private static float DistanceMouseToSegment(Vector2 mousePos, Vector3 worldPointA, Vector3 worldPointB, out Vector3 closestWorldPoint)
         {
             closestWorldPoint = Vector3.zero;
-            
+
             var a = HandleUtility.WorldToGUIPoint(worldPointA);
             var b = HandleUtility.WorldToGUIPoint(worldPointB);
 
@@ -490,7 +485,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             var closest2D = a + ab * t;
             closestWorldPoint = Vector3.Lerp(worldPointA, worldPointB, t);
-            
+
             return Vector2.Distance(mousePos, closest2D);
         }
 
@@ -500,10 +495,9 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             {
                 var worldPoint = transform.TransformPoint(pathPoint);
                 var guiPoint = HandleUtility.WorldToGUIPoint(worldPoint);
-                
+
                 if (Vector2.Distance(mousePos, guiPoint) < 20f)
                     return true;
-                
             }
 
             return false;
@@ -513,26 +507,26 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
         //OnDrawGizmos
         //================================================================================================================//
-        
+
         #region OnDrawGizmos
 
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
-        private static void OnSceneGUIAlways(SimplePathFollow simplePathFollow, GizmoType gizmoType)
+        private static void OnSceneGUIAlways(SimplePath simplePath, GizmoType gizmoType)
         {
-            var arraySize = simplePathFollow.pathPoints.Count;
-            var looping = simplePathFollow.looping;
+            var arraySize = simplePath.pathPoints.Count;
+            var looping = simplePath.looping;
 
             if (arraySize < 2)
                 return;
 
             Handles.color = Color.yellow;
 
-            switch (simplePathFollow.motion)
+            switch (simplePath.motion)
             {
-                case SimplePathFollow.MOTION.LINEAR:
+                case SimplePath.MOTION.LINEAR:
                     DrawLinearPath();
                     break;
-                case SimplePathFollow.MOTION.SMOOTH:
+                case SimplePath.MOTION.SMOOTH:
                     DrawCatmullPath();
                     break;
                 default:
@@ -564,15 +558,15 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             void DrawCatmullPath()
             {
-                var catmullResolution = simplePathFollow.catmullResolution;
+                var catmullResolution = simplePath.catmullResolution;
                 int segmentCount = looping ? arraySize : arraySize - 1;
 
                 for (int i = 0; i < segmentCount; i++)
                 {
-                    Vector3 p0 = simplePathFollow.GetCatmullPoint(i - 1);
-                    Vector3 p1 = simplePathFollow.GetCatmullPoint(i);
-                    Vector3 p2 = simplePathFollow.GetCatmullPoint(i + 1);
-                    Vector3 p3 = simplePathFollow.GetCatmullPoint(i + 2);
+                    Vector3 p0 = simplePath.GetCatmullPoint(i - 1);
+                    Vector3 p1 = simplePath.GetCatmullPoint(i);
+                    Vector3 p2 = simplePath.GetCatmullPoint(i + 1);
+                    Vector3 p3 = simplePath.GetCatmullPoint(i + 2);
 
                     Vector3 previousPoint = p1;
 
@@ -588,23 +582,22 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
             Vector3 GetWorldPathPoint(int index, bool invert = false)
             {
-                var point = simplePathFollow.pathPoints[index];
+                var point = simplePath.pathPoints[index];
                 return invert
-                    ? simplePathFollow.transform.InverseTransformPoint(point)
-                    : simplePathFollow.transform.TransformPoint(point);
+                    ? simplePath.transform.InverseTransformPoint(point)
+                    : simplePath.transform.TransformPoint(point);
             }
         }
 
         #endregion //OnDrawGizmos
 
         //================================================================================================================//
-
     }
-    
+
     [InitializeOnLoad]
     internal static class PathRegistry
     {
-        private static List<SimplePathFollow> s_paths = new();
+        private static List<SimplePath> s_paths = new();
         private static bool s_dirty = true;
 
         static PathRegistry()
@@ -613,20 +606,20 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
             Undo.undoRedoPerformed += () => s_dirty = true;
         }
 
-        public static List<SimplePathFollow> Paths
+        public static List<SimplePath> Paths
         {
             get
             {
-                if (!s_dirty) 
+                if (!s_dirty)
                     return s_paths;
-                
-                s_paths = Object.FindObjectsByType<SimplePathFollow>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID).ToList();
+
+                s_paths = Object.FindObjectsByType<SimplePath>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID).ToList();
                 s_dirty = false;
                 return s_paths;
             }
         }
     }
-    
+
     [InitializeOnLoad]
     internal static class PathHandleGlobal
     {
@@ -638,18 +631,18 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            foreach (var simplePathFollow in PathRegistry.Paths)
+            foreach (var simplePath in PathRegistry.Paths)
             {
-                if(Selection.activeObject == simplePathFollow)
-                    continue;
-                
-                if (simplePathFollow.pathPoints == null) 
+                if (Selection.activeObject == simplePath)
                     continue;
 
-                for (var i = 0; i < simplePathFollow.pathPoints.Count; i++)
+                if (simplePath.pathPoints == null)
+                    continue;
+
+                for (var i = 0; i < simplePath.pathPoints.Count; i++)
                 {
-                    var point = simplePathFollow.pathPoints[i];
-                    var worldPoint = simplePathFollow.transform.TransformPoint(point);
+                    var point = simplePath.pathPoints[i];
+                    var worldPoint = simplePath.transform.TransformPoint(point);
                     float size = HandleUtility.GetHandleSize(worldPoint) * 0.1f;
 
                     int controlID = GUIUtility.GetControlID(FocusType.Passive);
@@ -661,8 +654,7 @@ namespace JamStarter.Editor.Scripts.Utilities.Animations
                     {
                         GUIUtility.hotControl = controlID;
 
-                        // Handle click
-                        Selection.activeObject = simplePathFollow;
+                        Selection.activeObject = simplePath;
 
                         Event.current.Use();
                         SelectedPathIndex = i;

@@ -1,7 +1,7 @@
 {
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "unity": "6000.0",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
@@ -17,6 +17,7 @@
   },
   "documentationUrl": "https://abr-designs.github.io/jam-starter-package/",
   "dependencies": {
+    "com.unity.ugui": "2.0.0",
     "com.unity.feature.2d": "2.0.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.cinemachine": "3.1.2",
@@ -92,6 +93,11 @@
       "displayName": "Thumbnail Studio",
       "description": "Tool/Sample that enables you to create thumbnails of a collection of prefabs automatically.",
       "path": "Samples~/Thumbnail Studio"
+    },
+    {
+      "displayName": "Prefab Zoo & Gym",
+      "description": "Example prefab zoo & gym<a href=\"https://youtu.be/5PJRCz0t7yY?si=3rdhnLXqaTBd7aDQ\"><i>(see video)</i></a> to allow high overview of all assets within your project and to test them in real scenarios.",
+      "path": "Samples~/ZooGym"
     }
   ]
 }

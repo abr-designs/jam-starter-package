@@ -15,7 +15,7 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.9` - April 1, 2026
+### `v0.0.10` - July 05, 2026
 ### Supports Unity 6000.0
 
 ## Samples
@@ -74,6 +74,9 @@ projects & Game jams.
 #### Custom NuGet Packages
 > _See [`AddNuGetPackages.cs`](Editor/Packages/NugetPackages/AddNuGetPackages.cs)_
 - [ZLinq](https://github.com/Cysharp/ZLinq)
+- [ObservableCollections](https://github.com/Cysharp/ObservableCollections#unity)
 
 ## Contributing
 If you would like to contribute to this project, please review our [contribution guidelines](Documentation~/Contributing.md).
+
+Working with an AI coding agent? See [Agentic AI support](Documentation~/Contributing.md#ai-agents).

@@ -1,0 +1,25 @@
+{
+    "name": "Jam-starter.Runtime.TextAnimation",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e0a7d29f6751f3e479d83dc8ad7aa437",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "TMP_PRESENT"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "TMP_PRESENT"
+        }
+    ],
+    "noEngineReferences": false
+}
