@@ -28,6 +28,8 @@ Files named `NNNN-slug.md`. Status comes from each plan's Status field (Proposed
 |---|---|---|---|
 | 0001 | `plans/0001-simple-path.md` | Implemented | Extract a reusable `SimplePath` base class out of `SimplePathFollow`, splitting path structure and sampling from motion. |
 | 0002 | `plans/0002-async-tweening.md` | Implemented | UniTask-powered async tween backend (`TweenToAsync` family) beside the sync engine, gated behind the `UNITASK` define. Realises ADR 0001. |
+| 0003 | `plans/0003-text-animator.md` | Implemented | Per-character TMP text animation (shake, wave, jitter) driven by `<link>` tags and extensible code effects. Implements issue #21. |
+| 0004 | `plans/0004-anim-tag.md` | Implemented | Replace `<link>`-driven effects with a custom `<anim motion="..." color="...">` tag layering independent motion and color channels per character. |
 
 ## Conventions
 
