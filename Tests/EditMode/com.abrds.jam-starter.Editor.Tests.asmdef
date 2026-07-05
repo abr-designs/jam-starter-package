@@ -5,7 +5,9 @@
         "GUID:e0a7d29f6751f3e479d83dc8ad7aa437",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:09efeed86ad53d143bde843967b9daad"
+        "GUID:09efeed86ad53d143bde843967b9daad",
+        "Jam-starter.Runtime.TextAnimation",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"

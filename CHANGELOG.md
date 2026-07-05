@@ -17,6 +17,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added a `Skills` catalog to `AGENTS.md` so any agent that reads it, not just Claude Code, can discover & follow the included skills
   - Added a note that agents lacking a named Claude tool should use the plain equivalent
   - Documented the rule to update the catalog when adding or renaming a skill in `Documentation~/Contributing.md`
+- Added `TextAnimator.cs` to animate spans of TMP text per-character from a single PlayerLoop tick, ticking centrally rather than one MonoBehaviour per label
+  - Added `TMP_TextExtensions.PlayTextAnimation()` & `StopTextAnimation()` as the opt-in surface, adding & removing the `AnimatedTextMarker` to match the inspector toggle
+  - Added `AnimatedTextMarker.cs`, an `[ExecuteAlways]` opt-in component registering its TMP text while enabled & unregistering on disable, so edit-mode preview tracks the toggle
+  - Added the custom `<anim motion="key" color="key">` tag with independent motion & color channels that compose on the same characters, plus inline positional arguments such as `motion="wave(0.3, 2)"`
+  - Added em-normalized motion offsets, scaling `CharMod.Offset` by each character's line height so an amplitude reads the same on canvas & world-space text; offsets are authored in ems (`1` = one line height)
+  - Added author diagnostics for `<anim>` tags: an unresolved effect key warns with a cross-channel hint (`motion="rainbow"` points to `color`), & a bad inline argument like `wave(foo)` warns via a `TextEffect.ValidateArgs` hook, once per span build
+  - Added case-insensitive effect key resolution, so `motion="Wave"` matches `wave`
+  - Added `textPreprocessor` chaining, running & restoring an existing preprocessor instead of replacing it
+  - Added a duplicate-tick guard to `TextAnimator` install against a repeated PlayerLoop injection
+  - Added `AnimTagPreprocessor.cs`, an `ITextPreprocessor` stripping `<anim>` tags before TMP parses & recording each run's range & keys, mapped back to characters via `TMP_CharacterInfo.index`
+  - Added `TextEffect.cs` abstract base with `MotionTextEffect.cs` & `ColorTextEffect.cs` channel bases & `TextEffectAttribute.cs`, so effects are added by subclassing a channel & tagging a key
+  - Added `TextEffectRegistry.cs` to auto-discover effects by reflection per channel & cache one shared instance per key
+  - Added `AnimatedText.cs` to cache `<anim>` spans & re-parse on `TMPro_EventManager.TEXT_CHANGED_EVENT`
+  - Added visibility pausing in `AnimatedText` to skip hidden labels (inactive, frustum-culled world text, culled, zero-alpha or canvas-off UGUI), resuming seamlessly when shown, with an optional `Apply(force)` bypass for off-screen callers
+  - Added `CharMod.cs`, `EffectRange.cs`, `RawAnimSpan.cs` & `EffectArgs.cs` for per-character output, resolved spans & raw-token inline arguments read through non-allocating typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`)
+  - Added `ShakeMotionEffect.cs`, `WaveMotionEffect.cs`, `JitterMotionEffect.cs` & `PulseMotionEffect.cs` motion effects, keyed `shake`, `wave`, `jitter` & `pulse`
+  - Added `RainbowColorEffect.cs`, `GradientColorEffect.cs`, `FadeColorEffect.cs` & `FlashColorEffect.cs` color effects, keyed `rainbow`, `gradient`, `fade` & `flash`
+  - Added `Jam-starter.Runtime.TextAnimation.asmdef` gated behind a `TMP_PRESENT` version define
+  - Added `TextAnimatorEditorDriver.cs` to preview animations in edit mode via `EditorApplication.update` & a realtime clock, in a new editor-only `Jam-starter.Editor.TextAnimation.asmdef`
+  - Added `AnimatedTextHeaderToggle.cs` appending an "Animate Text" toggle to the GameObject inspector header of TMP text objects via `finishedDefaultHeaderGUI`, toggling the marker without replacing TMP's editor
+  - Added `utilities-text-animation.md` documenting `<anim>`-tag authoring, inline arguments, the two channels, the opt-in API, effect loading & adding a new effect
+  - Added `AnimTagPreprocessorTests.cs`, `EffectMathTests.cs` & `TextEffectRegistryTests.cs` (EditMode) covering tag stripping & range recording, inline-argument parsing, effect output bounds, `CharMod.Identity` & per-channel reflection discovery (built-in, custom & unknown keys)
+  - Added `TextAnimatorTests.cs` & `AnimatedTextMeshTests.cs` (PlayMode) covering registration, destroyed-text cleanup, PlayerLoop ticking, per-character displacement/restore & motion-with-color composition across `TextMeshProUGUI` & `TextMeshPro`
+  - Added `TmpEssentialsCiImporter.cs` importing the TMP Essential Resources in headless CI, so the mesh-dependent tests run against a real font instead of failing on a fontless mesh
 - Added `SimplePathTests.cs` (EditMode), covers `Evaluate`, `GetClosestT`, and `GetCatmullPoint` for both LINEAR/SMOOTH modes and looping/non-looping
 - Added `SimplePathFollowTests.cs` (PlayMode), covers ping-pong bounce, looping wrap, negative-speed backward movement, and `faceDirection` with instant/gradual rotation
 - Added `game.ci.yml` github workflow to automate testing of the package in Edit & Playmode
@@ -29,6 +53,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `TransformTweenExtensionsAsyncTests.cs` (PlayMode) covering await completion, token cancellation, registry preemption, destroyed-transform unwind, and the cross-backend assertion, in a UniTask-gated test assembly
 
 ### Fixed
+- Fixed `AnimatedText` throwing `NullReferenceException` in `SnapshotVertices()` when a marked label enabled before TMP built its mesh, e.g. opening a prefab, aborting registration so the text never animated until cycling the marker
 - Fixed `SimplePath.GetClosestT()` using per-segment projection for LINEAR paths instead of endpoint-only sampling
 - Fixed `SimplePathFollow` ping-pong direction initializing to `false` when `speed` defaults to 0 at `Start()` time; restructured bounce tests to yield before setting speed so `Start()` always runs first
 
