@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.0.10-preview] - DATE
+## [0.0.10] - 2026-07-05
 
 ### Added
 - Added `AGENTS.md` as the single source of truth for AI agent guidance, migrated from `CLAUDE.md`
