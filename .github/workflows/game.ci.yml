@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         projectPath: [test-project/Packages/com.abrds.jam-starter]
-        unityVersion: ['6000.4.1f1'] # some version must be included for package testing
+        unityVersion: ${{ fromJson(vars.UNITY_VERSIONS) }} # JSON array set in Settings > Environments > game.ci > Variables
         testMode: [editmode, playmode] #[editmode, playmode, Standalone]
 
     steps:
@@ -71,10 +71,10 @@ jobs:
         id: project-library-restore
         with:
           path: TempProject/Library
-          key: ${{ matrix.testMode }}-Library-TempProject
+          key: ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject
           restore-keys: |
-            ${{ matrix.testMode }}-Library-TempProject-
-            ${{ matrix.testMode }}-Library-
+            ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject-
+            ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-
 
       - uses: game-ci/unity-test-runner@v4
         name: Run Tests
@@ -99,7 +99,7 @@ jobs:
         id: project-library-save
         with:
           path: TempProject/Library
-          key: ${{ matrix.testMode }}-Library-TempProject
+          key: ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject
 
       - uses: actions/upload-artifact@v4
         name: Upload Artifacts

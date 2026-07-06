@@ -8,13 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.11 - preview] - DATE
 
 ### Added
-- 
+- Unity 6000.5+ support
+  - Updated package.json dependencies & minimum version
+  - Updated README to reflect the changes
 
 ### Fixed
 - Resolved Dead links in documentation
 
 ### Changed
-- 
+- Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
+  - Added `unityVersion` to the Library cache key to prevent collision across versions
 
 ## [0.0.10] - 2026-07-05
 
