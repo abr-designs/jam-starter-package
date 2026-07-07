@@ -76,7 +76,7 @@ jobs:
             ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject-
             ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-
 
-      - uses: game-ci/unity-test-runner@v4
+      - uses: abr-designs/unity-test-runner@patch/codecoverage-1.3.0
         name: Run Tests
         id: tests
         env:
