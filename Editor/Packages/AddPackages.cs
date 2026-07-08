@@ -15,7 +15,7 @@ namespace JamStarter.Editor
 
         private static readonly (string packageId, string packageUrl)[] Packages =
         {
-            ("com.dbrizov.naughtyattributes", "https://github.com/dbrizov/NaughtyAttributes.git#upm"),
+            ("com.dbrizov.naughtyattributes", "https://github.com/dbrizov/NaughtyAttributes.git#c37fb61a687a49fb61b0b48c47599cc8ddd9443e"),
             ("com.gitamend.unityutils", "https://github.com/adammyhre/Unity-Utils.git"),
             ("ayellowpaper.serialized-dictionary", "https://github.com/ayellowpaper/SerializedDictionary.git"),
             ("com.cysharp.unitask", "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.5.11"),
