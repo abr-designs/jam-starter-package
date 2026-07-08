@@ -49,7 +49,7 @@ jobs:
         testMode: [editmode, playmode] #[editmode, playmode, Standalone]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         name: Download package
         with:
           lfs: true
@@ -101,14 +101,14 @@ jobs:
           path: TempProject/Library
           key: ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: Upload Artifacts
         if: always()
         with: 
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: Upload Coverage Artifacts
         if: always()
         with:

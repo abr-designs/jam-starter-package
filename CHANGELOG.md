@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
   - Added `unityVersion` to the Library cache key to prevent collision across versions
+- Bumped `actions/checkout` & `actions/upload-artifact` from `v4` to `v5` in `game.ci.yml` to clear the Node 20 deprecation warning
 
 ## [0.0.10] - 2026-07-05
 
