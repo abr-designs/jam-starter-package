@@ -8,13 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.11 - preview] - DATE
 
 ### Added
-- 
+- Unity 6000.5+ support
+  - Updated package.json dependencies & minimum version
+  - Updated README to reflect the changes
 
 ### Fixed
-- 
+- Resolved Dead links in documentation
+- Resolved `game.ci.yml` failing on Unity 6000.5+ by pinning `unity-test-runner` to `abr-designs/unity-test-runner@patch/codecoverage-1.3.0`, which bumps the injected `com.unity.testtools.codecoverage` from `1.1.1` to `1.3.0`
 
 ### Changed
-- 
+- Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
+  - Added `unityVersion` to the Library cache key to prevent collision across versions
+- Bumped `actions/checkout` & `actions/upload-artifact` from `v4` to `v5` in `game.ci.yml` to clear the Node 20 deprecation warning
 
 ## [0.0.10] - 2026-07-05
 

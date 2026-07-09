@@ -196,7 +196,7 @@ What "Not visible" entails:
 > Types are marked `[Preserve]` so IL2CPP stripping keeps effect classes that nothing references directly.
 
 Effects are discovered by reflection at boot time using `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`. The [`TextEffectRegistry`](../../Runtime/Scripts/Utilities/TextAnimation/TextEffectRegistry.cs) scans every loaded
-assembly for non-abstract [`MotionTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/MotionTextEffect.cs) & [`ColorTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/ColorTextEffect.cs) subclasses carrying a [`[TextEffect("key")]`](../../Runtime/Scripts/Utilities/TextAnimation/TextEffectAttribute.cs) attribute, instantiates
+assembly for non-abstract [`MotionTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/MotionTextEffect.cs) & [`ColorTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/ColorTextEffect.cs) subclasses carrying a [`[TextEffect("key")]`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TextEffectAttribute.cs) attribute, instantiates
 one shared instance per key. Keys resolve per channel, so a motion key & a color key may reuse the same string. Key lookups are case-insensitive, so `motion="Wave"` resolves the same effect as `motion="wave"`.
 
 ## Adding a new effect

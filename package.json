@@ -2,7 +2,7 @@
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
   "version": "0.0.11-preview",
-  "unity": "6000.0",
+  "unity": "6000.5",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
     "jam"
@@ -17,11 +17,11 @@
   },
   "documentationUrl": "https://abr-designs.github.io/jam-starter-package/",
   "dependencies": {
-    "com.unity.ugui": "2.0.0",
-    "com.unity.feature.2d": "2.0.1",
-    "com.unity.nuget.newtonsoft-json": "3.2.1",
-    "com.unity.cinemachine": "3.1.2",
-    "com.unity.inputsystem": "1.11.2"
+    "com.unity.ugui": "2.5.0",
+    "com.unity.feature.2d": "2.0.2",
+    "com.unity.nuget.newtonsoft-json": "3.2.2",
+    "com.unity.cinemachine": "3.1.7",
+    "com.unity.inputsystem": "1.19.0"
   },
   "samples": [
     {

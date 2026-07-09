@@ -45,11 +45,11 @@ jobs:
       fail-fast: false
       matrix:
         projectPath: [test-project/Packages/com.abrds.jam-starter]
-        unityVersion: ['6000.4.1f1'] # some version must be included for package testing
+        unityVersion: ${{ fromJson(vars.UNITY_VERSIONS) }} # JSON array set in Settings > Environments > game.ci > Variables
         testMode: [editmode, playmode] #[editmode, playmode, Standalone]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         name: Download package
         with:
           lfs: true
@@ -71,12 +71,12 @@ jobs:
         id: project-library-restore
         with:
           path: TempProject/Library
-          key: ${{ matrix.testMode }}-Library-TempProject
+          key: ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject
           restore-keys: |
-            ${{ matrix.testMode }}-Library-TempProject-
-            ${{ matrix.testMode }}-Library-
+            ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject-
+            ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-
 
-      - uses: game-ci/unity-test-runner@v4
+      - uses: abr-designs/unity-test-runner@patch/codecoverage-1.3.0
         name: Run Tests
         id: tests
         env:
@@ -99,16 +99,16 @@ jobs:
         id: project-library-save
         with:
           path: TempProject/Library
-          key: ${{ matrix.testMode }}-Library-TempProject
+          key: ${{ matrix.testMode }}-${{ matrix.unityVersion }}-Library-TempProject
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: Upload Artifacts
         if: always()
         with: 
           name: Test results for ${{ matrix.testMode }}
           path: ${{ steps.tests.outputs.artifactsPath }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         name: Upload Coverage Artifacts
         if: always()
         with:
