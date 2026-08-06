@@ -30,17 +30,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow one concurrent deployment
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
-
 run-name: >
   Building Documentation Website From ${{ github.event_name == 'pull_request' &&
       format('🔀 PR #{0} [{1}] - {2}',
@@ -55,12 +44,11 @@ run-name: >
   }}
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
+  # Build step
+  build:
     name: Build Vitepress Documentation
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Current Branch (Builder)
@@ -262,12 +250,37 @@ jobs:
 
       - name: Upload artifact
         if:   ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           # Upload dist folder
           path: './final-dist'
 
-      - name: Deploy pages to Github Pages
-        if:   ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+  # Deploy step
+  deploy:
+    name: Deploy Github Pages
+    needs: build
+    
+    if: >
+      (github.event_name == 'push' ||
+       github.event_name == 'workflow_dispatch') &&
+      (github.ref_name == 'main' ||
+       startsWith(github.ref_name, 'develop/v'))
+    
+    runs-on: ubuntu-latest
+
+    permissions:
+          pages: write
+          id-token: write
+
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Deploy pages to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
