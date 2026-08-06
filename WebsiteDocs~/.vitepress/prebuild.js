@@ -85,10 +85,19 @@ const processExtensions = async () => {
     })
 }
 
-processMarkdownFiles()
-    .then(() => console.log('Markdown file links - Prebuild step completed!'))
-    .catch((err) => console.error('Error during prebuild:', err));
+async function main() {
+    try {
+        console.log('Starting markdown link processing...');
+        await processMarkdownFiles();
+        console.log('Markdown file links - Prebuild step completed!');
 
-processExtensions()
-    .then(() => console.log('Image rename - Prebuild step completed!'))
-    .catch((err) => console.error('Error during prebuild:', err));
+        console.log('Starting image extension processing...');
+        await processExtensions();
+        console.log('Image rename - Prebuild step completed!');
+    } catch (err) {
+        console.error('Error during prebuild:', err);
+        process.exitCode = 1;
+    }
+}
+
+main();
