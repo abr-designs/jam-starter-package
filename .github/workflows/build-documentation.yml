@@ -120,6 +120,7 @@ jobs:
 
       - name: Build Main Documentation
         id: build_main
+        timeout-minutes: 15
         run: | 
 
           LOG_FILE="$RUNNER_TEMP/main-documentation-build.log"
@@ -134,9 +135,11 @@ jobs:
           # Don't exit on error
           set +e
 
+          echo "Starting build at $(date -u)"
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
           npm run docs:build 2>&1 | tee "$LOG_FILE"
+          echo "Finished build at $(date -u)"
 
           BUILD_STATUS=${PIPESTATUS[0]}
 
@@ -179,6 +182,7 @@ jobs:
 
       - name: Build Development Documentation
         id: build_dev
+        timeout-minutes: 15
         run: | 
           LOG_FILE="$RUNNER_TEMP/development-documentation-build.log"
 
@@ -194,11 +198,11 @@ jobs:
 
           # Don't exit on build errors
           set +e
-
+          
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
           npm run docs:build 2>&1 | tee "$LOG_FILE"
-
+          
           BUILD_STATUS=${PIPESTATUS[0]}
 
           set -e
