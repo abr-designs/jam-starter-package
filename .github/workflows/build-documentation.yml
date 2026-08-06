@@ -1,5 +1,9 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Generate Documentation Website with Vitepress
+name: Build and Deploy Documentation Website
+
+defaults:
+    run:
+      shell: bash
 
 on:
   # Runs on pushes targeting the default branch
@@ -30,7 +34,7 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    name: Generate Pages with Vitepress
+    name: Build Vitepress Documentation
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -103,24 +107,69 @@ jobs:
         id: pages # ID for output access
         uses: actions/configure-pages@v4
 
-      - name: Build Main Docs
+      - name: Build Main Documentation
+        id: build_main
         run: | 
+
+          LOG_FILE="$RUNNER_TEMP/main-documentation-build.log"
+
           # Clean any current docs and copy over main
           rm -rf builder-repo/Documentation~
           cp -R main-repo/Documentation~ builder-repo/Documentation~
 
           cd builder-repo/WebsiteDocs~
           npm ci
+
+          # Don't exit on error
+          set +e
+
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
-          npm run docs:build
+          npm run docs:build 2>&1 | tee "$LOG_FILE"
+
+          BUILD_STATUS=${PIPSTATUS[0]}
+
+          set -e
+
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::error title=Main documentation build failed::VitePress failed while building the main documentation. See the job summary for the relevant output."
+
+            {
+              echo "## ❌ Main documentation build failed"
+              echo
+              echo "VitePress exited with code \`$BUILD_STATUS\`."
+              echo
+              echo "### Relevant errors"
+              echo
+              echo '```text'
+
+              grep -iE \
+                'dead link|dead links|error|failed|cannot find|not found|broken link' \
+                "$LOG_FILE" |
+                tail -n 50 || tail -n 50 "$LOG_FILE"
+
+              echo '```'
+              echo
+              echo "Open the **Build Main Documentation** step for the complete log."
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit "$BUILD_STATUS"
+          fi
 
           # Copy docs to final place
           mkdir -p $GITHUB_WORKSPACE/final-dist
           cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/
 
-      - name: Build Dev Docs
+          {
+            echo "## ✅ Main documentation built successfully"
+            echo
+            echo "The production documentation was generated successfully."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build Development Documentation
         run: | 
+          LOG_FILE="$RUNNER_TEMP/development-documentation-build.log"
+
           # Clean any current docs and copy over dev
           rm -rf builder-repo/Documentation~
           cp -R dev-repo/Documentation~ builder-repo/Documentation~
@@ -130,13 +179,55 @@ jobs:
 
           cd builder-repo/WebsiteDocs~
           npm ci
+
+          # Don't exit on build errors
+          set +e
+
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
-          npm run docs:build
+          npm run docs:build 2>&1 | tee "$LOG_FILE"
+
+          BUILD_STATUS=${PIPESTATUS[0]}
+
+          set -e
+
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::error title=Development documentation build failed::VitePress failed while building documentation from ${{ env.LATEST_DEV_BRANCH }}. See the job summary for the relevant output."
+
+            {
+              echo "## ❌ Development documentation build failed"
+              echo
+              echo "- Branch: \`${{ env.LATEST_DEV_BRANCH }}\`"
+              echo "- Version: \`${{ env.DEV_VERSION }}\`"
+              echo "- Exit code: \`$BUILD_STATUS\`"
+              echo
+              echo "### Relevant errors"
+              echo
+              echo '```text'
+
+              grep -iE \
+                'dead link|dead links|error|failed|cannot find|not found|broken link' \
+                "$LOG_FILE" |
+                tail -n 50 || tail -n 50 "$LOG_FILE"
+
+              echo '```'
+              echo
+              echo "Open the **Build Development Documentation** step for the complete log."
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit "$BUILD_STATUS"
+          fi
 
           # Copy docs to final place
           mkdir -p $GITHUB_WORKSPACE/final-dist/dev
           cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/dev
+
+          {
+            echo "## ✅ Development documentation built successfully"
+            echo
+            echo "- Branch: \`${{ env.LATEST_DEV_BRANCH }}\`"
+            echo "- Version: \`${{ env.DEV_VERSION }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
