@@ -17,7 +17,7 @@ on:
       - 'WebsiteDocs~/**'
       - '.github/workflows/**'
   
-  # Allow PRs to run this workflow - but don't upload any artifacts
+  # Allow PRs to run this workflow - but don't publish
   pull_request:
     branches:
       - 'main'
