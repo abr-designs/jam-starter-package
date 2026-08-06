@@ -138,11 +138,9 @@ jobs:
           echo "Starting build at $(date -u)"
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
-          npm run docs:build 2>&1 
-          #| tee "$LOG_FILE"
-          echo "Finished build at $(date -u)"
-
+          npm run docs:build #2>&1 | tee "$LOG_FILE"
           BUILD_STATUS=${PIPESTATUS[0]}
+          echo "Finished build at $(date -u)"
 
           set -e
 
