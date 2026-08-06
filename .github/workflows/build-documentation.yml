@@ -254,5 +254,6 @@ jobs:
           path: './final-dist'
 
       - name: Deploy pages to Github Pages
+        if:   ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         id: deployment
         uses: actions/deploy-pages@v4
