@@ -40,6 +40,19 @@ concurrency:
   group: 'pages'
   cancel-in-progress: true
 
+run-name: >
+  Building Documentation Website From ${{ github.event_name == 'pull_request' &&
+      format('🔀 PR #{0} [{1}] - {2}',
+        github.event.pull_request.number,
+        github.head_ref,
+        github.event.pull_request.title
+      )
+    ||
+      format('➡️ Push [{0}]',
+        github.ref_name
+      )
+  }}
+
 jobs:
   # Single deploy job since we're just deploying
   deploy:
