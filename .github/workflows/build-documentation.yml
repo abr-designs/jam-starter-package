@@ -144,8 +144,8 @@ jobs:
 
           set -e
 
-          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' \
-            "$LOG_FILE" > "$CLEAN_LOG"
+          # Strip ANSI escape/color codes before using the output in GitHub Summary 
+          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' "$LOG_FILE" > "$CLEAN_LOG"
 
 
           if [ "$BUILD_STATUS" -ne 0 ]; then
@@ -213,8 +213,7 @@ jobs:
           set -e
 
           # Strip ANSI escape/color codes before using the output in GitHub Summary 
-          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' \ 
-            "$LOG_FILE" > "$CLEAN_LOG"
+          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' "$LOG_FILE" > "$CLEAN_LOG"
 
           if [ "$BUILD_STATUS" -ne 0 ]; then
             echo "::error title=Development documentation build failed::VitePress failed while building documentation from ${{ env.LATEST_DEV_BRANCH }}. See the job summary for the relevant output."
