@@ -20,21 +20,38 @@ const fixCsLinks = (content) => {
 };
 // Function to replace links starting with 'Documentation~' to be relative to the root
 const fixDocLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\((((?:.*\/)*(?:Documentation)(?:~|%7E))[^\)]+)\)/g, (match, text, docPath, replacePart) => {
-      // Replace 'Documentation~' with the correct URL for documentation links
-      let relativeUrl = `${docPath.replace(replacePart,'')}`; // Adjust URL    
-      return `[${text}](${relativeUrl})`;
-    });
+    // Replace 'Documentation~' with the correct URL for documentation links
+    return content.replace(
+        /\[([^\]]*)\]\(\/?Documentation(?:~|%7E)\/([^)]+)\)/gi,
+        (_match, text, relativePath) => {
+            return `[${text}](/${relativePath})`;
+        }
+    );
   };
 
 // Ensure image links are absolute to asset path
 const fixImageAssets = (content) => {
- // Replace all instances of ../Images with /Images
- return content.replace(/\(([^)]+?)(\.[a-zA-Z]+)\)/g, (match, url, ext) => {
-    
-    const newUrl = `${collapseSlashes(url.replace("../Images","/Images"))}${ext.toLowerCase()}`;
-    return `(${newUrl})`;
-  });
+    // Replace all instances of ../Images with /Images
+    return content.replace(
+        /\(([^)]*?\.\.\/Images\/[^)]+)\)/gi,
+        (_match, url) => {
+            const normalizedUrl = collapseSlashes(
+                url.replace("../Images", "/Images")
+            );
+
+            const extension = path.extname(normalizedUrl);
+
+            if (!extension) {
+                return `(${normalizedUrl})`;
+            }
+
+            const correctedUrl =
+                normalizedUrl.slice(0, -extension.length) +
+                extension.toLowerCase();
+
+            return `(${correctedUrl})`;
+        }
+    );
 }
 
 // Replace checkbox with emoji (- [])
@@ -66,14 +83,14 @@ const processMarkdownFiles = async () => {
             await fs.writeFile(file, updatedContent, 'utf-8');
         }
     }
-};
+}
 
 
 // Ensure all extensions are lowercase
 const processExtensions = async () => {
     const files = await glob(`${docsDir}/**/*.*`, {nodir: true});
 
-    files.forEach(async file => {
+    for (const file of files) {
         const ext = path.extname(file);
         if(ext === ext.toUpperCase())
         {  
@@ -82,11 +99,12 @@ const processExtensions = async () => {
             await fs.rename(oldPath, newPath);
             console.log(`Renamed ${oldPath} to ${newPath}`);
         }
-    })
+    }
 }
 
 async function main() {
     try {
+
         console.log('Starting markdown link processing...');
         await processMarkdownFiles();
         console.log('Markdown file links - Prebuild step completed!');
@@ -94,6 +112,7 @@ async function main() {
         console.log('Starting image extension processing...');
         await processExtensions();
         console.log('Image rename - Prebuild step completed!');
+
     } catch (err) {
         console.error('Error during prebuild:', err);
         process.exitCode = 1;
