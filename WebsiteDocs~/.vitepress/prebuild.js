@@ -13,11 +13,15 @@ function collapseSlashes(url) {
 
 // Function to replace .cs file links with GitHub URLs
 const fixCsLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\(([^)]+\.cs)\)/g, (match, text, filePath) => {
-        const absoluteUrl = `${repoUrl}${filePath}`;
-        return `[${text}](${absoluteUrl})`;
-    });
+  return content.replace(
+    /\[([^\]]+)\]\(([^)]+\.cs)\)/gi,
+    (_match, text, filePath) => {
+      const absoluteUrl = `${repoUrl}${filePath}`;
+      return `[${text}](${absoluteUrl})`;
+    }
+  );
 };
+
 // Function to replace links starting with 'Documentation~' to be relative to the root
 const fixDocLinks = (content) => {
     // Replace 'Documentation~' with the correct URL for documentation links
