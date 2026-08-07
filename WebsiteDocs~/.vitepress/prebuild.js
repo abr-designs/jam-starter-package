@@ -33,23 +33,16 @@ const fixDocLinks = (content) => {
 const fixImageAssets = (content) => {
     // Replace all instances of ../Images with /Images
     return content.replace(
-        /\(([^)]*?\.\.\/Images\/[^)]+)\)/gi,
-        (_match, url) => {
-            const normalizedUrl = collapseSlashes(
-                url.replace("../Images", "/Images")
-            );
+        /\((?:\/|\.\.\/|\.\/)?Images\/([^)\s]+)\)/gi,
+        (_match, imagePath) => {
+            const extension = path.extname(imagePath);
 
-            const extension = path.extname(normalizedUrl);
+            const normalizedPath = extension
+                ? imagePath.slice(0, -extension.length) +
+                extension.toLowerCase()
+                : imagePath;
 
-            if (!extension) {
-                return `(${normalizedUrl})`;
-            }
-
-            const correctedUrl =
-                normalizedUrl.slice(0, -extension.length) +
-                extension.toLowerCase();
-
-            return `(${correctedUrl})`;
+            return `(/Images/${normalizedPath})`;
         }
     );
 }
