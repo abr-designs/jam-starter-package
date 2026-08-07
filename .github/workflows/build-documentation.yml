@@ -124,6 +124,7 @@ jobs:
         run: | 
 
           LOG_FILE="$RUNNER_TEMP/main-documentation-build.log"
+          CLEAN_LOG="$RUNNER_TEMP/main-documentation-build-clean.log"
 
           # Clean any current docs and copy over main
           rm -rf builder-repo/Documentation~
@@ -142,6 +143,10 @@ jobs:
 
           set -e
 
+          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' \
+            "$LOG_FILE" > "$CLEAN_LOG"
+
+
           if [ "$BUILD_STATUS" -ne 0 ]; then
             echo "::error title=Main documentation build failed::VitePress failed while building the main documentation. See the job summary for the relevant output."
 
@@ -157,7 +162,7 @@ jobs:
               grep -iE \
                 'dead link|dead links|error|failed|cannot find|not found|broken link' \
                 "$LOG_FILE" |
-                tail -n 50 || tail -n 50 "$LOG_FILE"
+                tail -n 50 || tail -n 50 "$CLEAN_LOG"
 
               echo '```'
               echo
@@ -182,6 +187,7 @@ jobs:
         timeout-minutes: 15
         run: | 
           LOG_FILE="$RUNNER_TEMP/development-documentation-build.log"
+          CLEAN_LOG="$RUNNER_TEMP/development-documentation-build-clean.log"
 
           # Clean any current docs and copy over dev
           rm -rf builder-repo/Documentation~
@@ -204,6 +210,10 @@ jobs:
 
           set -e
 
+          # Strip ANSI escape/color codes before using the output in GitHub Summary 
+          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' \ 
+            "$LOG_FILE" > "$CLEAN_LOG"
+
           if [ "$BUILD_STATUS" -ne 0 ]; then
             echo "::error title=Development documentation build failed::VitePress failed while building documentation from ${{ env.LATEST_DEV_BRANCH }}. See the job summary for the relevant output."
 
@@ -221,7 +231,7 @@ jobs:
               grep -iE \
                 'dead link|dead links|error|failed|cannot find|not found|broken link' \
                 "$LOG_FILE" |
-                tail -n 50 || tail -n 50 "$LOG_FILE"
+                tail -n 50 || tail -n 50 "$CLEAN_LOG"
 
               echo '```'
               echo
