@@ -13,28 +13,45 @@ function collapseSlashes(url) {
 
 // Function to replace .cs file links with GitHub URLs
 const fixCsLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\(([^)]+\.cs)\)/g, (match, text, filePath) => {
-        const absoluteUrl = `${repoUrl}${filePath}`;
-        return `[${text}](${absoluteUrl})`;
-    });
+  return content.replace(
+    /\[(.*?)\]\(([^)\s]+\.cs)\)/gi,
+    (_match, text, filePath) => {
+        const cleanPath = filePath
+            .replace(/^(\.\.\/)+/, '')
+            .replace(/^\.\//, '');
+
+      return `[${text}](${repoUrl}${cleanPath})`;
+    }
+  );
 };
+
 // Function to replace links starting with 'Documentation~' to be relative to the root
 const fixDocLinks = (content) => {
-    return content.replace(/\[([^\]]+)\]\((((?:.*\/)*(?:Documentation)(?:~|%7E))[^\)]+)\)/g, (match, text, docPath, replacePart) => {
-      // Replace 'Documentation~' with the correct URL for documentation links
-      let relativeUrl = `${docPath.replace(replacePart,'')}`; // Adjust URL    
-      return `[${text}](${relativeUrl})`;
-    });
+    // Replace 'Documentation~' with the correct URL for documentation links
+    return content.replace(
+        /\[(.*?)\]\(\/?Documentation(?:~|%7E)\/([^)]+)\)/gi,
+        (_match, text, relativePath) => {
+            return `[${text}](/${relativePath})`;
+        }
+    );
   };
 
 // Ensure image links are absolute to asset path
 const fixImageAssets = (content) => {
- // Replace all instances of ../Images with /Images
- return content.replace(/\(([^)]+?)(\.[a-zA-Z]+)\)/g, (match, url, ext) => {
-    
-    const newUrl = `${collapseSlashes(url.replace("../Images","/Images"))}${ext.toLowerCase()}`;
-    return `(${newUrl})`;
-  });
+    // Replace all instances of ../Images with /Images
+    return content.replace(
+        /\((?:\/|\.\.\/|\.\/)?Images\/([^)\s]+)\)/gi,
+        (_match, imagePath) => {
+            const extension = path.extname(imagePath);
+
+            const normalizedPath = extension
+                ? imagePath.slice(0, -extension.length) +
+                extension.toLowerCase()
+                : imagePath;
+
+            return `(/Images/${normalizedPath})`;
+        }
+    );
 }
 
 // Replace checkbox with emoji (- [])
@@ -66,14 +83,14 @@ const processMarkdownFiles = async () => {
             await fs.writeFile(file, updatedContent, 'utf-8');
         }
     }
-};
+}
 
 
 // Ensure all extensions are lowercase
 const processExtensions = async () => {
     const files = await glob(`${docsDir}/**/*.*`, {nodir: true});
 
-    files.forEach(async file => {
+    for (const file of files) {
         const ext = path.extname(file);
         if(ext === ext.toUpperCase())
         {  
@@ -82,13 +99,24 @@ const processExtensions = async () => {
             await fs.rename(oldPath, newPath);
             console.log(`Renamed ${oldPath} to ${newPath}`);
         }
-    })
+    }
 }
 
-processMarkdownFiles()
-    .then(() => console.log('Markdown file links - Prebuild step completed!'))
-    .catch((err) => console.error('Error during prebuild:', err));
+async function main() {
+    try {
 
-processExtensions()
-    .then(() => console.log('Image rename - Prebuild step completed!'))
-    .catch((err) => console.error('Error during prebuild:', err));
+        console.log('Starting markdown link processing...');
+        await processMarkdownFiles();
+        console.log('Markdown file links - Prebuild step completed!');
+
+        console.log('Starting image extension processing...');
+        await processExtensions();
+        console.log('Image rename - Prebuild step completed!');
+
+    } catch (err) {
+        console.error('Error during prebuild:', err);
+        process.exitCode = 1;
+    }
+}
+
+main();
