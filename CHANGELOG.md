@@ -11,8 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Unity 6000.5+ support
   - Updated package.json dependencies & minimum version
   - Updated README to reflect the changes
+- Added `TimeScaleToolbarTests.cs` (EditMode), covers the refresh throttle gate & maximum scale clamp
+- Added `Documentation~/EditorTools/TimeScaleToolbar.md` covering the slider, reset button & context menu
 
 ### Fixed
+- Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API
+  - Removed the vendored `ToolbarExtender.cs` & `ToolbarCallback.cs`, which reflected into `UnityEditor.Toolbar` internals
+  - Moved `Forced Override` & `Max Scale` from Project Settings into the element right-click menu
+  - Removed the `Toolbar Position`, `Position Offset` & `Enabled` settings, which have no equivalent in the new API
+  - Added `.agents/docs/adr/0004-main-toolbar-timescale.md` recording the decision
 - Resolved Dead links in documentation
 - Resolved `game.ci.yml` failing on Unity 6000.5+ by pinning `unity-test-runner` to `abr-designs/unity-test-runner@patch/codecoverage-1.3.0`, which bumps the injected `com.unity.testtools.codecoverage` from `1.1.1` to `1.3.0`
 
