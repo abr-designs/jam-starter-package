@@ -138,6 +138,7 @@ jobs:
 
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/" \
+          NO_COLOR=1 \
           npm run docs:build 2>&1 | tee "$LOG_FILE"
           BUILD_STATUS=${PIPESTATUS[0]}
 
@@ -204,6 +205,7 @@ jobs:
           
           VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
           VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
+          NO_COLOR=1 \
           npm run docs:build 2>&1 | tee "$LOG_FILE"
           
           BUILD_STATUS=${PIPESTATUS[0]}
