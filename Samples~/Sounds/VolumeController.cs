@@ -8,10 +8,10 @@ namespace Audio
     public class VolumeController : HiddenSingleton<VolumeController>, ISetVolume
     {
         [SerializeField]
-        private AudioMixerGroup sfxAudioMixer;
-        [SerializeReference]
+        private AudioMixerGroup masterAudioMixer;
+        [SerializeField]
         private SFXManager sfxVolume;
-        [SerializeReference]
+        [SerializeField]
         private MusicController musicVolume;
 
         public static void SetMasterVolume(float volume) => Instance?.SetVolume(volume);
@@ -19,6 +19,6 @@ namespace Audio
         public static void SetSFXVolume(float volume) => Instance?.sfxVolume?.SetVolume(volume);
         
         //Based on: https://johnleonardfrench.com/the-right-way-to-make-a-volume-slider-in-unity-using-logarithmic-conversion/
-        public void SetVolume(float volume) => sfxAudioMixer.audioMixer.SetVolume(volume);
+        public void SetVolume(float volume) => masterAudioMixer.audioMixer.SetVolume(volume);
     }
 }
