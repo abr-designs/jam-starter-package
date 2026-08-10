@@ -19,7 +19,7 @@ on:
     - '**/*.asmref'
     - 'package.json'
     - '.github/workflows/game.ci.yml'
-    - '!Samples~/**'
+    #- '!Samples~/**'
 
 run-name: >
   Testing Package From ${{ github.event_name == 'pull_request' &&
