@@ -1,4 +1,5 @@
-﻿namespace Sounds
+﻿
+namespace Audio
 {
     public interface ISetVolume
     {
@@ -6,4 +7,6 @@
         
         void SetVolume(float volume);
     }
+    
+
 }

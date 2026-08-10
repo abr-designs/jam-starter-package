@@ -1,4 +1,6 @@
 ﻿using System;
+using Audio;
+using Audio.Music;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -43,15 +45,15 @@ namespace UI
 
         private void OnMasterVolumeChanged(float value)
         {
-            Debug.LogError("MUST CONNECT MASTER VOLUME.\nChange no Saved...");
+            VolumeController.SetMasterVolume(value);
         }
         private void OnMusicVolumeChanged(float value)
         {
-            Debug.LogError("MUST MUSIC MASTER VOLUME.\nChange no Saved...");
+            VolumeController.SetMusicVolume(value);
         }
         private void OnSFXVolumeChanged(float value)
         {
-            Debug.LogError("MUST SFX MASTER VOLUME.\nChange no Saved...");
+            VolumeController.SetSFXVolume(value);
         }
 
         //Volume Settings Class
