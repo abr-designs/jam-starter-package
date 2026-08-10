@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Sounds;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Audio;
@@ -13,8 +12,6 @@ namespace Audio
 {
     public class SFXManager : HiddenSingleton<SFXManager>, ISetVolume
     {
-        internal static SFXManager instance => Instance;
-        
         //============================================================================================================//
         [Serializable]
         private class SfxData
@@ -235,13 +232,7 @@ namespace Audio
 
         //Set Volume
         //============================================================================================================//
-        
-        //Based on: https://johnleonardfrench.com/the-right-way-to-make-a-volume-slider-in-unity-using-logarithmic-conversion/
-        public void SetVolume(float volume)
-        {
-            var v = Mathf.Log10(volume) * 20;
-            Instance.sfxAudioMixer.audioMixer.SetFloat(ISetVolume.VOLUME_ID, v);
-        }
+        public void SetVolume(float volume) => Instance.sfxAudioMixer.audioMixer.SetVolume(volume);
 
         //Unity Editor Functions
         //============================================================================================================//

@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Updated README to reflect the changes
 - Added `TimeScaleToolbarTests.cs` (EditMode), covers the refresh throttle gate & maximum scale clamp
 - Added `Documentation~/EditorTools/TimeScaleToolbar.md` covering the slider, reset button & context menu
+- Added `VolumeController` to the Sounds sample as the single entry point for volume, exposing `SetMasterVolume()`, `SetMusicVolume()` & `SetSFXVolume()`
+  - Added the component to the `=== Audio Controllers ===` prefab, referencing the master mixer group & both child controllers
+  - Added `AudioMixerExtensions.SetVolume()`, holding the logarithmic slider conversion so each controller sets volume in one call
 
 ### Fixed
 - Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API
@@ -21,12 +24,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Removed the `Toolbar Position`, `Position Offset` & `Enabled` settings, which have no equivalent in the new API
   - Added `.agents/docs/adr/0004-main-toolbar-timescale.md` recording the decision
 - Resolved Dead links in documentation
+- Resolved the Main Menu sample volume sliders logging an error instead of setting volume, routing them through `VolumeController`
+- Resolved the `--- MUSIC CONTROLLER ---` prefab shipping an unassigned mixer reference
 - Resolved `game.ci.yml` failing on Unity 6000.5+ by pinning `unity-test-runner` to `abr-designs/unity-test-runner@patch/codecoverage-1.3.0`, which bumps the injected `com.unity.testtools.codecoverage` from `1.1.1` to `1.3.0`
 
 ### Changed
 - Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
   - Added `unityVersion` to the Library cache key to prevent collision across versions
 - Bumped `actions/checkout` & `actions/upload-artifact` from `v4` to `v5` in `game.ci.yml` to clear the Node 20 deprecation warning
+- Moved `ISetVolume` from the `Sounds` namespace to `Audio`, matching the controllers that implement it
+- `MusicController` & `SFXManager` delegate their volume conversion to `AudioMixer.SetVolume()`
+  - `MusicController` serializes an `AudioMixerGroup` instead of an `AudioMixer`, matching `SFXManager`
+  - Removed the unused `SFXManager.instance` accessor
 
 ## [0.0.10] - 2026-07-05
 
