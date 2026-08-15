@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `VolumeController` to the Sounds sample as the single entry point for volume, exposing `SetMasterVolume()`, `SetMusicVolume()` & `SetSFXVolume()`
   - Added the component to the `=== Audio Controllers ===` prefab, referencing the master mixer group & both child controllers
   - Added `AudioMixerExtensions.SetVolume()`, holding the logarithmic slider conversion so each controller sets volume in one call
+- Added `.agents/docs/adr/0004-pinch-composite-signed-delta.md` recording why `PinchingComposite` returns a signed per-frame pixel delta instead of a gesture-relative ratio
+  - Added a `Camera Pan` section to `CONTEXT.md` defining zoom delta, pinch lockout & primary press
+- Added the `Panning Camera` sample, covering drag panning plus scroll & pinch zoom
+  - Added `Documentation~/Samples/panning-camera.md` describing the controls, inspector fields & drag event
+  - Added the sample to the README list
 
 ### Fixed
 - Resolved Dead links in documentation

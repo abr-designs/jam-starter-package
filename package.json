@@ -98,6 +98,11 @@
       "displayName": "Prefab Zoo & Gym",
       "description": "Example prefab zoo & gym<a href=\"https://youtu.be/5PJRCz0t7yY?si=3rdhnLXqaTBd7aDQ\"><i>(see video)</i></a> to allow high overview of all assets within your project and to test them in real scenarios.",
       "path": "Samples~/ZooGym"
+    },
+    {
+      "displayName": "Panning Camera",
+      "description": "Uses mouse & Touch controls to pan & zoom the camera.<br><br><u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a>",
+      "path": "Samples~/PanCam"
     }
   ]
 }

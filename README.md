@@ -35,6 +35,7 @@ projects & Game jams.
 - ### [Materials](Documentation~/Samples/samples-materials.md)
 - ### [Thumbnail Studio](Documentation~/Samples/thumbnail-studio.md)
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
+- ### [Panning Camera](Documentation~/Samples/panning-camera.md)
 
 ## Features
 - ### [Fixed Palette Tool](Documentation~/FixedPaletteTool/FixedPaletteTool.md)
