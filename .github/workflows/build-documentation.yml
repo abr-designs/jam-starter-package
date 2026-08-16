@@ -57,6 +57,8 @@ jobs:
             path: builder-repo
             sparse-checkout: |
               WebsiteDocs~
+              Documentation~
+              package.json
             lfs: true
 
       - name: Checkout Main
@@ -118,8 +120,72 @@ jobs:
         id: pages # ID for output access
         uses: actions/configure-pages@v4
 
+      - name: Build PR Documentation
+        id: build_pr
+        if: ${{ github.event_name == 'pull_request' }}
+        timeout-minutes: 15
+        run: | 
+          LOG_FILE="$RUNNER_TEMP/pr-documentation-build.log"
+          CLEAN_LOG="$RUNNER_TEMP/pr-documentation-build-clean.log"
+
+          cd builder-repo/WebsiteDocs~
+          npm ci
+
+          # Don't exit on build errors
+          set +e
+          
+          VITE_DEV_VERSION="${{ env.DEV_VERSION }}" \
+          VITE_BASE_URL="${{ steps.pages.outputs.base_path }}/dev/" \
+          NO_COLOR=1 \
+          npm run docs:build 2>&1 | tee "$LOG_FILE"
+          
+          BUILD_STATUS=${PIPESTATUS[0]}
+
+          set -e
+
+          # Strip ANSI escape/color codes before using the output in GitHub Summary 
+          sed -E 's/\x1B\[[0-9;?]*[ -/]*[@-~]//g' "$LOG_FILE" > "$CLEAN_LOG"
+
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            echo "::error title=PR documentation build failed::VitePress failed while building the PR documentation. See the job summary for the relevant output."
+
+            {
+              echo "## ❌ PR documentation build failed"
+              echo
+              echo "VitePress exited with code \`$BUILD_STATUS\`."
+              echo
+              echo "### Relevant errors"
+              echo
+              echo '```text'
+
+              MATCHES=$(grep -iE \
+                'dead link|dead links|error|failed|cannot find|not found|broken link' \
+                "$CLEAN_LOG" || true)
+
+              if [ -n "$MATCHES" ]; then
+                echo "$MATCHES" | tail -n 50
+              else
+                tail -n 50 "$CLEAN_LOG"
+              fi
+
+              echo '```'
+              echo
+              echo "Open the **Build PR Documentation** step for the complete log."
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit "$BUILD_STATUS"
+          fi
+
+          {
+            echo "## ✅ PR documentation built successfully"
+            echo
+            echo "The documentation was generated successfully."
+          } >> "$GITHUB_STEP_SUMMARY"
+          
+
       - name: Build Main Documentation
         id: build_main
+        if: ${{ github.event_name != 'pull_request' }}
         timeout-minutes: 15
         run: | 
 
@@ -160,10 +226,15 @@ jobs:
               echo
               echo '```text'
 
-              grep -iE \
+              MATCHES=$(grep -iE \
                 'dead link|dead links|error|failed|cannot find|not found|broken link' \
-                "$LOG_FILE" |
-                tail -n 50 || tail -n 50 "$CLEAN_LOG"
+                "$CLEAN_LOG" || true)
+
+              if [ -n "$MATCHES" ]; then
+                echo "$MATCHES" | tail -n 50
+              else
+                tail -n 50 "$CLEAN_LOG"
+              fi
 
               echo '```'
               echo
@@ -173,18 +244,16 @@ jobs:
             exit "$BUILD_STATUS"
           fi
 
-          # Copy docs to final place
-          mkdir -p $GITHUB_WORKSPACE/final-dist
-          cp -R .vitepress/dist/* $GITHUB_WORKSPACE/final-dist/
-
+          
           {
             echo "## ✅ Main documentation built successfully"
             echo
-            echo "The production documentation was generated successfully."
+            echo "The documentation was generated successfully."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build Development Documentation
         id: build_dev
+        if: ${{ github.event_name != 'pull_request' }}
         timeout-minutes: 15
         run: | 
           LOG_FILE="$RUNNER_TEMP/development-documentation-build.log"
@@ -228,11 +297,16 @@ jobs:
               echo "### Relevant errors"
               echo
               echo '```text'
-
-              grep -iE \
+              
+              MATCHES=$(grep -iE \
                 'dead link|dead links|error|failed|cannot find|not found|broken link' \
-                "$LOG_FILE" |
-                tail -n 50 || tail -n 50 "$CLEAN_LOG"
+                "$CLEAN_LOG" || true)
+
+              if [ -n "$MATCHES" ]; then
+                echo "$MATCHES" | tail -n 50
+              else
+                tail -n 50 "$CLEAN_LOG"
+              fi
 
               echo '```'
               echo
@@ -258,7 +332,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: documentation-preview
-          path: ./final-dist
+          path: ./builder-repo/WebsiteDocs~/.vitepress/dist
 
       - name: Upload artifact
         if:   ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
