@@ -19,6 +19,7 @@ Files named `NNNN-slug.md`. Status comes from each file's `Status:` line.
 | 0001 | `adr/0001-dual-backend-tweening.md` | Accepted | Dual-backend tweening: keep the sync `TweenTo` / `TweenToCoroutine` engine, add an optional UniTask `TweenToAsync` engine in a gated asmdef, share curve math via `TweenMath`. Caller picks the backend at the call site. |
 | 0002 | `adr/0002-agentic-config-single-source.md` | Accepted | `AGENTS.md` at the repo root is the single source of AI-agent guidance; `CLAUDE.md`, `.gemini`, and other tools point at it rather than duplicating content. |
 | 0003 | `adr/0003-cross-tool-skill-exposure.md` | Accepted | A `## Skills` catalog table in `AGENTS.md` exposes the `.claude/skills/` workflows to non-Claude agents that have no skill loader. |
+| 0004 | `adr/0004-main-toolbar-timescale.md` | Accepted | Rewrite the TimeScale Toolbar on Unity 6.3's `MainToolbarElement` API with no legacy fallback, move its configuration from a `SettingsProvider` into the element context menu, and route all state changes through a throttled `MainToolbar.Refresh`. |
 
 ## Feature Plans (`plans/`)
 
