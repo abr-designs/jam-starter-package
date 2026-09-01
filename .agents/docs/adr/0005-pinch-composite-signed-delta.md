@@ -1,4 +1,4 @@
-# ADR 0004: Pinch Composite Emits a Signed Per-Frame Delta
+# ADR 0005: Pinch Composite Emits a Signed Per-Frame Delta
 
 **Date:** 2026-08-15
 **Status:** Accepted

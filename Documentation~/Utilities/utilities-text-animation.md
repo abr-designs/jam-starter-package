@@ -3,7 +3,7 @@ title: Text Animation
 ---
 # Text Animation
 Per-character animation for [TextMeshPro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest) text. You wrap text in a custom `<anim>` tag with two
-independent channels, `motion` and/or `color`. The animation is driven by a single [`TextAnimator`](../../Runtime/Scripts/Utilities/TextAnimation/TextAnimator.cs) component
+independent channels, `motion` and/or `color`. The animation is driven by a single [`TextAnimator`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TextAnimator.cs) component
 which is automatically added when animation on the object is enabled.
 
 ### Features
@@ -134,7 +134,7 @@ registered & updated.
 1. Enabled the inspector "Animate Text" toggle
 2. Calling the `PlayTextAnimation()` extension method
 3. Adding the `AnimatedTextMarker` manually
-   - Call the [`PlayTextAnimation()`](../../Runtime/Scripts/Utilities/TextAnimation/TMP_TextExtensions.cs) extension method on any `TMP_Text` to add the marker. Call `StopTextAnimation()` to remove it, restoring the original mesh & unregistering the text.
+   - Call the [`PlayTextAnimation()`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TMP_TextExtensions.cs) extension method on any `TMP_Text` to add the marker. Call `StopTextAnimation()` to remove it, restoring the original mesh & unregistering the text.
 
 ```csharp
 using TMPro;
@@ -184,7 +184,7 @@ What "Not visible" entails:
 
 ## How the tag is parsed
 > [!IMPORTANT]
-> TMP only understands its own rich-text tags, so [`AnimTagPreprocessor`](../../Runtime/Scripts/Utilities/TextAnimation/AnimTagPreprocessor.cs) (an `ITextPreprocessor`) strips every `<anim>` tag before TMP parses & records each run's range and keys. Every other tag is passed through untouched.
+> TMP only understands its own rich-text tags, so [`AnimTagPreprocessor`](../../Runtime/Scripts/Utilities/TextAnimation/Processors/AnimTagPreprocessor.cs) (an `ITextPreprocessor`) strips every `<anim>` tag before TMP parses & records each run's range and keys. Every other tag is passed through untouched.
 
 > [!NOTE]
 > _If the label already carried a `textPreprocessor`, it is chained rather than replaced: the existing one runs first, then `<anim>` stripping runs on its output. Stopping the animation restores the original preprocessor._
@@ -195,8 +195,8 @@ What "Not visible" entails:
 > [!IMPORTANT]
 > Types are marked `[Preserve]` so IL2CPP stripping keeps effect classes that nothing references directly.
 
-Effects are discovered by reflection at boot time using `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`. The [`TextEffectRegistry`](../../Runtime/Scripts/Utilities/TextAnimation/TextEffectRegistry.cs) scans every loaded
-assembly for non-abstract [`MotionTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/MotionTextEffect.cs) & [`ColorTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/ColorTextEffect.cs) subclasses carrying a [`[TextEffect("key")]`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TextEffectAttribute.cs) attribute, instantiates
+Effects are discovered by reflection at boot time using `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`. The [`TextEffectRegistry`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TextEffectRegistry.cs) scans every loaded
+assembly for non-abstract [`MotionTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/Base/MotionTextEffect.cs) & [`ColorTextEffect`](../../Runtime/Scripts/Utilities/TextAnimation/Base/ColorTextEffect.cs) subclasses carrying a [`[TextEffect("key")]`](../../Runtime/Scripts/Utilities/TextAnimation/Helpers/TextEffectAttribute.cs) attribute, instantiates
 one shared instance per key. Keys resolve per channel, so a motion key & a color key may reuse the same string. Key lookups are case-insensitive, so `motion="Wave"` resolves the same effect as `motion="wave"`.
 
 ## Adding a new effect
@@ -208,7 +208,7 @@ one shared instance per key. Keys resolve per channel, so a motion key & a color
 Inherit from `MotionTextEffect` (offset / scale / rotation) or `ColorTextEffect` (tint / alpha) & tag it with `[TextEffect("yourKey")]`, then implement the
 per-character math. The base you extend is what routes the key into the motion or color channel.
 
-Inline arguments arrive as raw tokens in [`EffectArgs`](../../Runtime/Scripts/Utilities/TextAnimation/EffectArgs.cs); read them with the typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`),
+Inline arguments arrive as raw tokens in [`EffectArgs`](../../Runtime/Scripts/Utilities/TextAnimation/Data/EffectArgs.cs); read them with the typed getters (`GetFloat`, `GetInt`, `GetBool`, `GetString`, `GetColor`),
 each taking a fallback for when the author omitted that argument. The getters do not allocate, so reading them each frame is free.
 
 To surface a mistyped argument (like `swing(foo)`) to whoever authored the tag, override `ValidateArgs(in EffectArgs)` and return a message describing the problem, or null when the args are fine. It runs once when spans are built, not per frame, so it is where validation belongs rather than silently falling back inside `Apply`. The `ValidateFloats(args, ...names)` helper covers the common case where every listed slot must be a number:
@@ -245,7 +245,7 @@ namespace Utilities.TextAnimation
 }
 ```
 
-You write into the [`CharMod`](../../Runtime/Scripts/Utilities/TextAnimation/CharMod.cs) struct passed by `ref`. It carries
+You write into the [`CharMod`](../../Runtime/Scripts/Utilities/TextAnimation/Data/CharMod.cs) struct passed by `ref`. It carries
 every channel an effect can drive, and starts at an identity value (zero offset, zero rotation, unit scale, white):
 
 | Field | Type | Channel | Meaning |

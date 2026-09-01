@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Unity 6000.5+ support
   - Updated package.json dependencies & minimum version
   - Updated README to reflect the changes
+- Added `TimeScaleToolbarTests.cs` (EditMode), covers the refresh throttle gate & maximum scale clamp
+- Added `Documentation~/EditorTools/TimeScaleToolbar.md` covering the slider, reset button & context menu
 - Added `VolumeController` to the Sounds sample as the single entry point for volume, exposing `SetMasterVolume()`, `SetMusicVolume()` & `SetSFXVolume()`
   - Added the component to the `=== Audio Controllers ===` prefab, referencing the master mixer group & both child controllers
   - Added `AudioMixerExtensions.SetVolume()`, holding the logarithmic slider conversion so each controller sets volume in one call
@@ -21,6 +23,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Added the sample to the README list
 
 ### Fixed
+- Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API
+  - Removed the vendored `ToolbarExtender.cs` & `ToolbarCallback.cs`, which reflected into `UnityEditor.Toolbar` internals
+  - Moved `Forced Override` & `Max Scale` from Project Settings into the element right-click menu
+  - Removed the `Toolbar Position`, `Position Offset` & `Enabled` settings, which have no equivalent in the new API
+  - Added `.agents/docs/adr/0004-main-toolbar-timescale.md` recording the decision
 - Resolved Dead links in documentation
 - Resolved the Main Menu sample volume sliders logging an error instead of setting volume, routing them through `VolumeController`
 - Resolved the `--- MUSIC CONTROLLER ---` prefab shipping an unassigned mixer reference
