@@ -66,7 +66,7 @@ Scroll and pinch keep separate tuning values because their inputs arrive in diff
 | Use Keyboard Movement | Enables `WASD` / arrow key movement. Requires the [Game Input](game-input.md) sample. |
 | Move Speed | World units per second at the closest zoom. Grows with the zoom distance, by the amount Move Speed Zoom Scale sets. |
 | Move Speed Zoom Scale | How strongly Move Speed follows the zoom distance. `1` holds the same screen-space speed at any range, `0.5` softens the ramp, `0` keeps Move Speed fixed. |
-| Smoothing | How quickly the camera reaches Move Speed. Higher is snappier, and the result is framerate independent. |
+| Settle Time | Seconds the camera takes to reach 99% of Move Speed. Lower is snappier, and the result is framerate independent. |
 
 Dragging needs no equivalent setting. It pins the ground point you grabbed under the pointer, so it already covers more world distance per pixel the further out the camera is.
 

@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Existing `X Bounds` & `Z Bounds` values describe a ground area rather than camera placement, so they may need re-tuning
   - Keyboard `Move Speed` grows with the zoom distance, so a key press covers more ground the further out the camera is
   - Added `Move Speed Zoom Scale`, setting how strongly that ramp applies, defaulting to `0.5`
+  - Replaced keyboard `Smoothing` (a rate) with `Settle Time`, seconds taken to reach 99% of `Move Speed`
   - Added `Documentation~/Samples/panning-camera.md` describing the controls, inspector fields & drag event
   - Added the sample to the README list
 

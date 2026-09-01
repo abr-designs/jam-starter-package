@@ -88,8 +88,10 @@ namespace Samples.CameraPan
                  "speed at any range, 0.5 softens the ramp, 0 keeps Move Speed fixed.")]
         private float moveSpeedZoomScale = 0.5f;
 
-        [SerializeField, Tooltip("Higher = snappier. Framerate independent.")]
-        private float smoothing = 12f;
+        [SerializeField, Min(0.0001f)]
+        [Tooltip("Seconds for movement to reach 99% of Move Speed. Lower is snappier. Framerate " +
+                 "independent. Cannot be zero, since a paused timeScale would divide by it.")]
+        private float settleTime = 0.4f;
         
         private Vector3 m_currentVelocity;
         private Vector2 m_keyboardInput;
@@ -460,8 +462,8 @@ namespace Samples.CameraPan
 
             Vector3 desiredVelocity = (forward * input.y + right * input.x) * (moveSpeed * zoomScale);
 
-            // Framerate-independent exponential smoothing.
-            float t = 1f - Mathf.Exp(-smoothing * Time.deltaTime);
+            //Reaches 99% of the target velocity after settleTime seconds.
+            float t = 1f - Mathf.Pow(0.01f, Time.deltaTime / settleTime);
             m_currentVelocity = Vector3.Lerp(m_currentVelocity, desiredVelocity, t);
 
             transform.position += m_currentVelocity * Time.deltaTime;
