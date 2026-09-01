@@ -50,30 +50,37 @@ Everything the camera does is measured against the **ground plane at world Y = 0
 | Field | Does |
 |---|---|
 | Zoom Smooth Time | Smoothing applied to the zoom. Lower is snappier. |
-| Min Zoom Distance | Closest the camera gets to the ground. Also the starting distance. |
+| Min Zoom Distance | Closest the camera gets to the ground. Also the starting distance. Cannot be zero, since zoom scales the distance rather than adding to it. |
 | Max Zoom Distance | Furthest the camera pulls back. |
-| Scroll Zoom Sensitivity | World units of zoom per scroll wheel notch. |
-| Pinch Zoom Sensitivity | World units of zoom per screen pixel of pinch. |
+| Scroll Zoom Percent | Fraction of the current distance added or removed per scroll wheel notch. `0.1` is 10% per notch. |
+| Pinch Sensitivity | How closely zoom tracks the pinch. `1` moves the camera the same percentage the fingers moved, `0.5` is softer, `2` is stronger. |
 
-Scroll and pinch are tuned separately because their inputs arrive in different units. A notch is one step; a pinch is measured in pixels of finger separation.
+Both sources scale the zoom distance by a percentage rather than adding a fixed number of world units. A notch covers a few units up close and a large sweep far out, so crossing a wide `Min` to `Max` range takes the same handful of notches as a narrow one. At `0.1`, the default `10` to `30` range spans roughly 11 notches.
+
+Scroll and pinch keep separate tuning values because their inputs arrive in different units. A notch is a discrete step. A pinch is read as a ratio between the fingers' current and previous separation, which keeps the gesture feeling the same on a dense phone screen as on a coarse one.
 
 ### Keyboard Movement
 
 | Field | Does |
 |---|---|
 | Use Keyboard Movement | Enables `WASD` / arrow key movement. Requires the [Game Input](game-input.md) sample. |
-| Move Speed | World units per second at full stick or key press. |
+| Move Speed | World units per second at the closest zoom. Grows with the zoom distance, by the amount Move Speed Zoom Scale sets. |
+| Move Speed Zoom Scale | How strongly Move Speed follows the zoom distance. `1` holds the same screen-space speed at any range, `0.5` softens the ramp, `0` keeps Move Speed fixed. |
 | Smoothing | How quickly the camera reaches Move Speed. Higher is snappier, and the result is framerate independent. |
+
+Dragging needs no equivalent setting. It pins the ground point you grabbed under the pointer, so it already covers more world distance per pixel the further out the camera is.
 
 ### Bounds (Optional)
 
 | Field | Does |
 |---|---|
-| Use Bounds | Clamps the camera position on the X and Z axes. |
+| Use Bounds | Keeps the ground point the camera looks at inside the X and Z range. |
 | X Bounds | Minimum and maximum world X. |
 | Z Bounds | Minimum and maximum world Z. |
 
-Bounds draw as a yellow rectangle in the Scene view while the camera is selected.
+Bounds constrain the point the camera is aimed at rather than where the camera body sits. An angled camera stands well behind that point, and the gap grows with the zoom distance, so clamping the body would drag the focus along as you pull back and leave it moved once you zoom in again.
+
+Bounds draw as a yellow rectangle on the ground plane while the camera is selected, with a marker on the point currently being looked at.
 
 ## Input System support
 

@@ -50,7 +50,9 @@ namespace Samples.CameraPan
         [SerializeField, Tooltip("SmoothDamp time for the zoom interpolation. Lower = snappier.")]
         private float zoomSmoothTime = 0.12f;
 
-        [SerializeField]
+        [SerializeField, Min(0.01f)]
+        [Tooltip("Zoom scales multiplicatively, so this can never be zero. A zero distance would " +
+                 "trap the camera at the focal point with nothing left to scale.")]
         private float minZoomDistance = 10f;
 
         [SerializeField] private float maxZoomDistance = 30f;
@@ -58,13 +60,18 @@ namespace Samples.CameraPan
         private float m_targetZoom;
         private float m_zoomVelocity;
 
-        [SerializeField, Tooltip("World units of zoom per scroll wheel notch.")]
-        private float scrollZoomSensitivity = 2f;
+        [SerializeField, Min(0f)]
+        [Tooltip("Fraction of the current zoom distance added or removed per scroll wheel notch. " +
+                 "0.1 = 10% per notch, so a notch covers more ground the further out the camera is.")]
+        private float scrollZoomPercent = 0.1f;
 
-        [SerializeField, Tooltip("World units of zoom per screen pixel of two-finger pinch.")]
-        private float pinchZoomSensitivity = 0.05f;
+        [SerializeField, Min(0f)]
+        [Tooltip("How closely zoom tracks the pinch ratio. 1 = the camera moves the same " +
+                 "percentage the fingers did, 0.5 = softer, 2 = stronger.")]
+        private float pinchSensitivity = 1f;
 
         private bool m_isPinching;
+        private float m_previousPinchDistance;
 
         //public bool SuppressLastClick = false;
 
@@ -75,6 +82,12 @@ namespace Samples.CameraPan
         private bool useKeyboardMovement;
         [SerializeField] 
         private float moveSpeed = 20f;
+
+        [SerializeField, Range(0f, 1f)]
+        [Tooltip("How strongly Move Speed follows the zoom distance. 1 holds the same screen-space " +
+                 "speed at any range, 0.5 softens the ramp, 0 keeps Move Speed fixed.")]
+        private float moveSpeedZoomScale = 0.5f;
+
         [SerializeField, Tooltip("Higher = snappier. Framerate independent.")]
         private float smoothing = 12f;
         
@@ -113,18 +126,16 @@ namespace Samples.CameraPan
 
 #if OLD_INPUT_SYSTEM
         /// <summary>
-        /// Polls scroll, pinch and press from the legacy Input Manager. Only compiled when the
+        /// Polls scroll and press from the legacy Input Manager. Only compiled when the
         /// GameInput sample is absent, so this path never references the Input System package.
         /// </summary>
         /// <remarks>Created by Claude (claude-opus-5) — 2026-08-15</remarks>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void Update()
         {
             var scrollNotches = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scrollNotches) > Mathf.Epsilon)
                 OnScrollZoom(scrollNotches);
-
-            if (Input.touchCount >= 2)
-                DoPinchZoom();
 
             if (Input.GetMouseButtonDown(0))
                 OnPrimaryPress(true);
@@ -224,6 +235,44 @@ namespace Samples.CameraPan
         }
 
         /// <summary>
+        /// Measures the screen-pixel distance between the first two touch slots. Returns false unless
+        /// both are pressed, so the caller can hold its previous reading.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-opus-5) — 2026-09-01</remarks>
+        private static bool TryGetPinchDistance(out float distance)
+        {
+#if OLD_INPUT_SYSTEM
+            if (Input.touchCount < 2)
+            {
+                distance = 0f;
+                return false;
+            }
+
+            distance = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
+            return true;
+#else
+            distance = 0f;
+
+            var touchscreen = Touchscreen.current;
+            if (touchscreen == null)
+                return false;
+
+            var touches = touchscreen.touches;
+            if (touches.Count < 2)
+                return false;
+
+            var first = touches[0];
+            var second = touches[1];
+
+            if (!first.press.isPressed || !second.press.isPressed)
+                return false;
+
+            distance = Vector2.Distance(first.position.ReadValue(), second.position.ReadValue());
+            return true;
+#endif
+        }
+
+        /// <summary>
         /// Raycasts the pointer against the ground plane, clamping to the screen first so an off-screen
         /// pointer still resolves to a usable world point.
         /// </summary>
@@ -260,6 +309,9 @@ namespace Samples.CameraPan
             if (m_isPinching == wasPinching)
                 return;
 
+            //Both edges drop the baseline so the next pinch seeds from its own first frame.
+            m_previousPinchDistance = 0f;
+
             if (m_isPinching)
             {
                 m_dragDuringLastClick = true;
@@ -284,18 +336,63 @@ namespace Samples.CameraPan
 
         #region Movement Processing
 
+        /// <summary>
+        /// Finds the ground point the camera is aimed at by casting its forward ray onto the ground
+        /// plane. Reads only the transform, so editor gizmos can call it before the camera reference
+        /// is assigned. Returns false when the camera is level or tilted up and the ray never lands.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-opus-5) — 2026-09-01</remarks>
+        private bool TryGetFocalPoint(out Vector3 focalPoint)
+        {
+            var ray = new Ray(transform.position, transform.forward);
+
+            if (!GroundPlane.Raycast(ray, out var distance))
+            {
+                focalPoint = default;
+                return false;
+            }
+
+            focalPoint = ray.GetPoint(distance);
+            return true;
+        }
+
+        /// <summary>
+        /// Zooms by the ratio between this frame's finger distance and the last one, so the gesture
+        /// reads the same on any screen density and at any zoom.
+        /// </summary>
+        /// <remarks>Created by Claude (claude-opus-5) — 2026-09-01</remarks>
+        private void ProcessPinchZoom()
+        {
+            if (!m_isPinching)
+                return;
+
+            if (!TryGetPinchDistance(out var pinchDistance) || pinchDistance <= 0f)
+                return;
+
+            //First frame of the gesture only seeds the baseline; there is nothing to divide by yet.
+            if (m_previousPinchDistance <= 0f)
+            {
+                m_previousPinchDistance = pinchDistance;
+                return;
+            }
+
+            var ratio = pinchDistance / m_previousPinchDistance;
+
+            ApplyZoomTarget(m_targetZoom / Mathf.Pow(ratio, pinchSensitivity));
+
+            m_previousPinchDistance = pinchDistance;
+        }
+
         private void ProcessZoom()
         {
             UpdatePinchState();
-            
+            ProcessPinchZoom();
+
             if (Mathf.Abs(m_currentZoom - m_targetZoom) < 0.0001f)
                 return;
 
-            var ray = new Ray(transform.position, transform.forward);
-            if (!GroundPlane.Raycast(ray, out var distance))
+            if (!TryGetFocalPoint(out var focalPoint))
                 return;
-
-            var focalPoint = ray.GetPoint(distance);
 
             m_currentZoom = Mathf.SmoothDamp(m_currentZoom, m_targetZoom, ref m_zoomVelocity, zoomSmoothTime);
             transform.position = focalPoint - transform.forward * m_currentZoom;
@@ -327,6 +424,12 @@ namespace Samples.CameraPan
             OnDragStateChanged?.Invoke(m_isDragging);
         }
 
+        /// <summary>
+        /// Moves the camera along the ground from keyboard input, scaling the speed by how far out
+        /// the camera is, by an amount moveSpeedZoomScale controls. Drag panning needs no equivalent,
+        /// being anchored to the world point under the pointer.
+        /// </summary>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void ProcessMovement()
         {
             if (!useKeyboardMovement)
@@ -349,7 +452,13 @@ namespace Samples.CameraPan
             right.y = 0f;
             right.Normalize();
 
-            Vector3 desiredVelocity = (forward * input.y + right * input.x) * moveSpeed;
+            //Measured off the live transform rather than m_currentZoom, which reads zero until the
+            //first zoom settles and never accounts for the height the camera was authored at.
+            var zoomScale = TryGetFocalPoint(out var focalPoint)
+                ? Mathf.Pow(Vector3.Distance(transform.position, focalPoint) / minZoomDistance, moveSpeedZoomScale)
+                : 1f;
+
+            Vector3 desiredVelocity = (forward * input.y + right * input.x) * (moveSpeed * zoomScale);
 
             // Framerate-independent exponential smoothing.
             float t = 1f - Mathf.Exp(-smoothing * Time.deltaTime);
@@ -358,15 +467,24 @@ namespace Samples.CameraPan
             transform.position += m_currentVelocity * Time.deltaTime;
         }
 
+        /// <summary>
+        /// Keeps the ground point the camera looks at inside the configured rectangle. The camera sits
+        /// behind that point by the zoom distance, so clamping the transform itself would shove the
+        /// focal point along as the camera pulls back, and that shift would persist after zooming in.
+        /// </summary>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void ProcessBounds()
         {
             if (!useBounds)
                 return;
 
-            var pos = transform.position;
-            pos.x = Math.Clamp(pos.x, xBounds.x, xBounds.y);
-            pos.z = Math.Clamp(pos.z, zBounds.x, zBounds.y);
-            transform.position = pos;
+            if (!TryGetFocalPoint(out var focalPoint))
+                return;
+
+            var clampedX = Math.Clamp(focalPoint.x, xBounds.x, xBounds.y);
+            var clampedZ = Math.Clamp(focalPoint.z, zBounds.x, zBounds.y);
+
+            transform.position += new Vector3(clampedX - focalPoint.x, 0f, clampedZ - focalPoint.z);
         }
 
         #endregion //Movement Processing
@@ -375,72 +493,53 @@ namespace Samples.CameraPan
         //================================================================================================================//
 
         /// <summary>
-        /// Converts a scroll wheel reading into world units of zoom. The raw magnitude is platform
-        /// specific (one notch is 1 on the legacy Input Manager, 120 on Windows through the Input
-        /// System), so it is clamped to a single notch and one sensitivity value serves both paths.
+        /// Scales the zoom distance by a percentage per notch, so one notch covers more ground the
+        /// further out the camera is. The raw magnitude is platform specific (one notch is 1 on the
+        /// legacy Input Manager, 120 on Windows through the Input System), so it is clamped to a
+        /// single notch and one sensitivity value serves both paths. A partial notch from a trackpad
+        /// survives the clamp and scales the exponent.
         /// </summary>
         /// <remarks>Created by Claude (claude-opus-5) — 2026-08-15</remarks>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void OnScrollZoom(float rawScroll)
         {
-            ApplyZoomDelta(Mathf.Clamp(rawScroll, -1f, 1f) * scrollZoomSensitivity);
+            var notches = Mathf.Clamp(rawScroll, -1f, 1f);
+
+            ApplyZoomTarget(m_targetZoom * Mathf.Pow(1f + scrollZoomPercent, -notches));
         }
 
         /// <summary>
-        /// Converts a signed per-frame pinch delta, in screen pixels, into world units of zoom.
+        /// Clamps a requested zoom distance into the configured bounds. Every zoom source computes
+        /// its own target by scaling the current one, so the bounds are enforced in one place.
         /// </summary>
-        /// <remarks>Created by Claude (claude-opus-5) — 2026-08-15</remarks>
-        private void OnPinchZoom(float pixelDelta)
+        /// <remarks>Created by Claude (claude-opus-5) — 2026-09-01</remarks>
+        private void ApplyZoomTarget(float desiredZoom)
         {
-            ApplyZoomDelta(pixelDelta * pinchZoomSensitivity);
-        }
-
-        private void ApplyZoomDelta(float delta)
-        {
-            if (Mathf.Abs(delta) < 0.001f)
+            if (Mathf.Abs(desiredZoom - m_targetZoom) < 0.001f)
                 return;
 
             m_targetZoom = Mathf.Clamp(
-                m_targetZoom - delta,
+                desiredZoom,
                 minZoomDistance,
                 maxZoomDistance
             );
         }
-
-#if OLD_INPUT_SYSTEM
-        /// <summary>
-        /// Measures the per-frame change in distance between the first two legacy touches. Mirrors
-        /// what PinchingComposite produces on the Input System path, so both feed the same sensitivity.
-        /// </summary>
-        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-08-15</remarks>
-        private void DoPinchZoom()
-        {
-            var touch0 = Input.GetTouch(0);
-            var touch1 = Input.GetTouch(1);
-
-            var currentDistance = Vector2.Distance(touch0.position, touch1.position);
-            var previousDistance = Vector2.Distance(
-                touch0.position - touch0.deltaPosition,
-                touch1.position - touch1.deltaPosition);
-
-            OnPinchZoom(currentDistance - previousDistance);
-        }
-#endif
 
         //Callbacks
         //================================================================================================================//
 
 #if JAM_INPUT_DELEGATOR
         /// <summary>
-        /// Routes the shared Zoom action to the matching sensitivity. Both bindings emit a signed
-        /// per-frame delta, but in different units, and only the live touch count tells them apart.
+        /// Routes the shared Zoom action to the scroll sensitivity. The pinch binding also drives this
+        /// action, but its pixel delta is discarded because ProcessZoom reads the fingers directly.
         /// </summary>
-        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-08-15</remarks>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void OnCameraZoom(float rawZoomDelta)
         {
             if (GetActiveTouchCount() >= 2)
-                OnPinchZoom(rawZoomDelta);
-            else
-                OnScrollZoom(rawZoomDelta);
+                return;
+
+            OnScrollZoom(rawZoomDelta);
         }
 
         private void OnMovementChanged(Vector2 input)
@@ -476,24 +575,32 @@ namespace Samples.CameraPan
         //================================================================================================================//
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Draws the bounds on the ground plane they constrain, plus a marker on the point the camera
+        /// is aimed at so the clamp can be seen acting while tuning. The marker scales with the zoom
+        /// distance to stay visible at any range.
+        /// </summary>
+        /// <remarks>Rewritten by Claude (claude-opus-5) — 2026-09-01</remarks>
         private void OnDrawGizmosSelected()
         {
             if (!useBounds)
                 return;
 
-            //Halfway between 0f & camera position
-            var yPos = transform.position.y / 2f;
-
             Span<Vector3> points = stackalloc Vector3[]
             {
-                new Vector3(xBounds.x, yPos, zBounds.y),
-                new Vector3(xBounds.y, yPos, zBounds.y),
-                new Vector3(xBounds.y, yPos, zBounds.x),
-                new Vector3(xBounds.x, yPos, zBounds.x)
+                new Vector3(xBounds.x, 0f, zBounds.y),
+                new Vector3(xBounds.y, 0f, zBounds.y),
+                new Vector3(xBounds.y, 0f, zBounds.x),
+                new Vector3(xBounds.x, 0f, zBounds.x)
             };
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawLineStrip(points, true);
+
+            if (!TryGetFocalPoint(out var focalPoint))
+                return;
+
+            Gizmos.DrawSphere(focalPoint, Vector3.Distance(transform.position, focalPoint) * 0.02f);
         }
 
 #endif
