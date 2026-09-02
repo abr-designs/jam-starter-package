@@ -16,6 +16,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `VolumeController` to the Sounds sample as the single entry point for volume, exposing `SetMasterVolume()`, `SetMusicVolume()` & `SetSFXVolume()`
   - Added the component to the `=== Audio Controllers ===` prefab, referencing the master mixer group & both child controllers
   - Added `AudioMixerExtensions.SetVolume()`, holding the logarithmic slider conversion so each controller sets volume in one call
+- Added `.agents/docs/adr/0005-pinch-composite-signed-delta.md` recording why `PinchingComposite` returns a signed per-frame pixel delta instead of a gesture-relative ratio
+  - Added a `Camera Pan` section to `CONTEXT.md` defining zoom delta, pinch lockout & primary press
+- Added the `Panning Camera` sample, covering drag panning plus scroll & pinch zoom
+  - Pinch zoom scales by the ratio between the fingers' current & previous separation, so the gesture feels the same on any screen density
+  - Replaced `Pinch Zoom Sensitivity` (world units per pixel) with `Pinch Sensitivity`, where `1` moves the camera the same percentage the fingers moved
+  - Scroll zoom scales by a percentage of the current distance, so a notch covers more ground the further out the camera is
+  - Replaced `Scroll Zoom Sensitivity` (world units per notch) with `Scroll Zoom Percent`, defaulting to `0.1` for 10% per notch
+  - `Min Zoom Distance` now refuses values below `0.01`, since a zero distance leaves multiplicative zoom nothing to scale
+  - `Use Bounds` clamps the ground point the camera looks at, so zooming far out & back in returns to the same focus
+  - Bounds gizmo draws on the ground plane at `Y = 0` & marks the point the camera is aimed at
+  - Existing `X Bounds` & `Z Bounds` values describe a ground area rather than camera placement, so they may need re-tuning
+  - Keyboard `Move Speed` grows with the zoom distance, so a key press covers more ground the further out the camera is
+  - Added `Move Speed Zoom Scale`, setting how strongly that ramp applies, defaulting to `0.5`
+  - Replaced keyboard `Smoothing` (a rate) with `Settle Time`, seconds taken to reach 99% of `Move Speed`
+  - Added `Documentation~/Samples/panning-camera.md` describing the controls, inspector fields & drag event
+  - Added the sample to the README list
 
 ### Fixed
 - Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API

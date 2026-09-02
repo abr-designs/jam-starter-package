@@ -8,7 +8,9 @@
         "Unity.TextMeshPro",
         "Unity.Cinemachine",
         "Unity.Splines",
-        "Jam-Stater.Runtime.Geodesics"
+        "Jam-Stater.Runtime.Geodesics",
+        "UniTask",
+        "Jam-starter.Runtime.tweening.unitask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
