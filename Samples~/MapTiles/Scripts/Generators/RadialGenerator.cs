@@ -5,71 +5,48 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Tiles;
 using UnityEngine;
+using UnityEngine.WSA;
 using UnityUtils;
 using Utilities;
 using Object = UnityEngine.Object;
 
 namespace MapGeneration.Generators
 {
-    public class RadialGenerator : IGenerate<int>
+    public class RadialGenerator : IGenerate<int, Tile2D, Vector2Int, int>
     {
-        public int Seed { get; }
-
-        public int Size { get; }
-
+        public int Seed { get; protected set; }
+        public int MapSize { get; }
+        public int TileSize { get; }
+        
         //Used as seed to ensure generation sequence is the same
         private readonly System.Random m_originalSeedRandom;
         //Used to generate new maps
         private System.Random m_randomMapGen;
+        private readonly Func<int, IEnumerable<Vector2Int>> GetCoordinatesInRadius;
 
-        private int mapSeed;
-        public int MapSeed => mapSeed; // TODO - needs to be part of the interface
-        
         private Transform m_parent;
-        
-        public RadialGenerator(int seed, int size)
+
+        public RadialGenerator(int seed, int mapSize, int tileSize, Transform parent, Func<int, IEnumerable<Vector2Int>> getCoordinatesInRadius)
         {
             Seed = seed;
-            Size = size;
+            MapSize = mapSize;
+            TileSize = tileSize;
+            m_parent = parent;
+            GetCoordinatesInRadius = getCoordinatesInRadius;
             
             m_originalSeedRandom = new System.Random(seed);
-            mapSeed = seed;
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
+            Seed = seed;
+            IGenerate.OnNewMapSeed?.Invoke(Seed);
         }
 
-        public void NextMap()
-        {
-            mapSeed += 1;
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
-        }
-
-        public void RandomMap()
-        {
-            mapSeed = m_originalSeedRandom.Next();
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
-        }
-
-        public void DailyMap()
-        {
-            var now = System.DateTime.UtcNow;
-            mapSeed = now.Year * 10000 + now.Month * 100 + now.Day;
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
-        }
-
-        public void LoadMap(int mapSeed)
-        {
-            this.mapSeed = mapSeed;
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
-        }
-
-        private void SecondPassOfMapTileRules(TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)
+        /*private void SecondPassOfMapTileRules(TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)
         {
             // change graveyards surrounding tiles to deserts - should also change start and end surrounding tiles to replace graveyards with deserts
             ApplyMapGraveyardRules(tiles);
             ApplyMapStartRules(tiles);
-        }
+        }*/
 
-        private void ApplyMapGraveyardRules(Dictionary<Vector2Int, BaseTile> tiles)
+        /*private void ApplyMapGraveyardRules(Dictionary<Vector2Int, BaseTile> tiles)
         {
             int graveyardId = TileHelper.GetTileId("graveyard");
             int desertId = TileHelper.GetTileId("desert");
@@ -164,19 +141,19 @@ namespace MapGeneration.Generators
             {
                 tiles[pair.Key] = pair.Value;
             }
-        }
+        }*/
 
-        public int GenerateMap(TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles, Transform parent)
+        public int GenerateMap(TilesetScriptableObject tileset, Dictionary<Vector2Int, Tile2D> tiles, Transform parent)
         {
-            m_randomMapGen = new System.Random(mapSeed);
+            m_randomMapGen = new System.Random(Seed);
             m_parent = parent;
             tiles.Clear();
 
-            GenerateStartAndEnd(Size, tileset, tiles);
+            //GenerateStartAndEnd(MapSize, tileset, tiles);
 
             int tileCount = 0;
 
-            foreach (var coordinate in SimpleTileBaseExtensions.GetCoordinatesInRadius(Size))
+            foreach (var coordinate in GetCoordinatesInRadius(MapSize))
             {
                 if(tiles.ContainsKey(coordinate))
                     continue;
@@ -185,7 +162,7 @@ namespace MapGeneration.Generators
                 tileCount++;
             }
 
-            SecondPassOfMapTileRules(tileset, tiles);
+            //SecondPassOfMapTileRules(tileset, tiles);
 
             //Debug.Log($"tileCount = {tileCount}");
             return tileCount;
@@ -194,7 +171,7 @@ namespace MapGeneration.Generators
         //Generate Start & Exit
         //================================================================================================================//
 
-        private void GenerateStartAndEnd(int mapSize, TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)
+        /*private void GenerateStartAndEnd(int mapSize, TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)
         {
             const float MIN_EXIT_DISTANCE = 0.5f;
             
@@ -212,9 +189,9 @@ namespace MapGeneration.Generators
             
             tiles.Add(startPosition, startTile);
             tiles.Add(exitPosition, endTile);
-        }
+        }*/
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /*[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Vector2 GetRandomPointWithMinDistance(
             System.Random rand, 
             float minRadius, 
@@ -235,29 +212,29 @@ namespace MapGeneration.Generators
             var y = radius * Mathf.Sin(theta);
     
             return new Vector2(x, y);
-        }
+        }*/
         
         //Tile Factories
         //================================================================================================================//
 
-        private BaseTile PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
+        private Tile2D PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
         {
             var tileData = GetRandomTileData(tileset, m_randomMapGen);
             return CreateTile(position, tileData, m_parent);
         }
         
-        private static BaseTile CreateTile(Vector2Int position, TileData data, Transform parent)
+        public Tile2D CreateTile(Vector2Int position, TileData data, Transform parent)
         {
             var prefab = data.tileVariants.Random();
             
             var simpleTileInstance = Object.Instantiate(
                 prefab, 
-                new Vector3(position.x * IGenerate.TILE_SIZE, 0f, position.y * IGenerate.TILE_SIZE),
-                Quaternion.identity, parent);
+                new Vector3(position.x * TileSize, 0f, position.y * TileSize),
+                Quaternion.identity, parent) as Tile2D;
             
             simpleTileInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";
             
-            simpleTileInstance.Init(/*TILE_STATE.HIDDEN, */data, position);
+            simpleTileInstance.Init(data, position);
 
             return simpleTileInstance;
         }
@@ -287,5 +264,7 @@ namespace MapGeneration.Generators
             }
             return tiles[0];
         }
+
+
     }
 }

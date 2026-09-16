@@ -13,10 +13,27 @@ MonoBehaviour:
   m_Name: Tileset
   m_EditorClassIdentifier: Assembly-CSharp::MapGeneration.ScriptableObjects.TilesetScriptableObject
   tiles:
-  - name: Default
-    id: 0
+  - name: Grass
+    id: -1234459612
     description: 
-    cost: 0
-    costMinMax: {x: 0, y: 0}
-    spawnWeight: 0
-    tileVariants: []
+    spawnWeight: 10
+    tileVariants:
+    - {fileID: 5407442316861521776, guid: 6e0504142e88dce4bbae32bfeac2e43a, type: 3}
+  - name: Rock
+    id: 963907833
+    description: 
+    spawnWeight: 5
+    tileVariants:
+    - {fileID: -3243291150125265403, guid: a1ad5ea0fe571ee4981d91c9a42e9b97, type: 3}
+  - name: Sand
+    id: 762136440
+    description: 
+    spawnWeight: 3
+    tileVariants:
+    - {fileID: 2706307305666509315, guid: b0fbff25c241f3b4a89549c2e9315575, type: 3}
+  - name: Water
+    id: -1779147911
+    description: 
+    spawnWeight: 6
+    tileVariants:
+    - {fileID: -8981220747970109745, guid: 486b5134c0c41cc4abf87f162575ee78, type: 3}

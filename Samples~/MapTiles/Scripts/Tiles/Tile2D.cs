@@ -2,11 +2,11 @@
 
 namespace Tiles
 {
-    public class Tile2D : BaseTile<Vector2Int, float>
+    public class Tile2D : BaseTile<Vector2Int, int>
     {
         public override Vector2Int Position { get; set; }
         
-        public override float Size => 2f;
+        public override int Size => 2;
 
         protected override void OnClickDown()
         {

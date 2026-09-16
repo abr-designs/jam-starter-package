@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MapGeneration.Generators;
 using MapGeneration.ScriptableObjects;
 using NaughtyAttributes;
+using Samples.MapTiles.Scripts.Map;
 using Tiles;
 using UnityEditor;
 using UnityEngine;
@@ -14,13 +15,16 @@ namespace MapGeneration
         [SerializeField]
         private Vector2Int mapSize;
 
-        [SerializeField, Min(10)]
+        [SerializeField, Min(2)]
         private int mapRadius;
+
+        [SerializeField, Min(1)]
+        private int tileSize;
         
         [SerializeField]
         private TilesetScriptableObject tileset;
 
-        private Dictionary<Vector2Int, BaseTile> m_tiles;
+        private Dictionary<Vector2Int, Tile2D> m_tiles;
         
         [SerializeField]
         private List<GameObject> tileObjects;
@@ -43,9 +47,9 @@ namespace MapGeneration
             
             Cleanup();
             tileObjects = new List<GameObject>();
-            m_tiles = new Dictionary<Vector2Int, BaseTile>(mapSize.x * mapSize.y);
+            m_tiles = new Dictionary<Vector2Int, Tile2D>(mapSize.x * mapSize.y);
 
-            var mapGenerator = new RadialGenerator(seed, mapRadius);
+            var mapGenerator = new RadialGenerator(seed, mapRadius, tileSize, transform, BaseMap.GetCoordinatesInRadius);
             mapGenerator.GenerateMap(tileset, m_tiles,transform);
 
             foreach (var simpleTile in m_tiles)
