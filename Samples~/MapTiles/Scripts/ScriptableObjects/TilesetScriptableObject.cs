@@ -6,6 +6,7 @@ namespace MapGeneration.ScriptableObjects
     [CreateAssetMenu(fileName = "Tileset", menuName = "ScriptableObjects/Tileset", order = 1)]
     public class TilesetScriptableObject : ScriptableObject
     {
+        public float tileSize;
 #if UNITY_EDITOR
         [Button]
         private void AssignId()

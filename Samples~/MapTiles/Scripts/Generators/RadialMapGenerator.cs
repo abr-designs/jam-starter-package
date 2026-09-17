@@ -1,5 +1,6 @@
 using MapGeneration.ScriptableObjects;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,34 +10,31 @@ using UnityEngine.WSA;
 using UnityUtils;
 using Utilities;
 using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace MapGeneration.Generators
 {
-    public class RadialGenerator : IGenerate<int, Tile2D, Vector2Int, int>
+    public class RadialMapGenerator : IGenerate<int, Tile2D, Vector2Int, int>
     {
-        public int Seed { get; protected set; }
+        int IGenerate.Seed { get; set; }
+
+        Random IGenerate.OriginalSeedRandom { get; set; }
+
         public int MapSize { get; }
         public int TileSize { get; }
         
-        //Used as seed to ensure generation sequence is the same
-        private readonly System.Random m_originalSeedRandom;
-        //Used to generate new maps
-        private System.Random m_randomMapGen;
-        private readonly Func<int, IEnumerable<Vector2Int>> GetCoordinatesInRadius;
+
+        private readonly Func<int, IEnumerable<Vector2Int>> m_getCoordinatesInRadius;
 
         private Transform m_parent;
 
-        public RadialGenerator(int seed, int mapSize, int tileSize, Transform parent, Func<int, IEnumerable<Vector2Int>> getCoordinatesInRadius)
+        public RadialMapGenerator(int seed, int mapSize, int tileSize, Transform parent)
         {
-            Seed = seed;
             MapSize = mapSize;
             TileSize = tileSize;
             m_parent = parent;
-            GetCoordinatesInRadius = getCoordinatesInRadius;
             
-            m_originalSeedRandom = new System.Random(seed);
-            Seed = seed;
-            IGenerate.OnNewMapSeed?.Invoke(Seed);
+            ((IGenerate)this).SetSeed(seed);
         }
 
         /*private void SecondPassOfMapTileRules(TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)
@@ -143,9 +141,12 @@ namespace MapGeneration.Generators
             }
         }*/
 
+
+
+        public int GenerateMap(TilesetScriptableObject tileset, IDictionary tiles, Transform parent) => GenerateMap(tileset, (Dictionary<Vector2Int, Tile2D>)tiles, parent);
+
         public int GenerateMap(TilesetScriptableObject tileset, Dictionary<Vector2Int, Tile2D> tiles, Transform parent)
         {
-            m_randomMapGen = new System.Random(Seed);
             m_parent = parent;
             tiles.Clear();
 
@@ -153,7 +154,7 @@ namespace MapGeneration.Generators
 
             int tileCount = 0;
 
-            foreach (var coordinate in GetCoordinatesInRadius(MapSize))
+            foreach (var coordinate in m_getCoordinatesInRadius(MapSize))
             {
                 if(tiles.ContainsKey(coordinate))
                     continue;
@@ -164,8 +165,21 @@ namespace MapGeneration.Generators
 
             //SecondPassOfMapTileRules(tileset, tiles);
 
-            //Debug.Log($"tileCount = {tileCount}");
             return tileCount;
+        }
+        
+        public IEnumerable<Vector2Int> GetCoordinatesInRadius(int radius)
+        {
+            var rSquared = radius * radius;
+
+            for (var x = -radius; x <= radius; x++)
+            {
+                for (var y = -radius; y <= radius; y++)
+                {
+                    if (x * x + y * y <= rSquared)
+                        yield return new Vector2Int(x, y);
+                }
+            }
         }
 
         //Generate Start & Exit
@@ -219,7 +233,7 @@ namespace MapGeneration.Generators
 
         private Tile2D PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
         {
-            var tileData = GetRandomTileData(tileset, m_randomMapGen);
+            var tileData = IGenerate.GetRandomTileData(tileset, ((IGenerate)this).OriginalSeedRandom);
             return CreateTile(position, tileData, m_parent);
         }
         
@@ -241,29 +255,6 @@ namespace MapGeneration.Generators
 
         //Utilities
         //================================================================================================================//
-
-        private static TileData GetRandomTileData(TilesetScriptableObject tileset, System.Random random)
-        {
-            var tiles = tileset.tiles;
-            
-            float total = 0f;
-            for (int i = 0; i < tiles.Length; i++) 
-                total += tiles[i].spawnWeight;
-
-            float roll = (float)(random.NextDouble() * total);
-            float cumulative = 0f;
-
-            for (int i = 0; i < tiles.Length; i++)
-            {
-                if(tiles[i].spawnWeight == 0)
-                    continue;
-                
-                cumulative += tiles[i].spawnWeight;
-                if (roll < cumulative) 
-                    return tiles[i];
-            }
-            return tiles[0];
-        }
 
 
     }

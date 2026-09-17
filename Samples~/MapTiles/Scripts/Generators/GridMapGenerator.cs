@@ -1,80 +1,50 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using MapGeneration.ScriptableObjects;
 using Tiles;
 using UnityEngine;
 using UnityUtils;
+
 using Object = UnityEngine.Object;
+using Random = System.Random;
 
 namespace MapGeneration.Generators
 {
-    public class Default2DGenerator : IGenerate<Vector2Int, Tile2D, Vector2Int, int>
+    public class GridMapGenerator : IGenerate<Vector2Int, Tile2D, Vector2Int, int>
     {
         public Vector2Int MapSize { get; }
         public int TileSize { get; }
-        public int Seed { get; private set; }
-        
-        //Used as seed to ensure generation sequence is the same
-        private readonly System.Random m_originalSeedRandom;
-        //Used to generate new maps
-        private System.Random m_randomMapGen;
+
+        int IGenerate.Seed { get; set; }
+
+        Random IGenerate.OriginalSeedRandom { get; set; }
+
 
         private Transform m_parent;
-        
-        public Default2DGenerator(int seed, Vector2Int mapSize, int tileSize)
+
+        public GridMapGenerator(int seed, Vector2Int mapSize, int tileSize)
         {
-            Seed = seed;
+            ((IGenerate)this).Seed = seed;
             MapSize = mapSize;
             TileSize = tileSize;
-            
-            m_originalSeedRandom = new System.Random(seed);
-            Seed = seed;
-            IGenerate.OnNewMapSeed?.Invoke(Seed);
         }
 
-        // NO LONGER USED - MOVED TO RADIAL GENERATOR
-        public void NextMap()
-        {
-            Seed += 1;
-            IGenerate.OnNewMapSeed?.Invoke(Seed);
-        }
 
-        // NO LONGER USED - MOVED TO RADIAL GENERATOR
-        public void RandomMap()
-        {
-            Seed = m_originalSeedRandom.Next();
-            IGenerate.OnNewMapSeed?.Invoke(Seed);
-        }
-
-        // NO LONGER USED - MOVED TO RADIAL GENERATOR
-        public void DailyMap()
-        {
-            var now = System.DateTime.UtcNow;
-            Seed = now.Year * 10000 + now.Month * 100 + now.Day;
-            IGenerate.OnNewMapSeed?.Invoke(Seed);
-        }
-
-        // NO LONGER USED - MOVED TO RADIAL GENERATOR
-        public void LoadMap(int mapSeed)
-        {
-            this.Seed = mapSeed;
-            IGenerate.OnNewMapSeed?.Invoke(mapSeed);
-        }
+        public int GenerateMap(TilesetScriptableObject tileset, IDictionary tiles, Transform parent) => GenerateMap(tileset, (Dictionary<Vector2Int, Tile2D>)tiles, parent);
 
         public int GenerateMap(TilesetScriptableObject tileset, Dictionary<Vector2Int, Tile2D> tiles, Transform parent)
         {
-            m_randomMapGen = new System.Random(Seed);
             m_parent = parent;
             tiles.Clear();
 
-            GenerateStartAndEnd(MapSize, tileset, tiles);
+            //GenerateStartAndEnd(MapSize, tileset, tiles);
 
-            int tileCount = 0;
+            var tileCount = 0;
 
-            for (int x = 0; x < MapSize.x; x++)
+            for (var x = 0; x < MapSize.x; x++)
             {
-                for (int y = 0; y < MapSize.y; y++)
+                for (var y = 0; y < MapSize.y; y++)
                 {
                     var position = new Vector2Int(x, y);
                     
@@ -93,7 +63,7 @@ namespace MapGeneration.Generators
         //Generate Start & Exit
         //================================================================================================================//
 
-        private void GenerateStartAndEnd(Vector2Int mapSize, TilesetScriptableObject tileset, Dictionary<Vector2Int, Tile2D> tiles)
+        /*private void GenerateStartAndEnd(Vector2Int mapSize, TilesetScriptableObject tileset, Dictionary<Vector2Int, Tile2D> tiles)
         {
             var startPosition = new Vector2Int(1, mapSize.y / 2);
             var startTile = CreateTile(startPosition, tileset.tiles.FirstOrDefault(x => 
@@ -106,14 +76,14 @@ namespace MapGeneration.Generators
             
             tiles.Add(startPosition, startTile);
             tiles.Add(exitPosition, endTile);
-        }
+        }*/
 
         //Tile Factories
         //================================================================================================================//
 
         private Tile2D PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
         {
-            var tileData = GetRandomTileData(tileset, m_randomMapGen);
+            var tileData = IGenerate.GetRandomTileData(tileset, ((IGenerate)this).OriginalSeedRandom);
             return CreateTile(position, tileData, m_parent);
         }
         
@@ -136,32 +106,5 @@ namespace MapGeneration.Generators
 
             return simpleTileInstance;
         }
-
-        //Utilities
-        //================================================================================================================//
-
-        private static TileData GetRandomTileData(TilesetScriptableObject tileset, System.Random random)
-        {
-            var tiles = tileset.tiles;
-            
-            float total = 0f;
-            for (int i = 0; i < tiles.Length; i++) 
-                total += tiles[i].spawnWeight;
-
-            float roll = (float)(random.NextDouble() * total);
-            float cumulative = 0f;
-
-            for (int i = 0; i < tiles.Length; i++)
-            {
-                if(tiles[i].spawnWeight == 0)
-                    continue;
-                
-                cumulative += tiles[i].spawnWeight;
-                if (roll < cumulative) 
-                    return tiles[i];
-            }
-            return tiles[0];
-        }
-
     }
 }

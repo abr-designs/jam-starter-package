@@ -43,7 +43,7 @@ namespace MapGeneration
         [Button]
         private void Generate()
         {
-            TileHelper.RegisterTiles(tileset.tiles);
+            /*TileHelper.RegisterTiles(tileset.tiles);
             
             Cleanup();
             tileObjects = new List<GameObject>();
@@ -56,7 +56,7 @@ namespace MapGeneration
             {
                 //simpleTile.Value.SetState(TILE_STATE.CLAIMED);
                 tileObjects.Add(simpleTile.Value.gameObject);
-            }
+            }*/
         }
         
         private void Cleanup()

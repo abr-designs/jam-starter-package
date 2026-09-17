@@ -12,7 +12,6 @@ namespace Samples.MapTiles.Scripts.Map
             
         }
 
-
         //Map Helper Functions
         //================================================================================================================//
 
@@ -20,9 +19,9 @@ namespace Samples.MapTiles.Scripts.Map
 
         public override IEnumerable<Tile2D> GetSurroundingTiles(Tile2D mapTile, int radius, Dictionary<Vector2Int, Tile2D> tiles)
         {
-            foreach (var coordinate in GetCoordinatesInRadius(mapTile.Position, radius))
+            foreach (var coordinate in GetCoordinatesInRadius(radius))
             {
-                if(!tiles.TryGetValue(coordinate, out var tile))
+                if(!tiles.TryGetValue(coordinate + mapTile.Position, out var tile))
                     continue;
                 
                 yield return tile;
@@ -31,33 +30,14 @@ namespace Samples.MapTiles.Scripts.Map
 
         public override IEnumerable<Tile2D> GetEncompassingTiles(Tile2D baseTile, int radius, Dictionary<Vector2Int, Tile2D> tiles)
         {
-            foreach (var coordinate in GetCoordinatesInSquare(baseTile.Position, radius))
+            foreach (var coordinate in GetCoordinatesInSquare(radius))
             {
-                if(!tiles.TryGetValue(coordinate, out var tile))
+                if(!tiles.TryGetValue(coordinate + baseTile.Position, out var tile))
                     continue;
                 
                 yield return tile;
             }
         }
-
-        public override IEnumerable<Vector2Int> GetCoordinatesInRadius(Vector2Int center, int radius)
-        {
-            var rSquared = radius * radius;
-
-            for (var x = -radius; x <= radius; x++)
-            {
-                for (var y = -radius; y <= radius; y++)
-                {
-                    //Exclude the center
-                    if (x == 0 && y == 0)
-                        continue;
-
-                    if (x * x + y * y <= rSquared)
-                        yield return new Vector2Int(center.x + x, center.y + y);
-                }
-            }
-        }
-
 
 
         public override List<Tile2D> FindAllSimilarConnected(Tile2D start, Dictionary<Vector2Int, Tile2D> tiles)
@@ -91,50 +71,38 @@ namespace Samples.MapTiles.Scripts.Map
                 }
             }
         }
-
-        #endregion //Map Helper Functions
         
-        //Custom Map Helper Functions
-        //================================================================================================================//
-
-        #region Custom Map Helper Functions
-
-        public IEnumerable<Vector2Int> GetCoordinatesInSquare(Vector2Int center, int radius)
+        /// <summary>
+        /// Returns all coordinates from center (0, 0) for the specified radius
+        /// </summary>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        public override IEnumerable<Vector2Int> GetCoordinatesInRadius(int radius)
         {
-            int rSquared = radius * radius;
+            var rSquared = radius * radius;
 
-            for (int x = -radius; x <= radius; x++)
+            for (var x = -radius; x <= radius; x++)
             {
-                for (int y = -radius; y <= radius; y++)
+                for (var y = -radius; y <= radius; y++)
                 {
-                    //Exclude the center
-                    if (x == 0 && y == 0)
-                        continue;
-
-                    yield return new Vector2Int(center.x + x, center.y + y);
-                }
-            }
-        }
-
-        public IEnumerable<Vector2Int> GetCoordinatesInRadius(int radius)
-        {
-            int rSquared = radius * radius;
-
-            for (int x = -radius; x <= radius; x++)
-            {
-                for (int y = -radius; y <= radius; y++)
-                {
-                    //Exclude the center
-                    if (x == 0 && y == 0) 
-                        continue;
-                    
                     if (x * x + y * y <= rSquared)
                         yield return new Vector2Int(x, y);
                 }
             }
         }
+        
+        public override IEnumerable<Vector2Int> GetCoordinatesInSquare(int radius)
+        {
+            for (int x = -radius; x <= radius; x++)
+            {
+                for (int y = -radius; y <= radius; y++)
+                {
+                    yield return new Vector2Int(x, y);
+                }
+            }
+        }
 
-        #endregion //Custom Map Helper Functions
+        #endregion //Map Helper Functions
 
         //================================================================================================================//
     }

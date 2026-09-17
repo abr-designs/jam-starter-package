@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using MapGeneration;
 using MapGeneration.ScriptableObjects;
@@ -8,9 +9,76 @@ using UnityEngine;
 
 public interface IGenerate
 {
-    public static Action<int> OnNewMapSeed;
+    public static event Action<int> OnNewMapSeed;
     
-    int Seed { get; } 
+    int Seed { get; protected internal set; } 
+    //Used as seed to ensure generation sequence is the same
+    System.Random OriginalSeedRandom { get; protected set; }
+
+
+    int GenerateMap(TilesetScriptableObject tileset, IDictionary tiles, Transform parent);
+
+    //Defined Seed Functions
+    //================================================================================================================//
+
+
+    public void SetSeed(int seed)
+    {
+        OriginalSeedRandom = new System.Random(seed);
+        Seed = seed;
+        OnNewMapSeed?.Invoke(Seed);
+    }
+    
+    public void NextMap()
+    {
+        Seed += 1;
+        OnNewMapSeed?.Invoke(Seed);
+    }
+
+    public void RandomMap()
+    {
+        Seed = OriginalSeedRandom.Next();
+        OnNewMapSeed?.Invoke(Seed);
+    }
+
+    public void DailyMap()
+    {
+        var now = DateTime.UtcNow;
+        Seed = now.Year * 10000 + now.Month * 100 + now.Day;
+        OnNewMapSeed?.Invoke(Seed);
+    }
+
+    public void LoadMap(int mapSeed)
+    {
+        Seed = mapSeed;
+        OnNewMapSeed?.Invoke(mapSeed);
+    }
+    
+    //================================================================================================================//
+    
+    protected static TileData GetRandomTileData(TilesetScriptableObject tileset, System.Random random)
+    {
+        var tiles = tileset.tiles;
+            
+        float total = 0f;
+        for (int i = 0; i < tiles.Length; i++) 
+            total += tiles[i].spawnWeight;
+
+        float roll = (float)(random.NextDouble() * total);
+        float cumulative = 0f;
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            if(tiles[i].spawnWeight == 0)
+                continue;
+                
+            cumulative += tiles[i].spawnWeight;
+            if (roll < cumulative) 
+                return tiles[i];
+        }
+        return tiles[0];
+    }
+
 }
 
 /// <summary>

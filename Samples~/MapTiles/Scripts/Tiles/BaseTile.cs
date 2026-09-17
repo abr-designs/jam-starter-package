@@ -12,8 +12,6 @@ namespace Tiles
     {
         public abstract T Position { get; set; }
         
-        public abstract TU Size { get; }
-        
         public void Init(/*TILE_STATE state, */TileData tileData, T position)
         {
             if (MainCameraTransform == null)
