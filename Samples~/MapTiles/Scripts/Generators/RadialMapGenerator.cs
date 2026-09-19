@@ -2,13 +2,11 @@ using MapGeneration.ScriptableObjects;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Tiles;
 using UnityEngine;
 using UnityEngine.WSA;
 using UnityUtils;
-using Utilities;
+
 using Object = UnityEngine.Object;
 using Random = System.Random;
 
@@ -22,7 +20,9 @@ namespace MapGeneration.Generators
 
         public int MapSize { get; }
         public int TileSize { get; }
-        
+        public Action<Dictionary<Vector2Int, TileData>> PrePass { get; set; }
+        public List<Action<Dictionary<Vector2Int, TileData>>> Passes { get; set; }
+
 
         private readonly Func<int, IEnumerable<Vector2Int>> m_getCoordinatesInRadius;
 
@@ -149,8 +149,9 @@ namespace MapGeneration.Generators
         {
             m_parent = parent;
             tiles.Clear();
-
-            //GenerateStartAndEnd(MapSize, tileset, tiles);
+            var mapData = new Dictionary<Vector2Int, TileData>();
+            
+            ProcessPrePass(mapData);
 
             int tileCount = 0;
 
@@ -159,15 +160,30 @@ namespace MapGeneration.Generators
                 if(tiles.ContainsKey(coordinate))
                     continue;
                     
-                tiles.Add(coordinate, PickRandomTile(coordinate, tileset) );
+                mapData.Add(coordinate, PickRandomTile(coordinate, tileset) );
                 tileCount++;
             }
 
-            //SecondPassOfMapTileRules(tileset, tiles);
+            ProcessPasses(mapData);
+            
+            CreateTiles(mapData, m_parent, ref tiles);
 
             return tileCount;
         }
-        
+
+        public void ProcessPrePass(Dictionary<Vector2Int, TileData> tiles)
+        {
+            PrePass?.Invoke(tiles);
+        }
+
+        public void ProcessPasses(Dictionary<Vector2Int, TileData> tiles)
+        {
+            foreach (var pass in Passes)
+            {
+                pass.Invoke(tiles);
+            }
+        }
+
         public IEnumerable<Vector2Int> GetCoordinatesInRadius(int radius)
         {
             var rSquared = radius * radius;
@@ -231,31 +247,36 @@ namespace MapGeneration.Generators
         //Tile Factories
         //================================================================================================================//
 
-        private Tile2D PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
+        private TileData PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
         {
             var tileData = IGenerate.GetRandomTileData(tileset, ((IGenerate)this).OriginalSeedRandom);
-            return CreateTile(position, tileData, m_parent);
+            return tileData;
+            //return CreateTile(position, tileData, m_parent);
+        }
+        
+        public void CreateTiles(in Dictionary<Vector2Int, TileData> tileData, Transform parent, ref Dictionary<Vector2Int, Tile2D> generatedTiles)
+        {
+            foreach (var (pos, td) in tileData)
+            {
+                if(!generatedTiles.TryAdd(pos, CreateTile(pos, td, parent)))
+                    throw new Exception($"Tile {pos.x},{pos.y} has already been generated");
+            }
         }
         
         public Tile2D CreateTile(Vector2Int position, TileData data, Transform parent)
         {
             var prefab = data.tileVariants.Random();
             
-            var simpleTileInstance = Object.Instantiate(
+            var tile2dInstance = Object.Instantiate(
                 prefab, 
                 new Vector3(position.x * TileSize, 0f, position.y * TileSize),
                 Quaternion.identity, parent) as Tile2D;
             
-            simpleTileInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";
+            tile2dInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";
             
-            simpleTileInstance.Init(data, position);
+            tile2dInstance.Init(data, position);
 
-            return simpleTileInstance;
+            return tile2dInstance;
         }
-
-        //Utilities
-        //================================================================================================================//
-
-
     }
 }

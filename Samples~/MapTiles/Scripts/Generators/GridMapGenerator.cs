@@ -15,6 +15,8 @@ namespace MapGeneration.Generators
     {
         public Vector2Int MapSize { get; }
         public int TileSize { get; }
+        public Action<Dictionary<Vector2Int, TileData>> PrePass { get; }
+        public List<Action<Dictionary<Vector2Int, TileData>>> Passes { get; }
 
         int IGenerate.Seed { get; set; }
 
@@ -25,9 +27,10 @@ namespace MapGeneration.Generators
 
         public GridMapGenerator(int seed, Vector2Int mapSize, int tileSize)
         {
-            ((IGenerate)this).Seed = seed;
             MapSize = mapSize;
             TileSize = tileSize;
+            
+            ((IGenerate)this).SetSeed(seed);
         }
 
 
@@ -37,9 +40,10 @@ namespace MapGeneration.Generators
         {
             m_parent = parent;
             tiles.Clear();
+            var mapData = new Dictionary<Vector2Int, TileData>();
 
-            //GenerateStartAndEnd(MapSize, tileset, tiles);
-
+            ProcessPrePass(mapData);
+            
             var tileCount = 0;
 
             for (var x = 0; x < MapSize.x; x++)
@@ -52,12 +56,32 @@ namespace MapGeneration.Generators
                     if(tiles.ContainsKey(position))
                         continue;
                     
-                    tiles.Add(position, PickRandomTile(position, tileset) );
+                    mapData.Add(position, PickRandomTile(position, tileset) );
                     tileCount++;
                 }
             }
+            
+            ProcessPasses(mapData);
+            
+            CreateTiles(mapData, m_parent, ref tiles);
 
             return tileCount;
+        }
+
+        public void ProcessPrePass(Dictionary<Vector2Int, TileData> tiles)
+        {
+            PrePass?.Invoke(tiles);
+        }
+
+        public void ProcessPasses(Dictionary<Vector2Int, TileData> tiles)
+        {
+            if (Passes == null || Passes.Count == 0)
+                return;
+            
+            foreach (var pass in Passes)
+            {
+                pass.Invoke(tiles);
+            }
         }
 
         //Generate Start & Exit
@@ -81,10 +105,19 @@ namespace MapGeneration.Generators
         //Tile Factories
         //================================================================================================================//
 
-        private Tile2D PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
+        private TileData PickRandomTile(Vector2Int position, TilesetScriptableObject tileset)
         {
             var tileData = IGenerate.GetRandomTileData(tileset, ((IGenerate)this).OriginalSeedRandom);
-            return CreateTile(position, tileData, m_parent);
+            return tileData;
+        }
+
+        public void CreateTiles(in Dictionary<Vector2Int, TileData> tileData, Transform parent, ref Dictionary<Vector2Int, Tile2D> generatedTiles)
+        {
+            foreach (var (pos, td) in tileData)
+            {
+                if(!generatedTiles.TryAdd(pos, CreateTile(pos, td, parent)))
+                    throw new Exception($"Tile {pos.x},{pos.y} has already been generated");
+            }
         }
         
         public Tile2D CreateTile(Vector2Int position, TileData data, Transform parent)
@@ -95,16 +128,16 @@ namespace MapGeneration.Generators
             
             var prefab = data.tileVariants.Random();
             
-            var simpleTileInstance = Object.Instantiate(
+            var tile2dInstance = Object.Instantiate(
                 prefab, 
                 new Vector3(position.x * TileSize, 0f, position.y * TileSize),
                 Quaternion.identity, parent) as Tile2D;
             
-            simpleTileInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";
+            tile2dInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";
             
-            simpleTileInstance.Init(data, position);
+            tile2dInstance.Init(data, position);
 
-            return simpleTileInstance;
+            return tile2dInstance;
         }
     }
 }

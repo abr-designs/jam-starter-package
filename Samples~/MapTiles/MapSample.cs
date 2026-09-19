@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using MapGeneration;
 using MapGeneration.Generators;
 using MapGeneration.ScriptableObjects;
 using Samples.MapTiles.Scripts.Map;
@@ -27,10 +29,23 @@ namespace Samples.MapTiles
             m_myMap = new Map2DTiles(
                 mapTileset,
                 useRadial ? 
-                    new RadialMapGenerator(mapSeed, mapRadius, (int)mapTileset.tileSize, transform) :
+                    new RadialMapGenerator(mapSeed, mapRadius, (int)mapTileset.tileSize, transform)
+                    {
+                        PrePass = ApplyMapGraveyardRules,
+                        Passes =
+                        {
+                            ApplyMapGraveyardRules,
+                            ApplyMapGraveyardRules,
+                        }
+                    }:
                     new GridMapGenerator(mapSeed, mapSize, (int)mapTileset.tileSize));
             
             m_myMap.Generate(transform);
+        }
+
+        private void ApplyMapGraveyardRules(Dictionary<Vector2Int, TileData> tiles)
+        {
+            
         }
     
     }

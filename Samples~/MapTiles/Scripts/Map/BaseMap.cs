@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MapGeneration.ScriptableObjects;
 using Tiles;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Samples.MapTiles.Scripts.Map
             Generator = generator;
         }
         
-
+        
     }
     
     /// <summary>
@@ -36,7 +37,7 @@ namespace Samples.MapTiles.Scripts.Map
             Tiles = new Dictionary<TU, T>();
         }
         
-        public virtual void Generate(Transform parentContainer) => Generator.GenerateMap(Tileset, Tiles, parentContainer);
+        public /*virtual*/ void Generate(Transform parentContainer) => Generator.GenerateMap(Tileset, Tiles, parentContainer);
         
 
         //Map Tile Searching
@@ -65,6 +66,19 @@ namespace Samples.MapTiles.Scripts.Map
         #endregion //Map Tile Searching
         
 
+        public T GetFirstTileWhere(int typeId)
+        {
+            return Tiles.Values.FirstOrDefault(x => x.TypeId == typeId);
+        }
+        
+        public IEnumerable<T> GetAllTiles(int typeId)
+        {
+            foreach (var simpleTile in Tiles)
+            {
+                if(simpleTile.Value.TypeId == typeId)
+                    yield return simpleTile.Value;
+            }
+        }
 
     }
 }

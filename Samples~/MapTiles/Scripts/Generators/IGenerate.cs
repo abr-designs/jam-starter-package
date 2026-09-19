@@ -92,8 +92,15 @@ public interface IGenerate<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT, TILE_SIZE_UN
 {
     MAP_SIZE_TYPE MapSize { get; }
     TILE_SIZE_UNIT TileSize { get; }
-    
+
+    Action<Dictionary<TILE_POS_UNIT, TileData>> PrePass { get; }
+    List<Action<Dictionary<TILE_POS_UNIT, TileData>>> Passes { get; }
+
     int GenerateMap(TilesetScriptableObject tileset, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles, Transform parent);
 
+    void ProcessPrePass(Dictionary<TILE_POS_UNIT, TileData> tiles);
+    void ProcessPasses(Dictionary<TILE_POS_UNIT, TileData> tiles);
+
+    void CreateTiles(in Dictionary<TILE_POS_UNIT, TileData> tileData, Transform parent, ref Dictionary<TILE_POS_UNIT, TILE_TYPE> generatedTiles);
     TILE_TYPE CreateTile(TILE_POS_UNIT position, TileData data, Transform parent);
 }

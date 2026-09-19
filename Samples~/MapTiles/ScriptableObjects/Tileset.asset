@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b664f0eb67c944b5bb22dcce8d89df25, type: 3}
   m_Name: Tileset
   m_EditorClassIdentifier: Assembly-CSharp::MapGeneration.ScriptableObjects.TilesetScriptableObject
+  tileSize: 2
   tiles:
   - name: Grass
     id: -1234459612
