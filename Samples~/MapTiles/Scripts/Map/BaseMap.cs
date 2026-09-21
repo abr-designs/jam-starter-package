@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MapGeneration;
 using MapGeneration.ScriptableObjects;
 using Tiles;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Samples.MapTiles.Scripts.Map
 {
@@ -11,15 +13,22 @@ namespace Samples.MapTiles.Scripts.Map
         protected static readonly Vector2Int[] CardinalDirections = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
         
         protected readonly TilesetScriptableObject Tileset;
-        protected readonly IGenerate Generator;
+        private readonly Dictionary<int, TileTypeDefinition> m_tileTypeDefinitions;
+        protected readonly IGenerateMap MapGenerator;
 
-        protected BaseMap(TilesetScriptableObject tileset, IGenerate generator)
+        protected BaseMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator)
         {
             Tileset = tileset;
-            Generator = generator;
+            MapGenerator = mapGenerator;
+            
+            m_tileTypeDefinitions =  new Dictionary<int, TileTypeDefinition>(tileset.tiles.Length);
+            foreach (var tile in tileset.tiles)
+            {
+                m_tileTypeDefinitions.Add(tile.Id, tile);
+            }
         }
-        
-        
+
+        public TileTypeDefinition GetTileDefinition(TileType type) => m_tileTypeDefinitions[type.Id];
     }
     
     /// <summary>
@@ -28,18 +37,17 @@ namespace Samples.MapTiles.Scripts.Map
     /// <typeparam name="T">Tile Type</typeparam>
     /// <typeparam name="TU">Tile Position Unit</typeparam>
     /// <typeparam name="TS">Tile Size Unit</typeparam>
-    public abstract class BaseMap<T, TU, TS> : BaseMap where T : BaseTile<TU, TS>
+    public abstract class BaseMap<T, TU, TS> : BaseMap where T : BaseTile<TU>
     {
-        public readonly Dictionary<TU, T> Tiles;
+        public readonly Dictionary<TU, T> MapTiles;
         
-        protected BaseMap(TilesetScriptableObject tileset, IGenerate generator) : base(tileset, generator)
+        protected BaseMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator) : base(tileset, mapGenerator)
         {
-            Tiles = new Dictionary<TU, T>();
+            MapTiles = new Dictionary<TU, T>();
         }
         
-        public /*virtual*/ void Generate(Transform parentContainer) => Generator.GenerateMap(Tileset, Tiles, parentContainer);
+        public virtual void Generate() => MapGenerator.GenerateMap(Tileset, MapTiles);
         
-
         //Map Tile Searching
         //================================================================================================================//
 
@@ -61,24 +69,27 @@ namespace Samples.MapTiles.Scripts.Map
         /*public abstract IEnumerable<TU> GetCoordinatesInSquare(TU center, TS radius);
         public abstract IEnumerable<TU> GetCoordinatesInRadius(TS radius);*/
         public abstract List<T> FindAllSimilarConnected(T start, Dictionary<TU, T> tiles);
-        protected abstract void Search(T tile, int targetTypeID, HashSet<TU> visited, List<T> result, Dictionary<TU, T> tiles);
+        protected abstract void Search(T tile, TileType targetTypeID, HashSet<TU> visited, List<T> result, Dictionary<TU, T> tiles);
 
         #endregion //Map Tile Searching
-        
 
-        public T GetFirstTileWhere(int typeId)
+        //Misc Functions
+        //================================================================================================================//
+        
+        public T GetFirstTileWhere(TileType typeId)
         {
-            return Tiles.Values.FirstOrDefault(x => x.TypeId == typeId);
+            return MapTiles.Values.FirstOrDefault(x => x.TileType == typeId);
         }
         
-        public IEnumerable<T> GetAllTiles(int typeId)
+        public IEnumerable<T> GetAllTiles(TileType typeId)
         {
-            foreach (var simpleTile in Tiles)
+            foreach (var tile in MapTiles)
             {
-                if(simpleTile.Value.TypeId == typeId)
-                    yield return simpleTile.Value;
+                if(tile.Value.TileType == typeId)
+                    yield return tile.Value;
             }
         }
+        //================================================================================================================//
 
     }
 }

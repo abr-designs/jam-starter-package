@@ -1,4 +1,4 @@
-﻿using NaughtyAttributes;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace MapGeneration.ScriptableObjects
@@ -7,19 +7,38 @@ namespace MapGeneration.ScriptableObjects
     public class TilesetScriptableObject : ScriptableObject
     {
         public float tileSize;
+        
+        public TileTypeDefinition[] tiles;
+
+        //Unity Editor Functions
+        //================================================================================================================//
+
+        #region Unity Editor Functions
+
 #if UNITY_EDITOR
-        [Button]
-        private void AssignId()
+        //This remains because having the visual feedback that the ID is changing in the inspector is valuable
+        private void OnValidate()
         {
             foreach (var tileData in tiles)
             {
-                tileData.id = tileData.name.GetHashCode();
+                tileData.Id = ToEnumName(tileData.Name).GetHashCode();
             }
 
-            UnityEditor.EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(this);
+            return;
+
+            static string ToEnumName(string value)
+            {
+                return value
+                    .ToUpperInvariant()
+                    .Replace(' ', '_');
+            }
         }
 #endif
+
+        #endregion //Unity Editor Functions
         
-        public TileData[] tiles;
+        //================================================================================================================//
+
     }
 }

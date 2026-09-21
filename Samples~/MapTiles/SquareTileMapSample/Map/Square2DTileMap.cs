@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Samples.MapTiles.Scripts.Map
 {
-    public class Map2DTiles : BaseMap<Tile2D, Vector2Int, int>
+    public class Square2DTileMap : BaseMap<SquareTile2D, Vector2Int, int>
     {
-        public Map2DTiles(TilesetScriptableObject tileset, IGenerate generator) : base(tileset, generator)
+        public Square2DTileMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator) : base(tileset, mapGenerator)
         {
             
         }
@@ -17,7 +17,7 @@ namespace Samples.MapTiles.Scripts.Map
 
         #region Map Helper Functions
 
-        public override IEnumerable<Tile2D> GetSurroundingTiles(Tile2D mapTile, int radius, Dictionary<Vector2Int, Tile2D> tiles)
+        public override IEnumerable<SquareTile2D> GetSurroundingTiles(SquareTile2D mapTile, int radius, Dictionary<Vector2Int, SquareTile2D> tiles)
         {
             foreach (var coordinate in GetCoordinatesInRadius(radius))
             {
@@ -28,7 +28,7 @@ namespace Samples.MapTiles.Scripts.Map
             }
         }
 
-        public override IEnumerable<Tile2D> GetEncompassingTiles(Tile2D baseTile, int radius, Dictionary<Vector2Int, Tile2D> tiles)
+        public override IEnumerable<SquareTile2D> GetEncompassingTiles(SquareTile2D baseTile, int radius, Dictionary<Vector2Int, SquareTile2D> tiles)
         {
             foreach (var coordinate in GetCoordinatesInSquare(radius))
             {
@@ -40,17 +40,17 @@ namespace Samples.MapTiles.Scripts.Map
         }
 
 
-        public override List<Tile2D> FindAllSimilarConnected(Tile2D start, Dictionary<Vector2Int, Tile2D> tiles)
+        public override List<SquareTile2D> FindAllSimilarConnected(SquareTile2D start, Dictionary<Vector2Int, SquareTile2D> tiles)
         {
-            List<Tile2D> result = new();
+            List<SquareTile2D> result = new();
             HashSet<Vector2Int> visited = new();
 
-            Search(start, start.TypeId, visited, result, tiles);
+            Search(start, start.TileType, visited, result, tiles);
 
             return result;
         }
 
-        protected override void Search(Tile2D tile, int targetTypeID, HashSet<Vector2Int> visited, List<Tile2D> result, Dictionary<Vector2Int, Tile2D> tiles)
+        protected override void Search(SquareTile2D tile, TileType targetTypeID, HashSet<Vector2Int> visited, List<SquareTile2D> result, Dictionary<Vector2Int, SquareTile2D> tiles)
         {
             if (tile == null)
                 return;
@@ -58,7 +58,7 @@ namespace Samples.MapTiles.Scripts.Map
             if (!visited.Add(tile.Position))
                 return;
 
-            if (tile.TypeId != targetTypeID)
+            if (tile.TileType != targetTypeID)
                 return;
 
             result.Add(tile);

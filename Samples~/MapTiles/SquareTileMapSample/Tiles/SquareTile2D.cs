@@ -2,18 +2,18 @@
 
 namespace Tiles
 {
-    public class Tile2D : BaseTile<Vector2Int, int>
+    public class SquareTile2D : BaseTile<Vector2Int>
     {
         public override Vector2Int Position { get; set; }
 
         protected override void OnClickDown()
         {
-            throw new System.NotImplementedException();
+            Debug.Log("OnClickDown");
         }
 
         protected override void OnClickUp()
         {
-            throw new System.NotImplementedException();
+            Debug.Log("OnClickUp");
         }
        
     }

@@ -14,26 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapGeneration.ScriptableObjects.TilesetScriptableObject
   tileSize: 2
   tiles:
-  - name: Grass
-    id: -1234459612
+  - <Name>k__BackingField: grass
+    <Id>k__BackingField: -1032428892
     description: 
     spawnWeight: 10
     tileVariants:
     - {fileID: 5407442316861521776, guid: 6e0504142e88dce4bbae32bfeac2e43a, type: 3}
-  - name: Rock
-    id: 963907833
+  - <Name>k__BackingField: Rock
+    <Id>k__BackingField: -1683905319
     description: 
     spawnWeight: 5
     tileVariants:
     - {fileID: -3243291150125265403, guid: a1ad5ea0fe571ee4981d91c9a42e9b97, type: 3}
-  - name: Sand
-    id: 762136440
+  - <Name>k__BackingField: SanD
+    <Id>k__BackingField: -1885676648
     description: 
     spawnWeight: 3
     tileVariants:
     - {fileID: 2706307305666509315, guid: b0fbff25c241f3b4a89549c2e9315575, type: 3}
-  - name: Water
-    id: -1779147911
+  - <Name>k__BackingField: Water
+    <Id>k__BackingField: -131992711
     description: 
     spawnWeight: 6
     tileVariants:
