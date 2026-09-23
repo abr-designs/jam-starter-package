@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MapGeneration;
-using MapGeneration.ScriptableObjects;
-using Tiles;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Tiles;
 using UnityEngine;
 
-namespace Samples.MapTiles.Scripts.Map
+namespace Samples.MapTiles.Maps
 {
     public abstract class BaseMap
     {

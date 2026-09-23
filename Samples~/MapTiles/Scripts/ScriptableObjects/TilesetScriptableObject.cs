@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using Samples.MapTiles.Tiles;
+using UnityEditor;
 using UnityEngine;
 
-namespace MapGeneration.ScriptableObjects
+namespace Samples.MapTiles.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Tileset", menuName = "ScriptableObjects/Tileset", order = 1)]
     public class TilesetScriptableObject : ScriptableObject

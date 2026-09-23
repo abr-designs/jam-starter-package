@@ -1,9 +1,8 @@
 ﻿using System;
 using JamStarter.Utilities.Attributes;
-using Tiles;
 using UnityEngine;
 
-namespace MapGeneration
+namespace Samples.MapTiles.Tiles
 {
     /// <summary>
     /// Extend this class to include custom functionality. Used as the main definition for any tiles.

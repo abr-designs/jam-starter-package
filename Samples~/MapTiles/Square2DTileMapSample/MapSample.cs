@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using MapGeneration;
-using MapGeneration.Generators;
-using MapGeneration.ScriptableObjects;
-using Samples.MapTiles.Scripts.Map;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Square2DTiles.Generators;
+using Samples.MapTiles.Square2DTiles.Maps;
+using Samples.MapTiles.Tiles;
 using UnityEngine;
 
 namespace Samples.MapTiles

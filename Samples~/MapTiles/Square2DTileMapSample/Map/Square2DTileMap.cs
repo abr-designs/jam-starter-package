@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
-using MapGeneration.ScriptableObjects;
-using Tiles;
+using Samples.MapTiles.Maps;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Square2DTiles.Tiles;
 using UnityEngine;
 
-namespace Samples.MapTiles.Scripts.Map
+namespace Samples.MapTiles.Square2DTiles.Maps
 {
     public class Square2DTileMap : BaseMap<Square2DTile, Vector2Int>
     {

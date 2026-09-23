@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MapGeneration;
-using MapGeneration.ScriptableObjects;
-using Tiles;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Tiles;
 
 
 public interface IGenerateMap

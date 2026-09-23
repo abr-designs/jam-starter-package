@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Samples.MapTiles.Tiles;
+using UnityEngine;
 
-namespace Tiles
+namespace Samples.MapTiles.Square2DTiles.Tiles
 {
     public class Square2DTile : BaseTile<Vector2Int>
     {

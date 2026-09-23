@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using MapGeneration.ScriptableObjects;
-using Tiles;
+using Samples.MapTiles.Generators;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Square2DTiles.Tiles;
+using Samples.MapTiles.Tiles;
 using UnityEngine;
 using UnityUtils;
 
 using Object = UnityEngine.Object;
 
-namespace MapGeneration.Generators
+namespace Samples.MapTiles.Square2DTiles.Generators
 {
     public class Grid2DTileMapGenerator : BaseMapGenerator<Vector2Int, Square2DTile, Vector2Int>
     {

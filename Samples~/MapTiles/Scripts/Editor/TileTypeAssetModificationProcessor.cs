@@ -1,7 +1,8 @@
-﻿using UnityEditor;
-using MapGeneration.ScriptableObjects;
+﻿using Samples.MapTiles.ScriptableObjects;
+using UnityEditor;
 
-namespace Samples.MapTiles.Scripts.Editor
+
+namespace Samples.MapTiles.Editor
 {
     public class TileTypeAssetModificationProcessor : AssetModificationProcessor
     {

@@ -1,10 +1,11 @@
 ﻿using System;
-using MapGeneration.ScriptableObjects;
+
 using System.IO;
 using System.Text;
+using Samples.MapTiles.ScriptableObjects;
 using UnityEditor;
 
-namespace Samples.MapTiles.Scripts.Editor
+namespace Samples.MapTiles.Editor
 {
     public static class TileTypeGenerator
     {

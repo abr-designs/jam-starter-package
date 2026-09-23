@@ -1,10 +1,10 @@
 ﻿using System;
-using MapGeneration.ScriptableObjects;
+using Samples.MapTiles.ScriptableObjects;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace Samples.MapTiles.Scripts.Editor
+namespace Samples.MapTiles.Editor
 {
     public class TileTypeBuildProcessor : IPreprocessBuildWithReport
     {

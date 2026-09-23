@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Tiles
+namespace Samples.MapTiles.Tiles
 {
     public abstract class BaseTile<TPos> : BaseTile
     {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using MapGeneration.ScriptableObjects;
-using Tiles;
+using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Tiles;
 using UnityEngine;
 using Random = System.Random;
 
-namespace MapGeneration.Generators
+namespace Samples.MapTiles.Generators
 {
     public abstract class BaseMapGenerator<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> : IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> where TILE_TYPE : BaseTile<TILE_POS_UNIT>
     {
