@@ -21,13 +21,20 @@ public interface IGenerateMap
 /// <typeparam name="MAP_SIZE_TYPE">Map Size Type</typeparam>
 /// <typeparam name="TILE_TYPE">BaseTile Type</typeparam>
 /// <typeparam name="TILE_POS_UNIT">Tile Position Unit Type</typeparam>
-/// <typeparam name="TILE_SIZE_UNIT">Tile Size Type</typeparam>
-public interface IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT, TILE_SIZE_UNIT> : IGenerateMap where TILE_TYPE : BaseTile<TILE_POS_UNIT>
+public interface IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> : IGenerateMap where TILE_TYPE : BaseTile<TILE_POS_UNIT>
 {
     MAP_SIZE_TYPE MapSize { get; }
-    TILE_SIZE_UNIT TileSize { get; }
+    float TileSize { get; }
 
+    /// <summary>
+    /// Data Pre-pass for the map generation. This is meant to be used by external sources to steer the generation by pre-placing
+    /// tiles in the world. All pre-placed tiles by default will not be overwritten
+    /// </summary>
     Action<Dictionary<TILE_POS_UNIT, TileTypeDefinition>> PrePass { get; }
+    /// <summary>
+    /// Once the generator default pass has complete, these passes will commence. This is another opportunity to edit the
+    /// map data from external locations prior to it being generated
+    /// </summary>
     List<Action<Dictionary<TILE_POS_UNIT, TileTypeDefinition>>> Passes { get; }
 
     int GenerateMap(TilesetScriptableObject tileset, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);

@@ -4,7 +4,6 @@ using MapGeneration;
 using MapGeneration.ScriptableObjects;
 using Tiles;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Samples.MapTiles.Scripts.Map
 {
@@ -34,16 +33,15 @@ namespace Samples.MapTiles.Scripts.Map
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="T">Tile Type</typeparam>
-    /// <typeparam name="TU">Tile Position Unit</typeparam>
-    /// <typeparam name="TS">Tile Size Unit</typeparam>
-    public abstract class BaseMap<T, TU, TS> : BaseMap where T : BaseTile<TU>
+    /// <typeparam name="TILE_TYPE">Tile Type</typeparam>
+    /// <typeparam name="TILE_POS_UNIT">Tile Position Unit</typeparam>
+    public abstract class BaseMap<TILE_TYPE, TILE_POS_UNIT> : BaseMap where TILE_TYPE : BaseTile<TILE_POS_UNIT>
     {
-        public readonly Dictionary<TU, T> MapTiles;
+        public readonly Dictionary<TILE_POS_UNIT, TILE_TYPE> MapTiles;
         
         protected BaseMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator) : base(tileset, mapGenerator)
         {
-            MapTiles = new Dictionary<TU, T>();
+            MapTiles = new Dictionary<TILE_POS_UNIT, TILE_TYPE>();
         }
         
         public virtual void Generate() => MapGenerator.GenerateMap(Tileset, MapTiles);
@@ -58,34 +56,28 @@ namespace Samples.MapTiles.Scripts.Map
         /// </summary>
         /// <param name="radius"></param>
         /// <returns></returns>
-        public abstract IEnumerable<TU> GetCoordinatesInRadius(int radius);
-
-        public abstract IEnumerable<TU> GetCoordinatesInSquare(int radius);
-
-        public abstract IEnumerable<T> GetSurroundingTiles(T mapTile, TS radius, Dictionary<TU, T> tiles);
-        
-        public abstract IEnumerable<T> GetEncompassingTiles(T baseTile, TS radius, Dictionary<TU, T> tiles);
-        /*public abstract IEnumerable<TU> GetCardinalDirections(T baseTile);*/
-        /*public abstract IEnumerable<TU> GetCoordinatesInSquare(TU center, TS radius);
-        public abstract IEnumerable<TU> GetCoordinatesInRadius(TS radius);*/
-        public abstract List<T> FindAllSimilarConnected(T start, Dictionary<TU, T> tiles);
-        protected abstract void Search(T tile, TileType targetTypeID, HashSet<TU> visited, List<T> result, Dictionary<TU, T> tiles);
+        public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInRadius(int radius);
+        public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInSquare(int radius);
+        public abstract IEnumerable<TILE_TYPE> GetSurroundingTiles(TILE_TYPE mapTile, float radius, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
+        public abstract IEnumerable<TILE_TYPE> GetEncompassingTiles(TILE_TYPE baseTile, float radius, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
+        public abstract List<TILE_TYPE> FindAllSimilarConnected(TILE_TYPE start, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
+        protected abstract void Search(TILE_TYPE tile, int targetTypeID, HashSet<TILE_POS_UNIT> visited, List<TILE_TYPE> result, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
 
         #endregion //Map Tile Searching
 
         //Misc Functions
         //================================================================================================================//
         
-        public T GetFirstTileWhere(TileType typeId)
+        public TILE_TYPE GetFirstTileWhere(TileType typeId)
         {
-            return MapTiles.Values.FirstOrDefault(x => x.TileType == typeId);
+            return MapTiles.Values.FirstOrDefault(x => x.TileID == typeId);
         }
         
-        public IEnumerable<T> GetAllTiles(TileType typeId)
+        public IEnumerable<TILE_TYPE> GetAllTiles(TileType typeId)
         {
             foreach (var tile in MapTiles)
             {
-                if(tile.Value.TileType == typeId)
+                if(tile.Value.TileID == typeId)
                     yield return tile.Value;
             }
         }

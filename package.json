@@ -25,6 +25,11 @@
   },
   "samples": [
     {
+      "displayName": "Map Tiles",
+      "description": "",
+      "path": "Samples~/MapTiles"
+    },
+    {
       "displayName": "SFX & Music Controllers",
       "description": "",
       "path": "Samples~/Sounds"

@@ -11,11 +11,8 @@ namespace Tiles
         
         public void Init(TileTypeDefinition tileTypeDefinition, TPos position)
         {
-            if (MainCameraTransform == null)
-                MainCameraTransform = FindAnyObjectByType<Camera>().transform;
-
-            TileTypeDefinition = tileTypeDefinition;
             Position = position;
+            base.Init(tileTypeDefinition);
         }
     }
     
@@ -23,27 +20,33 @@ namespace Tiles
     public abstract class BaseTile : MonoBehaviour
     {
         public static event Action<BaseTile> OnTileClicked;
-        //public static event Action<BaseTile> OnRevealed;
         public static event Action<BaseTile> OnTileHover;
 
         private static BaseTile s_pressedTile;
-
         protected static Transform MainCameraTransform;
-
-        public TileType TileType;
-
-        public TileTypeDefinition TileTypeDefinition { get; set; } = null;
 
         [SerializeField]
         private MeshRenderer[] extraObjects;
         [SerializeField]
         private Collider collider;
+        
+        public int TileID => TileTypeDefinition.Id;
+        public TileTypeDefinition TileTypeDefinition { get; set; }
 
-
-        //SimpleTile Functions
+        //BaseTile Functions
         //================================================================================================================//
+        
+        public void Init(TileTypeDefinition tileTypeDefinition)
+        {
+            if (MainCameraTransform == null)
+                MainCameraTransform = FindAnyObjectByType<Camera>().transform;
 
-        private void SetInteractable(bool interactable)
+            TileTypeDefinition = tileTypeDefinition;
+
+            OnInitialized();
+        }
+
+        private void SetIsInteractable(bool interactable)
         {
             collider.enabled = interactable;
         }
@@ -83,9 +86,12 @@ namespace Tiles
 
         //================================================================================================================//
 
-        protected abstract void OnClickDown();
-        protected abstract void OnClickUp();
+        protected virtual void OnInitialized(){ }
         
+        protected virtual void OnClickDown(){ }
+        protected virtual void OnClickUp(){ }
+        protected virtual void OnHovered(){ }
+
         //================================================================================================================//
 
     }

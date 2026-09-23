@@ -8,7 +8,7 @@ using Random = System.Random;
 
 namespace MapGeneration.Generators
 {
-    public abstract class BaseMapGenerator<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT, TILE_SIZE_UNIT> : IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT, TILE_SIZE_UNIT> where TILE_TYPE : BaseTile<TILE_POS_UNIT>
+    public abstract class BaseMapGenerator<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> : IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> where TILE_TYPE : BaseTile<TILE_POS_UNIT>
     {
         public static event Action<int> OnNewMapSeed;
 
@@ -16,14 +16,14 @@ namespace MapGeneration.Generators
         public Random OriginalSeedRandom { get; private set; }
 
         public MAP_SIZE_TYPE MapSize { get; }
-        public TILE_SIZE_UNIT TileSize { get; }
+        public float TileSize { get; }
         public Action<Dictionary<TILE_POS_UNIT, TileTypeDefinition>> PrePass { get; set; }
         public List<Action<Dictionary<TILE_POS_UNIT, TileTypeDefinition>>> Passes { get; set; }
         
         protected readonly Transform Parent;
         
 
-        protected BaseMapGenerator(int seed, MAP_SIZE_TYPE mapSize, TILE_SIZE_UNIT tileSize, Transform parentContainer)
+        protected BaseMapGenerator(int seed, MAP_SIZE_TYPE mapSize, float tileSize, Transform parentContainer)
         {
             MapSize = mapSize;
             TileSize = tileSize;

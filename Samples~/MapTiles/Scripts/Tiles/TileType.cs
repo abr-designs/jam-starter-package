@@ -25,4 +25,12 @@ public readonly struct TileType : IEquatable<TileType>
     public static bool operator ==(TileType a, TileType b) => a.Id == b.Id;
 
     public static bool operator !=(TileType a, TileType b) => a.Id != b.Id;
+    
+    public static bool operator ==(int a, TileType b) => a == b.Id;
+
+    public static bool operator !=(int a, TileType b) => a != b.Id;
+    
+    public static bool operator ==(TileType a, int b) => a.Id == b;
+
+    public static bool operator !=(TileType a, int b) => a.Id != b;
 }

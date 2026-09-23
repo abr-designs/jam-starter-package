@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace MapGeneration.Generators
 {
-    public class Radial2DTileMapGenerator : BaseMapGenerator<int, SquareTile2D, Vector2Int, int>
+    public class Radial2DTileMapGenerator : BaseMapGenerator<int, Square2DTile, Vector2Int>
     {
         public Radial2DTileMapGenerator(int seed, int mapSize, int tileSize, Transform parent) : base(seed, mapSize, tileSize, parent)
         {
@@ -30,12 +30,12 @@ namespace MapGeneration.Generators
             }
         }
 
-        public override SquareTile2D CreateTile(Vector2Int position, TileTypeDefinition typeDefinition)
+        public override Square2DTile CreateTile(Vector2Int position, TileTypeDefinition typeDefinition)
         {
             var prefab = typeDefinition.tileVariants.Random();
             
-            if(prefab is not SquareTile2D tilePrefab)
-                throw new ArgumentException($"prefab [{prefab.name}] is not a {nameof(SquareTile2D)}", nameof(prefab));
+            if(prefab is not Square2DTile tilePrefab)
+                throw new ArgumentException($"prefab [{prefab.name}] is not a {nameof(Square2DTile)}", nameof(prefab));
             
             var tile2DInstance = Object.Instantiate(
                 tilePrefab, 
