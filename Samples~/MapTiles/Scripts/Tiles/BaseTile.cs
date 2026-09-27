@@ -22,11 +22,9 @@ namespace Samples.MapTiles.Tiles
         public static event Action<BaseTile> OnTileClicked;
         public static event Action<BaseTile> OnTileHover;
 
-        private static BaseTile s_pressedTile;
+        
         protected static Transform MainCameraTransform;
 
-        [SerializeField]
-        private MeshRenderer[] extraObjects;
         [SerializeField]
         private Collider collider;
         
@@ -46,40 +44,21 @@ namespace Samples.MapTiles.Tiles
             OnInitialized();
         }
 
-        private void SetIsInteractable(bool interactable)
+        public void SetIsInteractable(bool interactable)
         {
             collider.enabled = interactable;
         }
 
 
-        private void OnMouseDown()
+        protected virtual void OnMouseDown()
+        { }
+
+        protected virtual void OnMouseUp()
         {
-            s_pressedTile = this;
-            OnClickDown();
+            OnTileClicked?.Invoke(this);
         }
 
-        private void OnMouseUp()
-        {
-            bool shouldClick = s_pressedTile == this 
-                                //&& !CameraController.SuppressLastClick 
-                                && !EventSystem.current.IsPointerOverGameObject();
-
-            if(shouldClick)
-            {
-                OnTileClicked?.Invoke(this);
-            } 
-            else if (s_pressedTile == this)
-            {
-                //SimpleAnimator.AnimateUp();
-            }
-
-            if(s_pressedTile == this)
-                s_pressedTile = null;
-            
-            OnClickUp();
-        }
-
-        private void OnMouseOver()
+        protected virtual void OnMouseOver()
         {
             OnTileHover?.Invoke(this);
         }
@@ -87,7 +66,7 @@ namespace Samples.MapTiles.Tiles
         //================================================================================================================//
 
         protected virtual void OnInitialized(){ }
-        
+
         protected virtual void OnClickDown(){ }
         protected virtual void OnClickUp(){ }
         protected virtual void OnHovered(){ }

@@ -18,40 +18,40 @@ namespace Samples.MapTiles.Square2DTiles.Maps
 
         #region Map Helper Functions
 
-        public override IEnumerable<Square2DTile> GetSurroundingTiles(Square2DTile mapTile, float radius, Dictionary<Vector2Int, Square2DTile> tiles)
+        public override IEnumerable<T> GetSurroundingTiles<T>(T baseTile, float radius)
         {
             foreach (var coordinate in GetCoordinatesInRadius((int)radius))
             {
-                if(!tiles.TryGetValue(coordinate + mapTile.Position, out var tile))
+                if(!MapTiles.TryGetValue(coordinate + baseTile.Position, out var tile))
                     continue;
                 
-                yield return tile;
+                yield return tile as T;
             }
         }
 
-        public override IEnumerable<Square2DTile> GetEncompassingTiles(Square2DTile baseTile, float radius, Dictionary<Vector2Int, Square2DTile> tiles)
+        public override IEnumerable<T> GetEncompassingTiles<T>(T baseTile, float radius)
         {
             foreach (var coordinate in GetCoordinatesInSquare((int)radius))
             {
-                if(!tiles.TryGetValue(coordinate + baseTile.Position, out var tile))
+                if(!MapTiles.TryGetValue(coordinate + baseTile.Position, out var tile))
                     continue;
                 
-                yield return tile;
+                yield return tile as T;
             }
         }
 
 
-        public override List<Square2DTile> FindAllSimilarConnected(Square2DTile start, Dictionary<Vector2Int, Square2DTile> tiles)
+        public override List<T> FindAllSimilarConnected<T>(T start)
         {
             List<Square2DTile> result = new();
             HashSet<Vector2Int> visited = new();
 
-            Search(start, start.TileID, visited, result, tiles);
+            Search(start, start.TileID, visited, result);
 
-            return result;
+            return result as List<T>;
         }
 
-        protected override void Search(Square2DTile tile, int targetTypeID, HashSet<Vector2Int> visited, List<Square2DTile> result, Dictionary<Vector2Int, Square2DTile> tiles)
+        protected override void Search<T>(T tile, int targetTypeID, HashSet<Vector2Int> visited, List<T> result)
         {
             if (tile == null)
                 return;
@@ -66,9 +66,9 @@ namespace Samples.MapTiles.Square2DTiles.Maps
 
             foreach (var dir in CardinalDirections)
             {
-                if (tiles.TryGetValue(tile.Position + dir, out var neighbor))
+                if (MapTiles.TryGetValue(tile.Position + dir, out var neighbor))
                 {
-                    Search(neighbor, targetTypeID, visited, result, tiles);
+                    Search(neighbor as T, targetTypeID, visited, result);
                 }
             }
         }
