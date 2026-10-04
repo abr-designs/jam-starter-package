@@ -1,5 +1,4 @@
-﻿using MapGeneration;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -49,9 +48,6 @@ namespace Samples.MapTiles.Tiles
             collider.enabled = interactable;
         }
 
-
-        protected virtual void OnMouseDown()
-        { }
 
         protected virtual void OnMouseUp()
         {

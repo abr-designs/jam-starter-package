@@ -28,7 +28,7 @@ namespace Samples.MapTiles
             m_myTileMap = new Square2DTileMap(
                 mapTileset,
                 useRadial ? 
-                    new Radial2DTileMapGenerator(mapSeed, mapRadius, (int)mapTileset.tileSize, transform)
+                    new Radial2DTileMapGenerator(mapSeed, mapRadius, transform)
                     {
                         PrePass = ApplyMapGraveyardRules,
                         Passes =
@@ -37,14 +37,13 @@ namespace Samples.MapTiles
                             ApplyMapGraveyardRules,
                         }
                     }:
-                    new Grid2DTileMapGenerator(mapSeed, mapSize, (int)mapTileset.tileSize, transform));
+                    new Grid2DTileMapGenerator(mapSeed, mapSize, transform));
             
             m_myTileMap.Generate();
         }
 
-        private void ApplyMapGraveyardRules(Dictionary<Vector2Int, TileTypeDefinition> tiles)
+        private void ApplyMapGraveyardRules(MapGenContext<Vector2Int> mapGenContext)
         {
-            
         }
     
                 /*private void SecondPassOfMapTileRules(TilesetScriptableObject tileset, Dictionary<Vector2Int, BaseTile> tiles)

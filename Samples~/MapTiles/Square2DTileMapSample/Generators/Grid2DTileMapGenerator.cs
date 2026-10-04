@@ -13,7 +13,7 @@ namespace Samples.MapTiles.Square2DTiles.Generators
 {
     public class Grid2DTileMapGenerator : BaseMapGenerator<Vector2Int, Square2DTile, Vector2Int>
     {
-        public Grid2DTileMapGenerator(int seed, Vector2Int mapSize, int tileSize, Transform parentContainer) : base(seed, mapSize, tileSize, parentContainer)
+        public Grid2DTileMapGenerator(int seed, Vector2Int mapSize, Transform parentContainer) : base(seed, mapSize, parentContainer)
         {
 
         }
@@ -21,7 +21,7 @@ namespace Samples.MapTiles.Square2DTiles.Generators
         //BaseMapGenerator Overrides
         //================================================================================================================//
         
-        protected override void DefaultMapPass(TilesetScriptableObject tileset, Dictionary<Vector2Int, TileTypeDefinition> mapTileData)
+        protected override void DefaultMapPass(MapGenContext<Vector2Int> mapGenContext)
         {
             for (var x = 0; x < MapSize.x; x++)
             {
@@ -30,10 +30,10 @@ namespace Samples.MapTiles.Square2DTiles.Generators
                     var position = new Vector2Int(x, y);
                     
                     //Skip if already exists, anything added in the pre-pass
-                    if(mapTileData.ContainsKey(position))
+                    if(mapGenContext.Tiles.ContainsKey(position))
                         continue;
                     
-                    mapTileData.Add(position, GetRandomTileData(tileset, OriginalSeedRandom) );
+                    mapGenContext.Tiles.Add(position, GetRandomTileData(OriginalSeedRandom) );
                 }
             }
         }

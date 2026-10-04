@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Samples.MapTiles.Maps;
 using Samples.MapTiles.ScriptableObjects;
 using Samples.MapTiles.Square2DTiles.Tiles;
@@ -41,14 +42,19 @@ namespace Samples.MapTiles.Square2DTiles.Maps
         }
 
 
-        public override List<T> FindAllSimilarConnected<T>(T start)
+        public override List<Square2DTile> FindAllSimilarConnected(Square2DTile start)
         {
             List<Square2DTile> result = new();
             HashSet<Vector2Int> visited = new();
 
             Search(start, start.TileID, visited, result);
 
-            return result as List<T>;
+            return result;
+        }
+        
+        public IEnumerable<T> FindAllSimilarConnected<T>(T start) where T: Square2DTile
+        {
+            return FindAllSimilarConnected(start).OfType<T>();
         }
 
         protected override void Search<T>(T tile, int targetTypeID, HashSet<Vector2Int> visited, List<T> result)

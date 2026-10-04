@@ -13,7 +13,7 @@ namespace Samples.MapTiles.Square2DTiles.Generators
 {
     public class Radial2DTileMapGenerator : BaseMapGenerator<int, Square2DTile, Vector2Int>
     {
-        public Radial2DTileMapGenerator(int seed, int mapSize, int tileSize, Transform parent) : base(seed, mapSize, tileSize, parent)
+        public Radial2DTileMapGenerator(int seed, int mapSize, Transform parent) : base(seed, mapSize, parent)
         {
             
         }
@@ -21,14 +21,14 @@ namespace Samples.MapTiles.Square2DTiles.Generators
         //BaseMapGenerator Overrides
         //================================================================================================================//
 
-        protected override void DefaultMapPass(TilesetScriptableObject tileset, Dictionary<Vector2Int, TileTypeDefinition> mapTileData)
+        protected override void DefaultMapPass(MapGenContext<Vector2Int> mapGenContext)
         {
             foreach (var coordinate in GetCoordinatesInRadius(MapSize))
             {
-                if(mapTileData.ContainsKey(coordinate))
+                if(mapGenContext.Tiles.ContainsKey(coordinate))
                     continue;
                     
-                mapTileData.Add(coordinate, GetRandomTileData(tileset, OriginalSeedRandom) );
+                mapGenContext.Tiles.Add(coordinate, GetRandomTileData(OriginalSeedRandom) );
             }
         }
 

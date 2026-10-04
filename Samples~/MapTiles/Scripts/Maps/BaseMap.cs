@@ -12,7 +12,7 @@ namespace Samples.MapTiles.Maps
         
         protected readonly TilesetScriptableObject Tileset;
         private readonly Dictionary<int, TileTypeDefinition> m_tileTypeDefinitions;
-        protected readonly IGenerateMap MapGenerator;
+        public IGenerateMap MapGenerator { get; }
 
         protected BaseMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator)
         {
@@ -43,7 +43,7 @@ namespace Samples.MapTiles.Maps
             MapTiles = new Dictionary<TILE_POS_UNIT, TILE_TYPE>();
         }
         
-        public virtual void Generate() => MapGenerator.GenerateMap(Tileset, MapTiles);
+        public virtual int Generate() => MapGenerator.GenerateMap(Tileset, MapTiles);
         
         //Map Tile Searching
         //================================================================================================================//
@@ -57,27 +57,35 @@ namespace Samples.MapTiles.Maps
         /// <returns></returns>
         public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInRadius(int radius);
         public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInSquare(int radius);
-        public abstract IEnumerable<TILE_TYPE> GetSurroundingTiles(TILE_TYPE mapTile, float radius, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
-        public abstract IEnumerable<TILE_TYPE> GetEncompassingTiles(TILE_TYPE baseTile, float radius, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
-        public abstract List<TILE_TYPE> FindAllSimilarConnected(TILE_TYPE start, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
-        protected abstract void Search(TILE_TYPE tile, int targetTypeID, HashSet<TILE_POS_UNIT> visited, List<TILE_TYPE> result, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles);
+        public abstract IEnumerable<T> GetSurroundingTiles<T>(T mapTile, float radius) where T : TILE_TYPE;
+        public abstract IEnumerable<T> GetEncompassingTiles<T>(T baseTile, float radius) where T : TILE_TYPE;
+        public abstract List<TILE_TYPE> FindAllSimilarConnected(TILE_TYPE start);
+        protected abstract void Search<T>(T tile, int targetTypeID, HashSet<TILE_POS_UNIT> visited, List<T> result) where T : TILE_TYPE;
 
         #endregion //Map Tile Searching
 
         //Misc Functions
         //================================================================================================================//
         
-        public TILE_TYPE GetFirstTileWhere(TileType typeId)
+        public T GetFirstTileWhere<T>(TileType typeId) where T : TILE_TYPE
         {
-            return MapTiles.Values.FirstOrDefault(x => x.TileID == typeId);
+            return MapTiles.Values.FirstOrDefault(x => x.TileID == typeId) as T;
         }
         
-        public IEnumerable<TILE_TYPE> GetAllTiles(TileType typeId)
+        public IEnumerable<T> GetAllTiles<T>(int typeId) where T : TILE_TYPE
         {
             foreach (var tile in MapTiles)
             {
                 if(tile.Value.TileID == typeId)
-                    yield return tile.Value;
+                    yield return tile.Value as T;
+            }
+        }
+        public IEnumerable<T> GetAllTiles<T>(TileType typeId) where T : TILE_TYPE
+        {
+            foreach (var tile in MapTiles)
+            {
+                if(tile.Value.TileID == typeId)
+                    yield return tile.Value as T;
             }
         }
         //================================================================================================================//
