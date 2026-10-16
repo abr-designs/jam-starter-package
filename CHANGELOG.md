@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Resolved the Main Menu sample volume sliders logging an error instead of setting volume, routing them through `VolumeController`
 - Resolved the `--- MUSIC CONTROLLER ---` prefab shipping an unassigned mixer reference
 - Resolved `game.ci.yml` failing on Unity 6000.5+ by pinning `unity-test-runner` to `abr-designs/unity-test-runner@patch/codecoverage-1.3.0`, which bumps the injected `com.unity.testtools.codecoverage` from `1.1.1` to `1.3.0`
+- Resolved crash caused by `NugetForUnity` assembly reference used in `AddNuGetPackages.cs`
 
 ### Changed
 - Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
