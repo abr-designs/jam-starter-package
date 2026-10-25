@@ -10,15 +10,12 @@ namespace Samples.MapTiles.Generators
 {
     public abstract class BaseMapGenerator<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> : IGenerateMap<MAP_SIZE_TYPE, TILE_TYPE, TILE_POS_UNIT> where TILE_TYPE : BaseTile<TILE_POS_UNIT>
     {
-
-        public int Seed { get; set; }
-        public Random OriginalSeedRandom { get; set; }
+        public static event Action<int> OnNewMapSeed;
+        
+        public int Seed { get; private set; }
+        public Random OriginalSeedRandom { get; private set; }
         
         public MAP_SIZE_TYPE MapSize { get; }
-        /// <summary>
-        /// World size of one tile, read from the tileset at the start of each generation. 0 before the first generation.
-        /// </summary>
-        public float TileSize { get; private set; }
         public Action<MapGenContext<TILE_POS_UNIT>> PrePass { get; set; }
         public List<Action<MapGenContext<TILE_POS_UNIT>>> Passes { get; set; } = new();
         
@@ -36,25 +33,21 @@ namespace Samples.MapTiles.Generators
             MapSize = mapSize;
             Parent = parentContainer;
 
-            ((IGenerateMap)this).SetSeed(seed);
+            SetSeed(seed);
         }
         
-        public int GenerateMap(TilesetScriptableObject tileset, IDictionary tiles)
+        public virtual int GenerateMap(TilesetScriptableObject tileset, ITileLayout<TILE_POS_UNIT> layout, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles)
         {
-            return GenerateMap(tileset, (Dictionary<TILE_POS_UNIT, TILE_TYPE>)tiles);
-        }
-        
-        public virtual int GenerateMap(TilesetScriptableObject tileset, Dictionary<TILE_POS_UNIT, TILE_TYPE> tiles)
-        {
+            SetSeed(Seed);
+            
             tiles.Clear();
-            TileSize = tileset.tileSize; // [Claude 2026-09-30]
             BuildSpawnTable(tileset); // [Claude 2026-09-30]
-            //var mapData = new Dictionary<TILE_POS_UNIT, TileTypeDefinition>();
             
             var mapGenContext = new MapGenContext<TILE_POS_UNIT>()
             {
                 Tiles = new Dictionary<TILE_POS_UNIT, TileTypeDefinition>(),
                 Tileset =  tileset,
+                Layout = layout,
                 Seed = Seed,
                 Random = OriginalSeedRandom
             };
@@ -65,7 +58,7 @@ namespace Samples.MapTiles.Generators
             
             ProcessPasses(mapGenContext);
             
-            CreateTiles(mapGenContext, ref tiles);
+            InstantiateTilesFromData(mapGenContext, ref tiles);
 
             return tiles.Count;
         }
@@ -75,18 +68,21 @@ namespace Samples.MapTiles.Generators
 
         #region Map Generation Passes
 
-        public void ProcessPrePass(MapGenContext<TILE_POS_UNIT> mapGenContext)
+        protected void ProcessPrePass(MapGenContext<TILE_POS_UNIT> mapGenContext)
         {
             PrePass?.Invoke(mapGenContext);
         }
 
         protected abstract void DefaultMapPass(MapGenContext<TILE_POS_UNIT> mapGenContext);
 
-        public void ProcessPasses(MapGenContext<TILE_POS_UNIT> mapGenContext)
+        protected void ProcessPasses(MapGenContext<TILE_POS_UNIT> mapGenContext)
         {
+            if(Passes == null || Passes.Count == 0)
+                return;
+                
             foreach (var pass in Passes)
             {
-                pass.Invoke(mapGenContext);
+                pass?.Invoke(mapGenContext);
             }
         }
 
@@ -98,16 +94,16 @@ namespace Samples.MapTiles.Generators
 
         #region Tile Instantiation
 
-        public void CreateTiles(MapGenContext<TILE_POS_UNIT> mapGenContext, ref Dictionary<TILE_POS_UNIT, TILE_TYPE> generatedTiles)
+        private void InstantiateTilesFromData(MapGenContext<TILE_POS_UNIT> mapGenContext, ref Dictionary<TILE_POS_UNIT, TILE_TYPE> generatedTiles)
         {
             foreach (var (pos, td) in mapGenContext.Tiles)
             {
-                if(!generatedTiles.TryAdd(pos, CreateTile(pos, td)))
+                if(!generatedTiles.TryAdd(pos, InstantiateTileObject(pos, td, mapGenContext)))
                     throw new Exception($"Tile {pos} has already been generated");
             }
         }
 
-        public abstract TILE_TYPE CreateTile(TILE_POS_UNIT position, TileTypeDefinition typeDefinition);
+        protected abstract TILE_TYPE InstantiateTileObject(TILE_POS_UNIT position, TileTypeDefinition typeDefinition, MapGenContext<TILE_POS_UNIT> mapGenContext);
 
         #endregion //Tile Instantiation
 
@@ -119,7 +115,7 @@ namespace Samples.MapTiles.Generators
         /// <see cref="GetRandomTileData"/>.
         /// </summary>
         /// <remarks>Created by Claude (claude-opus-5-5), 2026-09-30</remarks>
-        protected void BuildSpawnTable(TilesetScriptableObject tileset)
+        private void BuildSpawnTable(TilesetScriptableObject tileset)
         {
             m_spawnTiles = tileset.tiles;
 
@@ -154,17 +150,39 @@ namespace Samples.MapTiles.Generators
 
             return m_spawnTiles[0];
         }
-
         //Seed Functions
         //================================================================================================================//
 
         #region Seed Functions
 
+        public void SetSeed(int seed)
+        {
+            OriginalSeedRandom = new Random(seed);
+            Seed = seed;
+            OnNewMapSeed?.Invoke(Seed);
+        }
+    
+        public void NextMap()
+        {
+            SetSeed(Seed + 1);
+        }
 
+        public void RandomMap()
+        {
+            SetSeed(OriginalSeedRandom.Next());
+        }
+
+        public void DailyMap()
+        {
+            var now = DateTime.UtcNow;
+            SetSeed(now.Year * 10000 + now.Month * 100 + now.Day);
+        }
+
+        public void LoadMap(int mapSeed) => SetSeed(mapSeed);
 
         #endregion //Seed Functions
-
         //================================================================================================================//
+
 
     }
 }

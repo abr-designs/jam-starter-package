@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Samples.MapTiles.Generators;
-using Samples.MapTiles.ScriptableObjects;
 using Samples.MapTiles.Square2DTiles.Tiles;
 using Samples.MapTiles.Tiles;
 using UnityEngine;
-using UnityUtils;
+using Utilities;
 
 using Object = UnityEngine.Object;
 
@@ -32,16 +31,16 @@ namespace Samples.MapTiles.Square2DTiles.Generators
             }
         }
 
-        public override Square2DTile CreateTile(Vector2Int position, TileTypeDefinition typeDefinition)
+        protected override Square2DTile InstantiateTileObject(Vector2Int position, TileTypeDefinition typeDefinition, MapGenContext<Vector2Int> mapGenContext)
         {
-            var prefab = typeDefinition.tileVariants.Random();
+            var prefab = typeDefinition.tileVariants.PickRandomElement(OriginalSeedRandom);
             
             if(prefab is not Square2DTile tilePrefab)
                 throw new ArgumentException($"prefab [{prefab.name}] is not a {nameof(Square2DTile)}", nameof(prefab));
             
             var tile2DInstance = Object.Instantiate(
                 tilePrefab, 
-                new Vector3(position.x * TileSize, 0f, position.y * TileSize),
+                mapGenContext.Layout.ToWorld(position),
                 Quaternion.identity, Parent);
             
             tile2DInstance.gameObject.name = $"[{position.x},{position.y}]_{prefab.name}";

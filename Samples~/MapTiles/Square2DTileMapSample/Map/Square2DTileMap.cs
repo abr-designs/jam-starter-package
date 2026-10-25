@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Samples.MapTiles.Maps;
 using Samples.MapTiles.ScriptableObjects;
+using Samples.MapTiles.Square2DTiles.Generators;
 using Samples.MapTiles.Square2DTiles.Tiles;
 using UnityEngine;
 
@@ -9,108 +12,74 @@ namespace Samples.MapTiles.Square2DTiles.Maps
 {
     public class Square2DTileMap : BaseMap<Square2DTile, Vector2Int>
     {
-        public Square2DTileMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator) : base(tileset, mapGenerator)
+        public Square2DTileMap(TilesetScriptableObject tileset, IGenerateMap<Square2DTile, Vector2Int> mapGenerator, Square2DLayout layout) : base(tileset, mapGenerator, layout)
         {
             
         }
 
-        //Map Helper Functions
+        //Map Generator Helpers
         //================================================================================================================//
 
-        #region Map Helper Functions
 
-        public override IEnumerable<T> GetSurroundingTiles<T>(T baseTile, float radius)
-        {
-            foreach (var coordinate in GetCoordinatesInRadius((int)radius))
-            {
-                if(!MapTiles.TryGetValue(coordinate + baseTile.Position, out var tile))
-                    continue;
-                
-                yield return tile as T;
-            }
-        }
-
-        public override IEnumerable<T> GetEncompassingTiles<T>(T baseTile, float radius)
-        {
-            foreach (var coordinate in GetCoordinatesInSquare((int)radius))
-            {
-                if(!MapTiles.TryGetValue(coordinate + baseTile.Position, out var tile))
-                    continue;
-                
-                yield return tile as T;
-            }
-        }
-
-
-        public override List<Square2DTile> FindAllSimilarConnected(Square2DTile start)
-        {
-            List<Square2DTile> result = new();
-            HashSet<Vector2Int> visited = new();
-
-            Search(start, start.TileID, visited, result);
-
-            return result;
-        }
-        
-        public IEnumerable<T> FindAllSimilarConnected<T>(T start) where T: Square2DTile
-        {
-            return FindAllSimilarConnected(start).OfType<T>();
-        }
-
-        protected override void Search<T>(T tile, int targetTypeID, HashSet<Vector2Int> visited, List<T> result)
-        {
-            if (tile == null)
-                return;
-
-            if (!visited.Add(tile.Position))
-                return;
-
-            if (tile.TileID != targetTypeID)
-                return;
-
-            result.Add(tile);
-
-            foreach (var dir in CardinalDirections)
-            {
-                if (MapTiles.TryGetValue(tile.Position + dir, out var neighbor))
-                {
-                    Search(neighbor as T, targetTypeID, visited, result);
-                }
-            }
-        }
-        
+        //TODO See if there's a way for these to be automatically added via the Generators, to avoid needing to insert them each time
         /// <summary>
-        /// Returns all coordinates from center (0, 0) for the specified radius
+        /// Automatically generates a <see cref="Grid2DTileMapGenerator"/> map, returning the <see cref="Square2DTileMap"/>.
+        /// Optionally you can include <see cref="MapGenContext"/> passes when calling
         /// </summary>
-        /// <param name="radius"></param>
+        /// <param name="tileset"></param>
+        /// <param name="mapSize"></param>
+        /// <param name="parent"></param>
+        /// <param name="seed"></param>
+        /// <param name="prepass"></param>
+        /// <param name="passes"></param>
         /// <returns></returns>
-        public override IEnumerable<Vector2Int> GetCoordinatesInRadius(int radius)
+        public static Square2DTileMap CreateGridMap(TilesetScriptableObject tileset, Vector2Int mapSize, Transform parent, 
+            int seed = 0, 
+            Action<MapGenContext<Vector2Int>> prepass = null,
+            List<Action<MapGenContext<Vector2Int>>> passes = null)
         {
-            var rSquared = radius * radius;
+            var map = new Square2DTileMap(tileset, new Grid2DTileMapGenerator(seed, mapSize, parent)
+            {
+                PrePass = prepass,
+                Passes = passes
+            }, new Square2DLayout(tileset.tileSize));
 
-            for (var x = -radius; x <= radius; x++)
-            {
-                for (var y = -radius; y <= radius; y++)
-                {
-                    if (x * x + y * y <= rSquared)
-                        yield return new Vector2Int(x, y);
-                }
-            }
-        }
-        
-        public override IEnumerable<Vector2Int> GetCoordinatesInSquare(int radius)
-        {
-            for (int x = -radius; x <= radius; x++)
-            {
-                for (int y = -radius; y <= radius; y++)
-                {
-                    yield return new Vector2Int(x, y);
-                }
-            }
+            map.Generate();
+            return map;
         }
 
-        #endregion //Map Helper Functions
+        /// <summary>
+        /// Automatically generates a <see cref="Radial2DTileMapGenerator"/> map, returning the <see cref="Square2DTileMap"/>.
+        /// Optionally you can include <see cref="MapGenContext"/> passes when calling
+        /// </summary>
+        /// <param name="tileset"></param>
+        /// <param name="mapRadius"></param>
+        /// <param name="parent"></param>
+        /// <param name="seed"></param>
+        /// <param name="prepass"></param>
+        /// <param name="passes"></param>
+        /// <returns></returns>
+        public static Square2DTileMap CreateRadialMap(TilesetScriptableObject tileset, int mapRadius, Transform parent,
+            int seed = 0, 
+            Action<MapGenContext<Vector2Int>> prepass = null,
+            List<Action<MapGenContext<Vector2Int>>> passes = null)
+        {
+            var map = new Square2DTileMap(tileset, new Radial2DTileMapGenerator(seed, mapRadius, parent)
+            {
+                PrePass = prepass,
+                Passes = passes
+            }, new Square2DLayout(tileset.tileSize));
+            
+            map.Generate();
+            return map;
+        }
+
+        //IGenerateMap Bridge Functions
+        //================================================================================================================//
+
+
 
         //================================================================================================================//
+
     }
 }

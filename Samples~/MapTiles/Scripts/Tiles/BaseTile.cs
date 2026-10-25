@@ -47,18 +47,28 @@ namespace Samples.MapTiles.Tiles
         {
             collider.enabled = interactable;
         }
-
-
-        protected virtual void OnMouseUp()
+        
+#if ENABLE_LEGACY_INPUT_MANAGER 
+        private void OnMouseDown()
         {
-            OnTileClicked?.Invoke(this);
+            OnClickDown();
         }
 
         protected virtual void OnMouseOver()
         {
             OnTileHover?.Invoke(this);
+            OnHovered();
         }
-
+        
+        protected virtual void OnMouseUp()
+        {
+            OnTileClicked?.Invoke(this);
+            OnClickUp();
+        }
+#elif ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        //TODO Need to add New Input System Support...
+#endif
+        
         //================================================================================================================//
 
         protected virtual void OnInitialized(){ }

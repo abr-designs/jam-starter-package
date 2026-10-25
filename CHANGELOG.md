@@ -32,6 +32,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Replaced keyboard `Smoothing` (a rate) with `Settle Time`, seconds taken to reach 99% of `Move Speed`
   - Added `Documentation~/Samples/panning-camera.md` describing the controls, inspector fields & drag event
   - Added the sample to the README list
+- Added the `Map Tiles` sample, generating seeded square tile maps in grid or radial shapes
+  - Added `ITileLayout` to convert between tile & world positions & get neighbours, with `Square2DLayout` as the square grid implementation
+  - `BaseMap` runs neighbour search & `FindAllSimilarConnected()` through the layout, so a new tile shape only needs an `ITileLayout`
+  - Added `Square2DTileMap.CreateGridMap()` & `CreateRadialMap()` to build & generate a map in one call, accepting optional pre-pass & pass callbacks
+  - Added `BaseMap.NextMap()` & `RegenerateMap()` to rebuild a map by seed
+  - Tile variants pick from the map seed, so the same seed rebuilds the same map
+  - Added a Play Mode `Regenerate` button to `MapSample`
+  - Tile click & hover events run under the legacy Input Manager
 
 ### Fixed
 - Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API
@@ -52,6 +60,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `MusicController` & `SFXManager` delegate their volume conversion to `AudioMixer.SetVolume()`
   - `MusicController` serializes an `AudioMixerGroup` instead of an `AudioMixer`, matching `SFXManager`
   - Removed the unused `SFXManager.instance` accessor
+- Added seeded `PickRandomElement()` & `Shuffle()` overloads to `CollectionExtensions.cs`, taking a `System.Random`
 
 ## [0.0.10] - 2026-07-05
 

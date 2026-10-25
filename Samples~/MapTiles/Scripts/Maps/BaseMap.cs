@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Samples.MapTiles.ScriptableObjects;
 using Samples.MapTiles.Tiles;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Samples.MapTiles.Maps
 {
     public abstract class BaseMap
     {
-        protected static readonly Vector2Int[] CardinalDirections = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
-        
         protected readonly TilesetScriptableObject Tileset;
         private readonly Dictionary<int, TileTypeDefinition> m_tileTypeDefinitions;
         public IGenerateMap MapGenerator { get; }
@@ -38,29 +37,76 @@ namespace Samples.MapTiles.Maps
     {
         public readonly Dictionary<TILE_POS_UNIT, TILE_TYPE> MapTiles;
         
-        protected BaseMap(TilesetScriptableObject tileset, IGenerateMap mapGenerator) : base(tileset, mapGenerator)
-        {
-            MapTiles = new Dictionary<TILE_POS_UNIT, TILE_TYPE>();
-        }
+        public new IGenerateMap<TILE_TYPE, TILE_POS_UNIT> MapGenerator { get; }
+        public ITileLayout<TILE_POS_UNIT> TileLayout;
         
-        public virtual int Generate() => MapGenerator.GenerateMap(Tileset, MapTiles);
+        protected BaseMap(TilesetScriptableObject tileset, IGenerateMap<TILE_TYPE, TILE_POS_UNIT> mapGenerator, ITileLayout<TILE_POS_UNIT> tileLayout) : base(tileset, mapGenerator)
+        {
+            MapGenerator = mapGenerator;
+            MapTiles = new Dictionary<TILE_POS_UNIT, TILE_TYPE>();
+            TileLayout = tileLayout;
+        }
+
+        //================================================================================================================//
+
+        public virtual int Generate()
+        {
+            ClearMapTiles();
+            return MapGenerator.GenerateMap(Tileset, TileLayout, MapTiles);
+        }
         
         //Map Tile Searching
         //================================================================================================================//
 
         #region Map Tile Searching
 
-        /// <summary>
-        /// Returns all coordinates from center (0, 0) for the specified radius
-        /// </summary>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInRadius(int radius);
-        public abstract IEnumerable<TILE_POS_UNIT> GetCoordinatesInSquare(int radius);
-        public abstract IEnumerable<T> GetSurroundingTiles<T>(T mapTile, float radius) where T : TILE_TYPE;
-        public abstract IEnumerable<T> GetEncompassingTiles<T>(T baseTile, float radius) where T : TILE_TYPE;
-        public abstract List<TILE_TYPE> FindAllSimilarConnected(TILE_TYPE start);
-        protected abstract void Search<T>(T tile, int targetTypeID, HashSet<TILE_POS_UNIT> visited, List<T> result) where T : TILE_TYPE;
+        public IEnumerable<T> GetSurroundingTiles<T>(T mapTile, int radius) where T : TILE_TYPE
+        {
+            foreach (var coordinate in TileLayout.CoordinatesInRadius(mapTile.Position, radius))
+            {
+                if(!MapTiles.TryGetValue(coordinate, out var tile) || tile is not T tileType)
+                    continue;
+                
+                yield return tileType;
+            }
+        }
+
+        public List<TILE_TYPE> FindAllSimilarConnected(TILE_TYPE start)
+        {
+            List<TILE_TYPE> result = new();
+            HashSet<TILE_POS_UNIT> visited = new();
+
+            Search(start, start.TileID, visited, result);
+
+            return result;
+        }
+
+        protected void Search<T>(T start, int targetTypeID, HashSet<TILE_POS_UNIT> visited, List<T> result) where T : TILE_TYPE
+        {
+            if (start == null || start.TileID != targetTypeID || !visited.Add(start.Position))
+                return;
+
+            var frontier = new Queue<T>();
+            frontier.Enqueue(start);
+
+            while (frontier.Count > 0)
+            {
+                var tile = frontier.Dequeue();
+                result.Add(tile);
+
+                foreach (var neighborPosition in TileLayout.Neighbours(tile.Position))
+                {
+                    if (!MapTiles.TryGetValue(neighborPosition, out var neighbor))
+                        continue;
+                    if (neighbor is not T typedNeighbor || typedNeighbor.TileID != targetTypeID)
+                        continue;
+                    if (!visited.Add(neighborPosition))
+                        continue;
+
+                    frontier.Enqueue(typedNeighbor);
+                }
+            }
+        }
 
         #endregion //Map Tile Searching
 
@@ -69,25 +115,65 @@ namespace Samples.MapTiles.Maps
         
         public T GetFirstTileWhere<T>(TileType typeId) where T : TILE_TYPE
         {
-            return MapTiles.Values.FirstOrDefault(x => x.TileID == typeId) as T;
+            return MapTiles.Values.OfType<T>().FirstOrDefault(x => x.TileID == typeId);
         }
         
         public IEnumerable<T> GetAllTiles<T>(int typeId) where T : TILE_TYPE
         {
             foreach (var tile in MapTiles)
             {
-                if(tile.Value.TileID == typeId)
-                    yield return tile.Value as T;
+                if (tile.Value is not T tileType)
+                    continue;
+                
+                if(tileType.TileID == typeId)
+                    yield return tileType;
             }
         }
         public IEnumerable<T> GetAllTiles<T>(TileType typeId) where T : TILE_TYPE
         {
             foreach (var tile in MapTiles)
             {
-                if(tile.Value.TileID == typeId)
-                    yield return tile.Value as T;
+                if (tile.Value is not T tileType)
+                    continue;
+
+                if (tileType.TileID == typeId)
+                    yield return tileType;
             }
         }
+
+        //Map Seed Generation Functions
+        //================================================================================================================//
+
+        public int Seed => MapGenerator.Seed;
+
+        public void NextMap()
+        {
+            MapGenerator.NextMap();
+            Generate();
+        }
+
+        public void RegenerateMap() => RegenerateMap(Seed);
+
+        public void RegenerateMap(int seed)
+        {
+            MapGenerator.LoadMap(seed);
+            Generate();
+        }
+        
+        //Cleanup Functions
+        //================================================================================================================//
+
+        //TODO Opportunity to add some recycling here
+        public void ClearMapTiles()
+        {
+            foreach (var (_, value) in MapTiles)
+            {
+                Object.Destroy(value.gameObject);
+            }
+            
+            MapTiles.Clear();
+        }
+
         //================================================================================================================//
 
     }

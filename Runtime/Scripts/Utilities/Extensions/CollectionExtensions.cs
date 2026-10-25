@@ -56,5 +56,55 @@ namespace Utilities
                 (array[k], array[n]) = (array[n], array[k]);
             }
         }
+
+        //With Provided Seed
+        //================================================================================================================//
+        public static T PickRandomElement<T>(this T[] array, Random random)
+        {
+            if (array == null || array.Length == 0)
+                throw new InvalidOperationException($"Passed collection is null or empty when calling {nameof(PickRandomElement)}!");
+            
+            var randomIndex = random.Next(array.Length);
+
+            return array[randomIndex];
+        }
+
+        public static T PickRandomElement<T>(this IList<T> list, Random random)
+        {
+            if (list == null || list.Count == 0)
+                throw new InvalidOperationException($"Passed collection is null or empty when calling {nameof(PickRandomElement)}!");
+            
+            var randomIndex = random.Next(list.Count);
+
+            return list[randomIndex];
+        }
+
+        //Based on: https://stackoverflow.com/a/1262619
+        public static void Shuffle<T>(this IList<T> list, Random random)
+        {
+            if (list == null || list.Count == 0)
+                throw new InvalidOperationException($"Passed collection is null or empty when calling {nameof(Shuffle)}!");
+            
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                (list[k], list[n]) = (list[n], list[k]);
+            }
+        }
+        public static void Shuffle<T>(this T[] array, Random random)
+        {
+            if (array == null || array.Length == 0)
+                throw new InvalidOperationException($"Passed collection is null or empty when calling {nameof(Shuffle)}!");
+            
+            int n = array.Length;
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                (array[k], array[n]) = (array[n], array[k]);
+            }
+        }
     }
 }

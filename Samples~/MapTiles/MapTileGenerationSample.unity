@@ -369,9 +369,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samples.MapTiles.MapSample
   mapTileset: {fileID: 11400000, guid: 08916baa2b7e275409a56a7561979e86, type: 2}
   mapSeed: 0
-  useRadial: 0
+  useRadial: 1
   mapSize: {x: 5, y: 5}
-  mapRadius: 0
+  mapRadius: 5
 --- !u!4 &1724884634
 Transform:
   m_ObjectHideFlags: 0
