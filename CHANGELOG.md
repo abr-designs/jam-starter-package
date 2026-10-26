@@ -40,6 +40,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Tile variants pick from the map seed, so the same seed rebuilds the same map
   - Added a Play Mode `Regenerate` button to `MapSample`
   - Tile click & hover events run under the legacy Input Manager
+  - Added `Documentation~/Samples/map-tiles.md` covering the Tileset, `Square2DTile`, map generators, `BaseMap` & `TileType`, plus a hexagon walkthrough for adding new tile shapes
+  - Added the sample to the README list
 
 ### Fixed
 - Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API

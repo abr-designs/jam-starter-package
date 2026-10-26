@@ -24,11 +24,7 @@
     "com.unity.inputsystem": "1.19.0"
   },
   "samples": [
-    {
-      "displayName": "Map Tiles",
-      "description": "",
-      "path": "Samples~/MapTiles"
-    },
+
     {
       "displayName": "SFX & Music Controllers",
       "description": "",
@@ -108,6 +104,11 @@
       "displayName": "Panning Camera",
       "description": "Uses mouse & Touch controls to pan & zoom the camera.<br><br><u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a>",
       "path": "Samples~/PanCam"
+    },    
+    {
+      "displayName": "Tile Map Generation",
+      "description": "A collection of scripts that can be extended to fit any map generation system. Square tile example included",
+      "path": "Samples~/MapTiles"
     }
   ]
 }
