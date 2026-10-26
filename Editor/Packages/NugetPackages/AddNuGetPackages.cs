@@ -78,15 +78,13 @@ namespace JamStarter.Editor
 
             static NugetInternalConfig()
             {
-                var asm = AppDomain.CurrentDomain
-                    .GetAssemblies()
-                    .FirstOrDefault(a => a.FullName.Contains(AssemblyName, StringComparison.OrdinalIgnoreCase));
+                var asm = typeof(NugetConfigFile).Assembly;
 
-                if (asm == null)
+                /*if (asm == null)
                 {
                     Debug.LogError("[NuGet] Unable to locate NugetForUnity assembly.");
                     return;
-                }
+                }*/
 
                 var configType = typeof(NugetConfigFile); //asm.GetType(ConfigTypeName, throwOnError: true);
                 _installLocationEnumType = asm.GetTypes()
