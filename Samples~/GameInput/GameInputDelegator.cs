@@ -10,8 +10,10 @@ namespace GameInput
         public static event Action<Vector2> OnMovementChanged;
         public static event Action<bool> OnJumpPressed;
     
-        public static event Action<bool> OnLeftClick;
+        public static event Action<bool> OnPrimaryPressChanged;
         public static event Action<bool> OnRightClick;
+        
+        public static event Action<float> OnZoomChanged;
 
         public static bool LockInputs { get; private set; }
 
@@ -96,12 +98,12 @@ namespace GameInput
         {
             if (LockInputs)
             {
-                OnLeftClick?.Invoke(false);
+                OnPrimaryPressChanged?.Invoke(false);
                 return;
             }
-            
+
             var pressed = context.ReadValueAsButton();
-            OnLeftClick?.Invoke(pressed);
+            OnPrimaryPressChanged?.Invoke(pressed);
         }
 
         public void OnMouseRightClick(InputAction.CallbackContext context)
@@ -114,6 +116,18 @@ namespace GameInput
             
             var pressed = context.ReadValueAsButton();
             OnRightClick?.Invoke(pressed);
+        }
+
+        public void OnZoom(InputAction.CallbackContext context)
+        {
+            if(LockInputs)
+            {
+                OnZoomChanged?.Invoke(0f);
+                return;
+            }
+
+            var scrollDelta = context.ReadValue<float>();
+            OnZoomChanged?.Invoke(scrollDelta);
         }
 
         //============================================================================================================//

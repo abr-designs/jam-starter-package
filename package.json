@@ -1,8 +1,8 @@
 {
   "name": "com.abrds.jam-starter",
   "displayName": "Jam Starter Kit",
-  "version": "0.0.10",
-  "unity": "6000.0",
+  "version": "0.0.11-preview",
+  "unity": "6000.5",
   "description": "A collection of scripts & samples to help kick start Game Jam projects. Includes some custom packages",
   "keywords": [
     "jam"
@@ -17,11 +17,11 @@
   },
   "documentationUrl": "https://abr-designs.github.io/jam-starter-package/",
   "dependencies": {
-    "com.unity.ugui": "2.0.0",
-    "com.unity.feature.2d": "2.0.1",
-    "com.unity.nuget.newtonsoft-json": "3.2.1",
-    "com.unity.cinemachine": "3.1.2",
-    "com.unity.inputsystem": "1.11.2"
+    "com.unity.ugui": "2.5.0",
+    "com.unity.feature.2d": "2.0.2",
+    "com.unity.nuget.newtonsoft-json": "3.2.2",
+    "com.unity.cinemachine": "3.1.7",
+    "com.unity.inputsystem": "1.19.0"
   },
   "samples": [
     {
@@ -53,7 +53,7 @@
       "displayName": "3D Character Controller",
       "description": "<u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a><br>- <a href=\"url\">Cinemachine</a>",
       "path": "Samples~/3DCharacterController"
-    },    
+    },
     {
       "displayName": "Dialog System",
       "description": "Example of how to use IDisplayDialog",
@@ -98,6 +98,16 @@
       "displayName": "Prefab Zoo & Gym",
       "description": "Example prefab zoo & gym<a href=\"https://youtu.be/5PJRCz0t7yY?si=3rdhnLXqaTBd7aDQ\"><i>(see video)</i></a> to allow high overview of all assets within your project and to test them in real scenarios.",
       "path": "Samples~/ZooGym"
+    },
+    {
+      "displayName": "Panning Camera",
+      "description": "Uses mouse & Touch controls to pan & zoom the camera.<br><br><u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a>",
+      "path": "Samples~/PanCam"
+    },
+    {
+      "displayName": "Tile Map Generation",
+      "description": "A collection of scripts that can be extended to fit any map generation system. Square tile example included",
+      "path": "Samples~/MapTiles"
     }
   ]
 }

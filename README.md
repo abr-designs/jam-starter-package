@@ -15,8 +15,8 @@ projects & Game jams.
 > For versions **previous to Unity 6**, use the following git url instead
 > - Paste `https://github.com/abr-designs/jam-starter-package.git#unity/version-support/pre-6000` into the text box
 
-### `v0.0.10` - July 05, 2026
-### Supports Unity 6000.0
+### `v0.0.11-preview` - DATE
+### Supports Unity 6000.5+
 
 ## Samples
 > To add samples, navigate to the **_Package Manager window → Jam Starter Kit → Samples_**
@@ -35,6 +35,8 @@ projects & Game jams.
 - ### [Materials](Documentation~/Samples/samples-materials.md)
 - ### [Thumbnail Studio](Documentation~/Samples/thumbnail-studio.md)
 - ### [Trajectory](Documentation~/Samples/trajectory.md)
+- ### [Panning Camera](Documentation~/Samples/panning-camera.md)
+- ### [Tile Map Generation](Documentation~/Samples/tile-map-generation.md)
 
 ## Features
 - ### [Fixed Palette Tool](Documentation~/FixedPaletteTool/FixedPaletteTool.md)
@@ -59,10 +61,9 @@ projects & Game jams.
 | Package          | Version |
 |------------------|---------|
 | [Unity Feature 2d](https://docs.unity3d.com/6000.0/Documentation/Manual/2DFeature.html) | Default |
-| [TextMeshPro](https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/index.html)   | 3.0.9   |
-| [Cinemachine](https://docs.unity3d.com/Packages/com.unity.cinemachine@2.3/manual/CinemachineOverview.html)    | 2.10.1  |
-| [New Input System](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.11/manual/index.html) | 1.7.0   |
-| [Newtonsoft JSON](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.2/manual/index.html) | 3.2.1   |
+| [Cinemachine](https://docs.unity3d.com/Packages/com.unity.cinemachine@2.3/manual/CinemachineOverview.html)    | 3.1.7   |
+| [New Input System](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.11/manual/index.html) | 1.19.0  |
+| [Newtonsoft JSON](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.2/manual/index.html) | 3.2.2   |
 
 #### Custom Packages
 > _See [`AddPackages.cs`](Editor/Packages/AddPackages.cs)_

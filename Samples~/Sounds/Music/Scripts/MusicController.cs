@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Sounds;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Audio;
@@ -27,8 +26,7 @@ namespace Audio.Music
         //------------------------------------------------//
 
         [SerializeField]
-        private AudioMixer musicAudioMixer;
-
+        private AudioMixerGroup musicAudioMixer;
         [SerializeField]
         private MUSIC startMusic;
 
@@ -164,11 +162,7 @@ namespace Audio.Music
         //============================================================================================================//
         
         //Based on: https://johnleonardfrench.com/the-right-way-to-make-a-volume-slider-in-unity-using-logarithmic-conversion/
-        public void SetVolume(float volume)
-        {
-            var v = Mathf.Log10(volume) * 20;
-            Instance.musicAudioMixer.SetFloat(ISetVolume.VOLUME_ID, v);
-        }
+        public void SetVolume(float volume) => Instance.musicAudioMixer.audioMixer.SetVolume(volume);
         
         //Unity Editor Functions
         //============================================================================================================//

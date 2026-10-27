@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.11 - preview] - DATE
+
+### Added
+- Unity 6000.5+ support
+  - Updated package.json dependencies & minimum version
+  - Updated README to reflect the changes
+- Added `TimeScaleToolbarTests.cs` (EditMode), covers the refresh throttle gate & maximum scale clamp
+- Added `Documentation~/EditorTools/TimeScaleToolbar.md` covering the slider, reset button & context menu
+- Added `VolumeController` to the Sounds sample as the single entry point for volume, exposing `SetMasterVolume()`, `SetMusicVolume()` & `SetSFXVolume()`
+  - Added the component to the `=== Audio Controllers ===` prefab, referencing the master mixer group & both child controllers
+  - Added `AudioMixerExtensions.SetVolume()`, holding the logarithmic slider conversion so each controller sets volume in one call
+- Added `.agents/docs/adr/0005-pinch-composite-signed-delta.md` recording why `PinchingComposite` returns a signed per-frame pixel delta instead of a gesture-relative ratio
+  - Added a `Camera Pan` section to `CONTEXT.md` defining zoom delta, pinch lockout & primary press
+- Added the `Panning Camera` sample, covering drag panning plus scroll & pinch zoom
+  - Pinch zoom scales by the ratio between the fingers' current & previous separation, so the gesture feels the same on any screen density
+  - Replaced `Pinch Zoom Sensitivity` (world units per pixel) with `Pinch Sensitivity`, where `1` moves the camera the same percentage the fingers moved
+  - Scroll zoom scales by a percentage of the current distance, so a notch covers more ground the further out the camera is
+  - Replaced `Scroll Zoom Sensitivity` (world units per notch) with `Scroll Zoom Percent`, defaulting to `0.1` for 10% per notch
+  - `Min Zoom Distance` now refuses values below `0.01`, since a zero distance leaves multiplicative zoom nothing to scale
+  - `Use Bounds` clamps the ground point the camera looks at, so zooming far out & back in returns to the same focus
+  - Bounds gizmo draws on the ground plane at `Y = 0` & marks the point the camera is aimed at
+  - Existing `X Bounds` & `Z Bounds` values describe a ground area rather than camera placement, so they may need re-tuning
+  - Keyboard `Move Speed` grows with the zoom distance, so a key press covers more ground the further out the camera is
+  - Added `Move Speed Zoom Scale`, setting how strongly that ramp applies, defaulting to `0.5`
+  - Replaced keyboard `Smoothing` (a rate) with `Settle Time`, seconds taken to reach 99% of `Move Speed`
+  - Added `Documentation~/Samples/panning-camera.md` describing the controls, inspector fields & drag event
+  - Added the sample to the README list
+- Added the `Map Tiles` sample, generating seeded square tile maps in grid or radial shapes
+  - Added `ITileLayout` to convert between tile & world positions & get neighbours, with `Square2DLayout` as the square grid implementation
+  - `BaseMap` runs neighbour search & `FindAllSimilarConnected()` through the layout, so a new tile shape only needs an `ITileLayout`
+  - Added `Square2DTileMap.CreateGridMap()` & `CreateRadialMap()` to build & generate a map in one call, accepting optional pre-pass & pass callbacks
+  - Added `BaseMap.NextMap()` & `RegenerateMap()` to rebuild a map by seed
+  - Tile variants pick from the map seed, so the same seed rebuilds the same map
+  - Added a Play Mode `Regenerate` button to `MapSample`
+  - Tile click & hover events run under the legacy Input Manager
+  - Added `Documentation~/Samples/tile-map-generation.md` covering the Tileset, `Square2DTile`, map generators, `BaseMap` & `TileType`, plus a hexagon walkthrough for adding new tile shapes
+  - Added the sample to the README list
+
+### Fixed
+- Resolved `TimeScaleToolbar.cs` breaking on Unity 6.3+ by rebuilding it on the `MainToolbarElement` API
+  - Removed the vendored `ToolbarExtender.cs` & `ToolbarCallback.cs`, which reflected into `UnityEditor.Toolbar` internals
+  - Moved `Forced Override` & `Max Scale` from Project Settings into the element right-click menu
+  - Removed the `Toolbar Position`, `Position Offset` & `Enabled` settings, which have no equivalent in the new API
+  - Added `.agents/docs/adr/0004-main-toolbar-timescale.md` recording the decision
+- Resolved Dead links in documentation
+- Resolved the Main Menu sample volume sliders logging an error instead of setting volume, routing them through `VolumeController`
+- Resolved the `--- MUSIC CONTROLLER ---` prefab shipping an unassigned mixer reference
+- Resolved `game.ci.yml` failing on Unity 6000.5+ by pinning `unity-test-runner` to `abr-designs/unity-test-runner@patch/codecoverage-1.3.0`, which bumps the injected `com.unity.testtools.codecoverage` from `1.1.1` to `1.3.0`
+- Resolved crash caused by `NugetForUnity` assembly reference used in `AddNuGetPackages.cs`
+
+### Changed
+- Moved CI Unity versions from hardcoded matrix into environment variable `UNITY_VERSIONS` in `game.ci.yml`, parsed as a JSON array by `fromJson()`
+  - Added `unityVersion` to the Library cache key to prevent collision across versions
+- Bumped `actions/checkout` & `actions/upload-artifact` from `v4` to `v5` in `game.ci.yml` to clear the Node 20 deprecation warning
+- Moved `ISetVolume` from the `Sounds` namespace to `Audio`, matching the controllers that implement it
+- `MusicController` & `SFXManager` delegate their volume conversion to `AudioMixer.SetVolume()`
+  - `MusicController` serializes an `AudioMixerGroup` instead of an `AudioMixer`, matching `SFXManager`
+  - Removed the unused `SFXManager.instance` accessor
+- Added seeded `PickRandomElement()` & `Shuffle()` overloads to `CollectionExtensions.cs`, taking a `System.Random`
+
 ## [0.0.10] - 2026-07-05
 
 ### Added

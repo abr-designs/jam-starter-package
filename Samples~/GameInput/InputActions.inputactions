@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "InputActions",
     "maps": [
         {
@@ -16,12 +17,12 @@
                 },
                 {
                     "name": "VerticalMovement",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "bd12a9d6-db60-4d4d-974b-025888a450f1",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -36,7 +37,7 @@
                     "name": "Mouse Left Click",
                     "type": "Button",
                     "id": "426bd2d0-af89-422c-9959-a5d5d2ba189d",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
@@ -45,10 +46,19 @@
                     "name": "Mouse Right Click",
                     "type": "Button",
                     "id": "0710c818-4bfa-4517-8352-d9ce6c382a0c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Zoom",
+                    "type": "Value",
+                    "id": "00c24994-69a3-454f-9d22-51c007d06c9a",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -132,7 +142,7 @@
                 {
                     "name": "",
                     "id": "7040ecd5-918f-46a9-a9e3-c87cab51b03f",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Pointer>/press",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -150,6 +160,50 @@
                     "action": "Mouse Right Click",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b15bf500-ec47-4ca3-904e-dcf4c9152522",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Pinching",
+                    "id": "1acd7ff4-c954-4dbf-9bb4-bb9a3061f1f1",
+                    "path": "Pinching",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "First Touch",
+                    "id": "0fd13648-9254-4bd4-93f8-5caad4f624e4",
+                    "path": "<Touchscreen>/touch0",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Second Touch",
+                    "id": "6f876f07-69a0-49e3-8883-cb6cc5d5a632",
+                    "path": "<Touchscreen>/touch1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },

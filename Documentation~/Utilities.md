@@ -11,6 +11,7 @@ title: Utilities
 - ### [Geodesics](Utilities/utilities-geodesics.md)
 - ### [Extensions](Utilities/utilities-extensions.md)
 - ### [Debugging - Draw.cs](Utilities/utilities-draw.md)
+- ### [TimeScale Toolbar](EditorTools/TimeScaleToolbar.md)
 
 ### `HiddenSingleton`
 This class is used for any object that should act as a singleton but you may want to limit access to. For example, the
