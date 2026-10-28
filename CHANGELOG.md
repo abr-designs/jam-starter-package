@@ -8,13 +8,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.12] - DATE
 
 ### Added
-- 
+- Added `FreeLookCamera.cs` to the 3D Character Controller sample, orbiting a target with the mouse at a fixed distance
+  - Added `FreelookCamera.prefab` using the component
+  - Supports the old Input System & `GameInputDelegator`, optionally orbiting only while the right mouse button is held
+  - Draws gizmos for the look-at point, orbit ring & pitch range
+- Added the Universal Animation Library (Standard) to the 3D Character Controller sample for player animations
+  - Added `CharacterAnimationController.controller`, replacing `FigurineAnimationController.controller`
 
 ### Changed
-- 
+- Renamed `3D Character Controller Sample.unity` to `3D Character Controller Samples.unity`
+- Updated `Animated Player.prefab` to use the Universal Animation Library character
+- Updated `3D Character Movement Data.asset` to fit the new character, raising `maxSpeed`, `rideHeight` & `uprightStrength`
+- Doubled the import scale of the Kenny Prototype Kit models to match the new character size
+- Removed the Kenny Prototype Kit `figurine.fbx`
 
 ### Fixed
-- 
+- Resolved `Draw.Arrow()` logging a `LookRotation` warning when given a zero direction
 
 ## [0.0.11 - preview] - DATE
 
