@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated `3D Character Movement Data.asset` to fit the new character, raising `maxSpeed`, `rideHeight` & `uprightStrength`
 - Doubled the import scale of the Kenny Prototype Kit models to match the new character size
 - Removed the Kenny Prototype Kit `figurine.fbx`
+- Renamed the 3D Character Controller sample `Scripts/Movement` folder to `Scripts/PhysicsMovement`
+  - Moved `CharacterMovement3DDataScriptableObject.cs` into the folder alongside `CharacterController3D.cs` & `Character3DBalancer.cs`
 
 ### Fixed
 - Resolved `Draw.Arrow()` logging a `LookRotation` warning when given a zero direction
