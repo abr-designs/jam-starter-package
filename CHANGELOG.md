@@ -8,13 +8,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.12] - DATE
 
 ### Added
-- 
+- Added `FreeLookCamera.cs` to the 3D Character Controller sample, orbiting a target with the mouse at a fixed distance
+  - Added `FreelookCamera.prefab` using the component
+  - Supports the old Input System & `GameInputDelegator`, optionally orbiting only while the right mouse button is held
+  - Draws gizmos for the look-at point, orbit ring & pitch range
+- Added the Universal Animation Library (Standard) to the 3D Character Controller sample for player animations
+  - Added `CharacterAnimationController.controller`, replacing `FigurineAnimationController.controller`
 
 ### Changed
-- 
+- Renamed `3D Character Controller Sample.unity` to `3D Character Controller Samples.unity`
+- Updated `Animated Player.prefab` to use the Universal Animation Library character
+- Updated `3D Character Movement Data.asset` to fit the new character, raising `maxSpeed`, `rideHeight` & `uprightStrength`
+- Doubled the import scale of the Kenny Prototype Kit models to match the new character size
+- Removed the Kenny Prototype Kit `figurine.fbx`
+- Renamed the 3D Character Controller sample `Scripts/Movement` folder to `Scripts/PhysicsMovement`
+  - Moved `CharacterMovement3DDataScriptableObject.cs` into the folder alongside `CharacterController3D.cs` & `Character3DBalancer.cs`
+- Updated `Documentation~/Samples/3d-character-controller.md` with a description, controls, included assets & tuning guide
+  - Replaced `character-controller-3d.gif` with `3d-controller-physics.gif`
+  - Removed the Cinemachine dependency & marked the Game Input sample as optional
+- Removed Cinemachine from the 3D Character Controller sample dependencies in `package.json`, marking the Game Input sample as optional
 
 ### Fixed
-- 
+- Resolved `Draw.Arrow()` logging a `LookRotation` warning when given a zero direction
 
 ## [0.0.11 - preview] - DATE
 

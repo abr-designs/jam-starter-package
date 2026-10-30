@@ -51,7 +51,7 @@
     },
     {      
       "displayName": "3D Character Controller",
-      "description": "<u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a><br>- <a href=\"url\">Cinemachine</a>",
+      "description": "<u>Dependencies:</u><br>- <a href=\"url\">Game Input Sample</a> (optional)",
       "path": "Samples~/3DCharacterController"
     },    
     {

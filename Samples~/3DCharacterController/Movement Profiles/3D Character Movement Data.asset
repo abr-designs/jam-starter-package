@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeb53417138442ce8d5b3efd632a3852, type: 3}
   m_Name: 3D Character Movement Data
   m_EditorClassIdentifier: 
-  maxSpeed: 5
+  maxSpeed: 7
   GroundAcceleration: 100
   AirAcceleration: 40
   accelerationFactorFromDot:
@@ -99,8 +99,8 @@ MonoBehaviour:
   ApexHangTime: 0.04
   JumpBufferTime: 0.125
   JumpCoyoteTime: 0.1
-  rideHeight: 0.5
+  rideHeight: 1.1
   springStrength: 1317.9
   springDamper: 0.1
-  uprightStrength: 70.58
+  uprightStrength: 100
   uprightDamper: 1
