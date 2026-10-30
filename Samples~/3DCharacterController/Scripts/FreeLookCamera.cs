@@ -34,8 +34,8 @@ namespace Samples.Cameras
         private float distance = 6f;
 
         [Header("Orbit")]
-        [SerializeField, Tooltip("Degrees rotated per pixel of mouse movement.")]
-        private float orbitSpeed = 0.2f;
+        [SerializeField, Tooltip("Degrees rotated when the mouse is dragged the full height of the screen. Independent of resolution and pixel density.")]
+        private float orbitSpeed = 200f;
 
         [SerializeField, Tooltip("When enabled, the camera only orbits while the right mouse button is held.")]
         private bool requireRightMouseHeld = true;
@@ -180,20 +180,24 @@ namespace Samples.Cameras
         }
 
         /// <summary>
-        /// Reads mouse movement in screen pixels from whichever input system is active.
+        /// Reads mouse movement as a fraction of the screen height from whichever input system is
+        /// active. Dividing out the pixel count makes the same gesture turn the camera the same amount
+        /// at any resolution or pixel density. Height alone is used so both axes share one scale and
+        /// ultrawide screens don't turn slower horizontally.
         /// </summary>
-        /// <remarks>Created by Claude (claude-opus-5-5) — 2026-10-28</remarks>
+        /// <remarks>Rewritten by Claude (claude-opus-5-5) — 2026-10-30</remarks>
         private static Vector2 GetMouseDelta()
         {
 #if OLD_INPUT_SYSTEM
-            return Input.mousePositionDelta;
+            Vector2 pixelDelta = Input.mousePositionDelta;
 #else
             if (GameInputDelegator.LockInputs)
                 return Vector2.zero;
 
             var pointer = Pointer.current;
-            return pointer == null ? Vector2.zero : pointer.delta.ReadValue();
+            var pixelDelta = pointer == null ? Vector2.zero : pointer.delta.ReadValue();
 #endif
+            return pixelDelta / Screen.height;
         }
 
 #if JAM_INPUT_DELEGATOR

@@ -50,10 +50,12 @@ MonoBehaviour:
   target: {fileID: 0}
   lookAtOffset: {x: 0, y: 0.48, z: 0}
   distance: 3.38
-  orbitSpeed: 0.2
+  orbitSpeed: 200
   requireRightMouseHeld: 0
   minPitch: -30
   maxPitch: 70
+  positionDampTime: 0.1
+  rotationDampTime: 0.05
 --- !u!20 &3401879507246518251
 Camera:
   m_ObjectHideFlags: 0
