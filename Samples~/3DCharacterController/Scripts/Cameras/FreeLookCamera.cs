@@ -20,7 +20,7 @@ namespace Samples.Cameras
     /// </summary>
     /// <remarks>Created by Claude (claude-opus-5-5) — 2026-10-28</remarks>
     [ExecuteAlways]
-    public class FreeLookCamera : MonoBehaviour
+    public class FreeLookCamera : MonoBehaviour, ICameraRig
     {
         [Header("Target")]
         [SerializeField]

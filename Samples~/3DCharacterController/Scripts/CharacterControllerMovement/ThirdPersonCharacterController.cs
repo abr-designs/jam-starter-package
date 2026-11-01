@@ -16,7 +16,7 @@ namespace Samples.CharacterController3D.Scripts
 {
     [RequireComponent(typeof(CharacterController))]
 
-    public class ThirdPersonCharacterController : MonoBehaviour
+    public class ThirdPersonCharacterController : MonoBehaviour, IThirdPersonCharacter
     {
         [Header("References")] [SerializeField]
         private Transform cameraTransform;
@@ -40,6 +40,10 @@ namespace Samples.CharacterController3D.Scripts
 
         public Vector2 MoveInput => m_moveInput;
         public bool IsGrounded => m_characterController.isGrounded;
+        // [Claude 2026-11-01 start]
+        public Vector3 Velocity => m_characterController.velocity;
+        public float MaxSpeed => moveSpeed;
+        // [Claude 2026-11-01 end]
 
         //Unity Functions
         //================================================================================================================//
@@ -173,7 +177,7 @@ namespace Samples.CharacterController3D.Scripts
     /// </summary>
     public void SetMoveInput(Vector2 input)
     {
-        moveInput = Vector2.ClampMagnitude(input, 1f);
+        m_moveInput = Vector2.ClampMagnitude(input, 1f);
     }
 
 #endif

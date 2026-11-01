@@ -2,6 +2,7 @@
 #define OLD_INPUT_SYSTEM
 #endif
 
+using Samples.Cameras; // [Claude 2026-11-01]
 using UnityEngine;
 
 #if JAM_INPUT_DELEGATOR
@@ -12,7 +13,7 @@ using UnityEngine.InputSystem;
 namespace Samples.CharacterController3D.Scripts
 {
     [DefaultExecutionOrder(-100)]
-    public class ThirdPersonCamera : MonoBehaviour
+    public class ThirdPersonCamera : MonoBehaviour, ICameraRig
     {
         [Header("Target")] [SerializeField] private Transform target;
         [SerializeField] private Vector3 localOffset = new Vector3(0f, 1.5f, 0f);

@@ -187,9 +187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 8238868713925122074}
-  characterController3D: {fileID: 7924086738605373563}
-  characterRigidbody: {fileID: 4838430102347522867}
-  characterMovementData: {fileID: 11400000, guid: 3b6fd2528e28c174fb5a1a750157dcfa, type: 2}
+  speedSmoothTime: 0
 --- !u!54 &4838430102347522867 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 3392609588280745930, guid: 344137cc316792d4aac2e1a6a1c15a88, type: 3}
