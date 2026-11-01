@@ -73,7 +73,7 @@ namespace Samples.CharacterController3D.Scripts
         private void Start()
         {
             m_rigidbody = GetComponent<Rigidbody>();
-            m_cameraTransform = Camera.main.transform;
+            //m_cameraTransform = //Camera.main.transform;
 
             m_3dBalancer = GetComponent<Character3DBalancer>();
         }
@@ -105,6 +105,14 @@ namespace Samples.CharacterController3D.Scripts
             GameInput.GameInputDelegator.OnJumpPressed -= OnJumpPressed;
         }
 #endif
+
+        //Public API
+        //================================================================================================================//
+
+        public void SetCameraTransform(Transform cameraTransform)
+        {
+            m_cameraTransform = cameraTransform;
+        }
 
         //Locomotion Functions
         //============================================================================================================//
