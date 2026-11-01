@@ -10,9 +10,13 @@ using Utilities;
 namespace Samples.CharacterController3D.Scripts
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class CharacterController3D : MonoBehaviour
+    public class CharacterController3D : MonoBehaviour, IThirdPersonCharacter
     {
         public bool IsGrounded => m_3dBalancer.Grounded;
+        // [Claude 2026-11-01 start]
+        public Vector3 Velocity => m_rigidbody.linearVelocity;
+        public float MaxSpeed => characterMovementData.maxSpeed;
+        // [Claude 2026-11-01 end]
         
         [SerializeField]
         private CharacterMovement3DDataScriptableObject characterMovementData;
@@ -73,7 +77,7 @@ namespace Samples.CharacterController3D.Scripts
         private void Start()
         {
             m_rigidbody = GetComponent<Rigidbody>();
-            m_cameraTransform = Camera.main.transform;
+            //m_cameraTransform = //Camera.main.transform;
 
             m_3dBalancer = GetComponent<Character3DBalancer>();
         }
@@ -105,6 +109,14 @@ namespace Samples.CharacterController3D.Scripts
             GameInput.GameInputDelegator.OnJumpPressed -= OnJumpPressed;
         }
 #endif
+
+        //Public API
+        //================================================================================================================//
+
+        public void SetCameraTransform(Transform cameraTransform)
+        {
+            m_cameraTransform = cameraTransform;
+        }
 
         //Locomotion Functions
         //============================================================================================================//

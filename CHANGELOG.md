@@ -9,23 +9,42 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `FreeLookCamera.cs` to the 3D Character Controller sample, orbiting a target with the mouse at a fixed distance
-  - Added `FreelookCamera.prefab` using the component
+  - Added `Cameras/Orbit_Camera.prefab` using the component
   - Supports the old Input System & `GameInputDelegator`, optionally orbiting only while the right mouse button is held
   - Draws gizmos for the look-at point, orbit ring & pitch range
+- Added `ThirdPersonCamera.cs` to the 3D Character Controller sample as an over-the-shoulder camera
+  - Added `Cameras/Shoulder_Camera.prefab` using the component
+- Added `ThirdPersonCharacterController.cs` to the 3D Character Controller sample, a classic `CharacterController` based alternative to the physics controller
+  - Added `Characters/ClassicCharacterController.prefab` using the component
+- Added `ControllerSelector.cs` & on-screen buttons to the 3D Character Controller sample to swap character & camera at runtime
+  - Works from assigned character & camera GameObject arrays using `SelectCharacter()` & `SelectCamera()`
+  - Added `startCharacterIndex` & `startCameraIndex` to set the starting pair
+- Added `IThirdPersonCharacter.cs` & `ICameraRig.cs` to the 3D Character Controller sample so animation & selection work with any controller or camera
+  - `CharacterController3D.cs` & `ThirdPersonCharacterController.cs` implement `IThirdPersonCharacter`
+  - `FreeLookCamera.cs` & `ThirdPersonCamera.cs` implement `ICameraRig`
 - Added the Universal Animation Library (Standard) to the 3D Character Controller sample for player animations
   - Added `CharacterAnimationController.controller`, replacing `FigurineAnimationController.controller`
 
 ### Changed
 - Renamed `3D Character Controller Sample.unity` to `3D Character Controller Samples.unity`
-- Updated `Animated Player.prefab` to use the Universal Animation Library character
-- Updated `3D Character Movement Data.asset` to fit the new character, raising `maxSpeed`, `rideHeight` & `uprightStrength`
+- Renamed `Animated Player.prefab` to `Characters/SpringCharacterController.prefab`, using the Universal Animation Library character
+  - Moved `PlayerCapsule.prefab` into `Prefabs/Characters`
+  - Moved `LockPlayerMouse` from the prefab into the scene
+- Renamed `3D Character Movement Data.asset` to `Spring Character Movement Data.asset`, raising `maxSpeed`, `rideHeight` & `uprightStrength` to fit the new character
 - Doubled the import scale of the Kenny Prototype Kit models to match the new character size
+  - Resized scene trigger colliders to match
+- Changed `KennyPrototypeKit.mat` to use the URP Simple Lit shader
 - Removed the Kenny Prototype Kit `figurine.fbx`
 - Renamed the 3D Character Controller sample `Scripts/Movement` folder to `Scripts/PhysicsMovement`
   - Moved `CharacterMovement3DDataScriptableObject.cs` into the folder alongside `CharacterController3D.cs` & `Character3DBalancer.cs`
+- Moved 3D Character Controller sample cameras into `Scripts/Cameras` & helpers into `Scripts/Utilities`
+- Changed `CharacterAnimationController.cs` to animate any `IThirdPersonCharacter`, moving it from `Scripts/PhysicsMovement` to `Scripts`
+  - Drives `Speed` from character velocity using `speedSmoothTime` easing, scaling linearly with speed
+- Added `CharacterController3D.SetCameraTransform()`, replacing the `Camera.main` lookup
 - Updated `Documentation~/Samples/3d-character-controller.md` with a description, controls, included assets & tuning guide
   - Replaced `character-controller-3d.gif` with `3d-controller-physics.gif`
   - Removed the Cinemachine dependency & marked the Game Input sample as optional
+  - Added the Classic character, both cameras, on-screen swapping & adding your own character or camera
 - Removed Cinemachine from the 3D Character Controller sample dependencies in `package.json`, marking the Game Input sample as optional
 
 ### Fixed
