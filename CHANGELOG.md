@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated `Documentation~/Samples/3d-character-controller.md` with a description, controls, included assets & tuning guide
   - Replaced `character-controller-3d.gif` with `3d-controller-physics.gif`
   - Removed the Cinemachine dependency & marked the Game Input sample as optional
+  - Added the Classic character, both cameras, on-screen swapping & adding your own character or camera
 - Removed Cinemachine from the 3D Character Controller sample dependencies in `package.json`, marking the Game Input sample as optional
 
 ### Fixed
