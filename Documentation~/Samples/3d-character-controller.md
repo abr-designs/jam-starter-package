@@ -40,13 +40,10 @@ Both characters move relative to the camera, so "forward" is always the directio
 ## What's Included
 - **Spring Character Controller**: the physics character, using the [Universal Animation Library](https://quaternius.itch.io/universal-animation-library) model & animations
 - **Classic Character Controller**: the `CharacterController` based character, using the same model & animations
-- **Player Capsule**: a plain capsule version of the Spring character, useful for testing without animations
 - **Orbit Camera** & **Shoulder Camera**: drop either in a scene & point it at any object to follow
 - **Spring Character Movement Data**: a settings file holding every Spring character movement value, so the feel can be tuned without touching code
-- **Controller Selector**: the on-screen buttons that swap the active character & camera
-- **Test level**: built from the [Kenney Prototype Kit](https://kenney.nl/assets/prototype-kit), with stairs, slopes, walls & crates to try the movement on
 
-## Tuning the Feel
+## Tuning 
 
 ### Spring Character
 Select `Spring Character Movement Data` in the Project window to change how the character moves. Changes apply while the game is running.
